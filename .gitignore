@@ -36,8 +36,8 @@ env/
 *.swo
 *~
 
-# Output files
-igme_tourist_values.csv
+# Output files (commented out so viewer can use CSV)
+# igme_tourist_values.csv
 igme_tourist_values.kml
 
 # OS

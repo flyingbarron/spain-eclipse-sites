@@ -1,6 +1,6 @@
-# IGME Tourist Value Scraper
+# IGME Tourist Value Scraper & Viewer
 
-A Python web scraper that extracts tourist value (Valor Turístico) data and geographic coordinates from the Spanish Geological Survey (IGME) IELIG database for geological sites. Generates both CSV and KML outputs for data analysis and map visualization.
+A Python web scraper that extracts tourist value (Valor Turístico) data and geographic coordinates from the Spanish Geological Survey (IGME) IELIG database for geological sites. Generates both CSV and KML outputs for data analysis and map visualization, plus an interactive HTML viewer to browse sites and their images.
 
 ## Overview
 
@@ -106,6 +106,33 @@ The script will:
 5. Save results to `igme_tourist_values.csv`
 6. Generate color-coded KML file `igme_tourist_values.kml`
 7. Display a summary of the scraping operation
+
+## Interactive Viewer
+
+After scraping, you can view the results in an interactive web interface:
+
+### Using the Viewer
+
+1. Open `viewer.html` in your web browser
+2. The viewer will automatically load data from `igme_tourist_values.csv`
+3. Browse sites in the left sidebar
+4. Click on any site to view:
+   - Site details (code, name, tourist value, privacy status, coordinates)
+   - Images from the IGME website
+   - Direct link to the original IGME page
+
+### Viewer Features
+
+- **Search functionality**: Filter sites by code or name
+- **Color-coded badges**: Visual indicators for tourist value and privacy status
+- **Image gallery**: Automatically extracts and displays images from site pages
+- **Full-screen images**: Click any image to view it in full size
+- **Responsive design**: Works on desktop and mobile devices
+- **Direct links**: Quick access to original IGME pages
+
+### Note on Images
+
+The viewer attempts to load images from IGME pages using a CORS proxy. If images fail to load due to network restrictions, you can click the "View on IGME Website" button to see them on the original site.
 
 ### Sample Output
 
@@ -256,8 +283,9 @@ scrape_igme/
 ├── README.md               # This file
 ├── requirements.txt        # Python dependencies
 ├── scrape_igme_sites.py   # Main scraper script
-├── igme_tourist_values.csv # Generated output (not tracked)
-└── igme_tourist_values.kml # Generated output (not tracked)
+├── viewer.html             # Interactive web viewer
+├── igme_tourist_values.csv # Generated CSV output
+└── igme_tourist_values.kml # Generated KML output (not tracked)
 ```
 
 ### Contributing
