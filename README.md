@@ -113,10 +113,28 @@ After scraping, you can view the results in an interactive web interface:
 
 ### Using the Viewer
 
-1. Open `viewer.html` in your web browser
-2. The viewer will automatically load data from `igme_tourist_values.csv`
-3. Browse sites in the left sidebar
-4. Click on any site to view:
+**Option 1: Using the Python Server (Recommended)**
+
+Run the included server script:
+
+```bash
+python3 serve_viewer.py
+```
+
+This will:
+- Start a local web server on port 8000
+- Automatically open the viewer in your default browser
+- Avoid CORS issues when loading the CSV file
+
+**Option 2: Direct File Access**
+
+If your browser allows local file access, you can open `viewer.html` directly. However, some browsers block loading local CSV files due to CORS restrictions.
+
+### What You'll See
+
+1. The viewer automatically loads data from `igme_tourist_values.csv`
+2. Browse sites in the left sidebar
+3. Click on any site to view:
    - Site details (code, name, tourist value, privacy status, coordinates)
    - Images from the IGME website
    - Direct link to the original IGME page
@@ -284,6 +302,7 @@ scrape_igme/
 ├── requirements.txt        # Python dependencies
 ├── scrape_igme_sites.py   # Main scraper script
 ├── viewer.html             # Interactive web viewer
+├── serve_viewer.py         # Local server for viewer
 ├── igme_tourist_values.csv # Generated CSV output
 └── igme_tourist_values.kml # Generated KML output (not tracked)
 ```
