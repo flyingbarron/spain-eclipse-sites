@@ -150,8 +150,9 @@ If your browser allows local file access, you can open `viewer.html` directly. H
   - Press ESC to close
   - Image counter shows current position (e.g., "3 / 8")
 - **Google Maps integration**: Direct link to view site location on Google Maps
+- **Shademap.app integration**: View sun/shadow patterns at the site location
 - **Responsive design**: Works on desktop and mobile devices
-- **Direct links**: Quick access to original IGME pages
+- **Direct links**: Quick access to original IGME pages and mapping services
 
 ### Note on Images
 

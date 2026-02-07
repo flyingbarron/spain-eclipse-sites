@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IGME Sites Viewer</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <style>
         * {
             margin: 0;
@@ -260,6 +261,14 @@
             background: #218838;
         }
 
+        .link-button.shademap {
+            background: #fd7e14;
+        }
+
+        .link-button.shademap:hover {
+            background: #e8590c;
+        }
+
         /* Modal for full-size images */
         .modal {
             display: none;
@@ -460,6 +469,13 @@
             
             const mapsUrl = `https://www.google.com/maps?q=${site.latitude},${site.longitude}`;
             
+            // Generate Shademap.app URL with site coordinates
+            const lat = parseFloat(site.latitude);
+            const lon = parseFloat(site.longitude);
+            const coordsBase64 = btoa(`${lat}, ${lon}`);
+            const timestamp = Date.now();
+            const shademapUrl = `https://shademap.app/@${lat},${lon},17z,${timestamp}t,0b,0p,0m!${timestamp - 47296769}!${timestamp + 3787457},${coordsBase64}!${lat}!${lon}`;
+            
             content.innerHTML = `
                 <div class="site-details">
                     <div class="detail-header">
@@ -467,6 +483,7 @@
                         <div>
                             <a href="${site.url}" target="_blank" class="link-button">View on IGME Website →</a>
                             <a href="${mapsUrl}" target="_blank" class="link-button maps">📍 Open in Google Maps</a>
+                            <a href="${shademapUrl}" target="_blank" class="link-button shademap">🌄 View on Shademap</a>
                         </div>
                     </div>
 
