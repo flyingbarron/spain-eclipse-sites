@@ -151,6 +151,7 @@ If your browser allows local file access, you can open `viewer.html` directly. H
   - Image counter shows current position (e.g., "3 / 8")
 - **Google Maps integration**: Direct link to view site location on Google Maps
 - **Shademap.app integration**: View sun/shadow patterns at the site location
+- **Eclipse 2026 visualizer**: IGN's eclipse viewer for the 2026 solar eclipse
 - **Responsive design**: Works on desktop and mobile devices
 - **Direct links**: Quick access to original IGME pages and mapping services
 

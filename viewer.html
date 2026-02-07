@@ -269,6 +269,14 @@
             background: #e8590c;
         }
 
+        .link-button.eclipse {
+            background: #6f42c1;
+        }
+
+        .link-button.eclipse:hover {
+            background: #5a32a3;
+        }
+
         /* Modal for full-size images */
         .modal {
             display: none;
@@ -476,6 +484,9 @@
             const coordsBase64 = btoa(`${lat}, ${lon}`);
             const shademapUrl = `https://shademap.app/@${lat},${lon},17z,1786559455614t,0b,0p,0m!1786512158844!1786563246912,${coordsBase64}!${lat}!${lon}`;
             
+            // Generate IGN Eclipse 2026 visualizer URL
+            const eclipseUrl = `https://visualizadores.ign.es/eclipses/2026?lat=${lat}&lon=${lon}`;
+            
             content.innerHTML = `
                 <div class="site-details">
                     <div class="detail-header">
@@ -484,6 +495,7 @@
                             <a href="${site.url}" target="_blank" class="link-button">View on IGME Website →</a>
                             <a href="${mapsUrl}" target="_blank" class="link-button maps">📍 Open in Google Maps</a>
                             <a href="${shademapUrl}" target="_blank" class="link-button shademap">🌄 View on Shademap</a>
+                            <a href="${eclipseUrl}" target="_blank" class="link-button eclipse">🌑 Eclipse 2026 View</a>
                         </div>
                     </div>
 
