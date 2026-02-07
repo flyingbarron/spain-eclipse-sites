@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IGME Sites Viewer</title>
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <title>Spain Eclipse Site Viewer</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦕</text></svg>">
     <style>
         * {
             margin: 0;
@@ -99,33 +99,49 @@
             font-size: 0.75rem;
             display: inline-block;
             padding: 0.2rem 0.5rem;
+            border-radius: 3px;
             background: #28a745;
             color: white;
-            border-radius: 3px;
-            margin-right: 0.5rem;
-        }
-
-        .site-item.active .site-value {
-            background: rgba(255,255,255,0.2);
+            margin-right: 0.25rem;
         }
 
         .site-privacy {
             font-size: 0.75rem;
             display: inline-block;
             padding: 0.2rem 0.5rem;
+            border-radius: 3px;
             background: #6c757d;
             color: white;
-            border-radius: 3px;
         }
 
-        .site-item.active .site-privacy {
-            background: rgba(255,255,255,0.2);
+        .site-eclipse {
+            font-size: 0.75rem;
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            margin-left: 0.25rem;
+        }
+
+        .site-eclipse.visible {
+            background: #6f42c1;
+            color: white;
+        }
+
+        .site-eclipse.not-visible {
+            background: #dc3545;
+            color: white;
+        }
+
+        .site-eclipse.unknown {
+            background: #ffc107;
+            color: #000;
         }
 
         .content {
             flex: 1;
             overflow-y: auto;
             padding: 2rem;
+            background: white;
         }
 
         .loading {
@@ -136,7 +152,6 @@
 
         .site-details {
             max-width: 1200px;
-            margin: 0 auto;
         }
 
         .detail-header {
@@ -146,30 +161,30 @@
         }
 
         .detail-header h2 {
-            font-size: 1.75rem;
-            margin-bottom: 0.5rem;
+            font-size: 2rem;
             color: #2c3e50;
+            margin-bottom: 1rem;
         }
 
         .detail-info {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .info-item {
-            background: #f8f9fa;
             padding: 1rem;
+            background: #f8f9fa;
             border-radius: 4px;
         }
 
         .info-label {
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             color: #6c757d;
+            margin-bottom: 0.5rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 0.25rem;
         }
 
         .info-value {
@@ -277,7 +292,51 @@
             background: #5a32a3;
         }
 
-        /* Modal for full-size images */
+        .eclipse-profile-thumbnail {
+            height: 120px;
+            border: 2px solid #6f42c1;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .eclipse-profile-thumbnail:hover {
+            border-color: #5a32a3;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .eclipse-profile-overlay {
+            display: none;
+            position: absolute;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            border: 3px solid #6f42c1;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            background: white;
+            padding: 4px;
+            pointer-events: none;
+        }
+
+        .eclipse-profile-overlay img {
+            display: block;
+            border-radius: 4px;
+            max-width: 600px;
+            height: auto;
+        }
+
+        .eclipse-profile-thumbnail:hover + .eclipse-profile-overlay {
+            display: block;
+        }
+
+        .eclipse-profile-overlay:hover {
+            display: block;
+        }
+
+        /* Modal styles */
         .modal {
             display: none;
             position: fixed;
@@ -286,33 +345,32 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.9);
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal.active {
-            display: flex;
+            background-color: rgba(0,0,0,0.9);
         }
 
         .modal-content {
+            margin: auto;
+            display: block;
             max-width: 90%;
             max-height: 90%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         .modal-close {
             position: absolute;
-            top: 20px;
-            right: 40px;
-            color: white;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
             font-size: 40px;
             font-weight: bold;
             cursor: pointer;
-            z-index: 1001;
         }
 
         .modal-close:hover {
-            color: #ccc;
+            color: #bbb;
         }
 
         .modal-nav {
@@ -320,27 +378,23 @@
             top: 50%;
             transform: translateY(-50%);
             color: white;
-            font-size: 50px;
+            font-size: 40px;
             font-weight: bold;
             cursor: pointer;
-            padding: 1rem;
+            padding: 16px;
             user-select: none;
-            z-index: 1001;
-            background: rgba(0,0,0,0.5);
-            border-radius: 4px;
-            transition: background 0.2s;
         }
 
         .modal-nav:hover {
-            background: rgba(0,0,0,0.8);
+            background-color: rgba(0,0,0,0.8);
         }
 
         .modal-nav.prev {
-            left: 20px;
+            left: 0;
         }
 
         .modal-nav.next {
-            right: 20px;
+            right: 0;
         }
 
         .modal-counter {
@@ -349,21 +403,53 @@
             left: 50%;
             transform: translateX(-50%);
             color: white;
-            background: rgba(0,0,0,0.7);
-            padding: 0.5rem 1rem;
+            font-size: 18px;
+            background-color: rgba(0,0,0,0.7);
+            padding: 8px 16px;
             border-radius: 4px;
-            font-size: 0.9rem;
+        }
+
+        footer {
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            padding: 1rem 2rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>🗺️ IGME Sites Viewer</h1>
+        <h1>🦕 Spain Eclipse Site Viewer</h1>
     </header>
 
     <div class="container">
         <aside class="sidebar">
             <input type="text" class="search-box" id="searchBox" placeholder="Search sites...">
+            <div style="padding: 0.5rem 0; margin-bottom: 0.5rem; border-bottom: 1px solid #dee2e6;">
+                <label style="display: flex; align-items: center; cursor: pointer; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                    <input type="checkbox" id="eclipseFilter" style="margin-right: 0.5rem; cursor: pointer;">
+                    <span>🌑 Show only eclipse-visible sites</span>
+                </label>
+                <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
+                    <label for="sortBy" style="font-weight: 500;">Sort by:</label>
+                    <select id="sortBy" style="flex: 1; padding: 0.4rem; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.85rem; cursor: pointer;">
+                        <option value="code">Code</option>
+                        <option value="name">Name</option>
+                        <option value="tourist_value">Tourist Value</option>
+                    </select>
+                </div>
+            </div>
             <ul class="site-list" id="siteList">
                 <li class="loading">Loading sites...</li>
             </ul>
@@ -375,6 +461,17 @@
             </div>
         </main>
     </div>
+
+    <footer>
+        <p>
+            Data sources: 
+            <a href="https://info.igme.es/ielig/" target="_blank">IGME IELIG Database</a> (Instituto Geológico y Minero de España) • 
+            <a href="https://visualizadores.ign.es/eclipses/2026" target="_blank">IGN Eclipse 2026 Viewer</a> (Instituto Geográfico Nacional)
+        </p>
+        <p style="margin-top: 0.5rem; font-size: 0.8rem;">
+            Made with Bob 🤖
+        </p>
+    </footer>
 
     <!-- Modal for full-size images -->
     <div class="modal" id="imageModal">
@@ -394,65 +491,112 @@
         // Load CSV file
         async function loadCSV() {
             try {
-                const response = await fetch('igme_tourist_values.csv');
+                const response = await fetch('data/eclipse_site_data.csv');
                 const text = await response.text();
-                parseSites(text);
+                
+                parseCSV(text);
+                displaySites(sitesData);
             } catch (error) {
-                document.getElementById('siteList').innerHTML = 
-                    '<li class="error">Error loading CSV file. Make sure igme_tourist_values.csv is in the same directory.</li>';
+                document.getElementById('siteList').innerHTML = '<li class="error">Error loading data. Please make sure the CSV file exists.</li>';
+                console.error('Error loading CSV:', error);
             }
         }
 
-        // Parse CSV data
-        function parseSites(csvText) {
-            const lines = csvText.split('\n');
+        // Parse CSV
+        function parseCSV(text) {
+            const lines = text.trim().split('\n');
             const headers = lines[0].split(',');
             
-            sitesData = lines.slice(1)
-                .filter(line => line.trim())
-                .map(line => {
-                    const values = line.split(',');
-                    const site = {};
-                    headers.forEach((header, index) => {
-                        site[header.trim()] = values[index] ? values[index].trim() : '';
-                    });
-                    return site;
-                })
-                .filter(site => site.code && site.status === 'success');
-
-            displaySites(sitesData);
+            sitesData = lines.slice(1).map(line => {
+                const values = line.split(',');
+                const site = {};
+                headers.forEach((header, index) => {
+                    site[header.trim()] = values[index] ? values[index].trim() : '';
+                });
+                return site;
+            });
         }
 
         // Display sites in sidebar
         function displaySites(sites) {
-            const siteList = document.getElementById('siteList');
+            const list = document.getElementById('siteList');
             
             if (sites.length === 0) {
-                siteList.innerHTML = '<li class="loading">No sites found</li>';
+                list.innerHTML = '<li class="loading">No sites found</li>';
                 return;
             }
-
-            siteList.innerHTML = sites.map(site => `
-                <li class="site-item" data-code="${site.code}" onclick="selectSite('${site.code}')">
-                    <div class="site-code">${site.code}</div>
-                    <div class="site-name">${site.denominacion || 'N/A'}</div>
-                    <div>
-                        <span class="site-value">VT: ${site.valor_turistico}</span>
-                        <span class="site-privacy">${site.confidencialidad}</span>
-                    </div>
-                </li>
-            `).join('');
+            
+            list.innerHTML = sites.map(site => {
+                let eclipseLabel = '';
+                let eclipseClass = 'unknown';
+                let eclipseText = '';
+                
+                if (site.eclipse_visibility === 'visible') {
+                    eclipseClass = 'visible';
+                    eclipseText = '🌑 Visible';
+                } else if (site.eclipse_visibility === 'not_visible') {
+                    eclipseClass = 'not-visible';
+                    eclipseText = '🌑 Not visible';
+                } else if (site.eclipse_visibility && site.eclipse_visibility !== 'unknown') {
+                    eclipseClass = 'unknown';
+                    eclipseText = '🌑 ' + site.eclipse_visibility;
+                }
+                
+                if (eclipseText) {
+                    eclipseLabel = `<span class="site-eclipse ${eclipseClass}">${eclipseText}</span>`;
+                }
+                
+                return `
+                    <li class="site-item" data-code="${site.code}" onclick="selectSite('${site.code}')">
+                        <div class="site-code">${site.code}</div>
+                        <div class="site-name">${site.denominacion || 'N/A'}</div>
+                        <div>
+                            <span class="site-value">VT: ${site.valor_turistico}</span>
+                            <span class="site-privacy">${site.confidencialidad}</span>
+                            ${eclipseLabel}
+                        </div>
+                    </li>
+                `;
+            }).join('');
         }
 
-        // Search functionality
-        document.getElementById('searchBox').addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const filtered = sitesData.filter(site => 
-                site.code.toLowerCase().includes(searchTerm) ||
-                (site.denominacion && site.denominacion.toLowerCase().includes(searchTerm))
-            );
+        // Filter and sort sites
+        function filterSites() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            const eclipseFilter = document.getElementById('eclipseFilter').checked;
+            const sortBy = document.getElementById('sortBy').value;
+            
+            let filtered = sitesData.filter(site => {
+                const matchesSearch = site.code.toLowerCase().includes(searchTerm) ||
+                    (site.denominacion && site.denominacion.toLowerCase().includes(searchTerm));
+                
+                const matchesEclipse = !eclipseFilter || site.eclipse_visibility === 'visible';
+                
+                return matchesSearch && matchesEclipse;
+            });
+            
+            // Sort
+            filtered.sort((a, b) => {
+                if (sortBy === 'name') {
+                    const nameA = (a.denominacion || a.code).toLowerCase();
+                    const nameB = (b.denominacion || b.code).toLowerCase();
+                    return nameA.localeCompare(nameB);
+                } else if (sortBy === 'tourist_value') {
+                    const valA = parseFloat(a.valor_turistico) || 0;
+                    const valB = parseFloat(b.valor_turistico) || 0;
+                    return valB - valA;
+                } else {
+                    return a.code.localeCompare(b.code);
+                }
+            });
+            
             displaySites(filtered);
-        });
+        }
+
+        // Event listeners
+        document.getElementById('searchBox').addEventListener('input', filterSites);
+        document.getElementById('eclipseFilter').addEventListener('change', filterSites);
+        document.getElementById('sortBy').addEventListener('change', filterSites);
 
         // Select a site
         function selectSite(code) {
@@ -471,36 +615,44 @@
             displaySiteDetails(site);
         }
 
-        // Display site details and load images
+        // Display site details
         async function displaySiteDetails(site) {
             const content = document.getElementById('content');
             
             const mapsUrl = `https://www.google.com/maps?q=${site.latitude},${site.longitude}`;
             
-            // Generate Shademap.app URL with site coordinates
-            // Fixed timestamp for August 12th, 20:30 local time in Spain
             const lat = parseFloat(site.latitude);
             const lon = parseFloat(site.longitude);
             const coordsBase64 = btoa(`${lat}, ${lon}`);
             const shademapUrl = `https://shademap.app/@${lat},${lon},17z,1786559455614t,0b,0p,0m!1786512158844!1786563246912,${coordsBase64}!${lat}!${lon}`;
             
-            // Generate IGN Eclipse 2026 visualizer URL
-            // Convert WGS84 (lat/lon) to Web Mercator (EPSG:3857)
             const x = lon * 20037508.34 / 180;
             const y = Math.log(Math.tan((90 + lat) * Math.PI / 360)) / (Math.PI / 180);
             const yMercator = y * 20037508.34 / 180;
             
-            const eclipseUrl = `https://visualizadores.ign.es/eclipses/2026?center=${x},${yMercator}&zoom=16&srs=EPSG:3857&layers=GeoJSON*Oscurecimiento_0*https%3A%2F%2Fwww.ign.es%2Fweb%2Fresources%2Fviewer%2Feclipses%2Foscurez_estandard_2026.geojson*false*eyJwYXJhbWV0ZXJzIjpbeyJwb2x5Z29uIjp7ImZpbGwiOnsiY29sb3IiOiJ7e2Z9fWZ1bmN0aW9uKGUpe3ZhciByPWUuZ2V0QXR0cmlidXRlKFwiT3NjdXJlY2ltaWVudG9cIik7bGV0IGk9MjAyNT09PXQuZGF0ZS5zdWJzdHJpbmcoMCw0KT9FOkE7Zm9yKGxldCBlPTA7ZTxpLmxlbmd0aC0xO2UrKylpZihyPj1pW2VdWzBdJiZyPGlbZSsxXVswXSlyZXR1cm4gaVtlXVsxXTtyZXR1cm4gaS5hdCgtMSlbMV19Iiwib3BhY2l0eSI6MC40fSwic3Ryb2tlIjp7Im9wYWNpdHkiOjB9fSwicG9pbnQiOnsicmFkaXVzIjo1fX1dLCJkZXNlcmlhbGl6ZWRNZXRob2QiOiIoKHNlcmlhbGl6ZWRQYXJhbWV0ZXJzKSA9PiBJREVFLnN0eWxlLlNpbXBsZS5kZXNlcmlhbGl6ZShzZXJpYWxpemVkUGFyYW1ldGVycywgJ0lERUUuc3R5bGUuR2VuZXJpYycpKSJ9,GeoJSON*Duracion_0*https%3A%2F%2Fwww.ign.es%2Fweb%2Fresources%2Fviewer%2Feclipses%2Fdurtot_estandard_2026.geojson*false*eyJwYXJhbWV0ZXJzIjpbeyJwb2x5Z29uIjp7InN0cm9rZSI6eyJjb2xvciI6IndoaXRlIiwid2lkdGgiOjAuNX0sImxhYmVsIjp7InRleHQiOiJ7e2Z9fWZ1bmN0aW9uKGUpe3JldHVybiB2b2lkIDAhPT1lLmdldEF0dHJpYnV0ZShcIkR1cmFjaW9uVG90YWxTZWdcIik/YCR7ZS5nZXRBdHRyaWJ1dGUoXCJEdXJhY2lvblRvdGFsU2VnXCIpfXNgOmAke2UuZ2V0QXR0cmlidXRlKFwiRHVyYWNpb25BbnVsYXJTZWdcIil9c2B9IiwiZm9udCI6ImJvbGQgMTJweCBDb3VyaWVyIE5ldyIsImNvbG9yIjoid2hpdGUiLCJzY2FsZSI6MC45fX0sInBvaW50Ijp7InJhZGl1cyI6NX19XSwiZGVzZXJpYWxpemVkTWV0aG9kIjoiKChzZXJpYWxpemVkUGFyYW1ldGVycykgPT4gSURFRS5zdHlsZS5TaW1wbGUuZGVzZXJpYWxpemUoc2VyaWFsaXplZFBhcmFtZXRlcnMsICdJREVFLnN0eWxlLkdlbmVyaWMnKSkifQ==`;
+            const eclipseUrl = `https://visualizadores.ign.es/eclipses/2026?center=${x},${yMercator}&zoom=16&srs=EPSG:3857`;
             
             content.innerHTML = `
                 <div class="site-details">
                     <div class="detail-header">
                         <h2>${site.denominacion || site.code}</h2>
-                        <div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                             <a href="${site.url}" target="_blank" class="link-button">View on IGME Website →</a>
                             <a href="${mapsUrl}" target="_blank" class="link-button maps">📍 Open in Google Maps</a>
                             <a href="${shademapUrl}" target="_blank" class="link-button shademap">🌄 View on Shademap</a>
                             <a href="${eclipseUrl}" target="_blank" class="link-button eclipse">🌑 Eclipse 2026 View</a>
+                            <div style="position: relative; display: inline-block;">
+                                <img src="data/eclipse_profiles/${site.code}_profile.png"
+                                     alt="Eclipse visibility profile for ${site.code}"
+                                     class="eclipse-profile-thumbnail"
+                                     onclick="window.open('data/eclipse_profiles/${site.code}_profile.png', '_blank')"
+                                     onerror="this.parentElement.style.display='none'"
+                                     title="Hover to preview, click to open full-size">
+                                <div class="eclipse-profile-overlay">
+                                    <img src="data/eclipse_profiles/${site.code}_profile.png"
+                                         alt="Eclipse visibility profile for ${site.code}">
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -521,141 +673,112 @@
                             <div class="info-label">Coordinates</div>
                             <div class="info-value">${site.latitude}, ${site.longitude}</div>
                         </div>
+                        ${site.eclipse_visibility ? `
+                        <div class="info-item">
+                            <div class="info-label">Eclipse 2026 Visibility</div>
+                            <div class="info-value" style="color: ${
+                                site.eclipse_visibility === 'visible' ? '#6f42c1' :
+                                site.eclipse_visibility === 'not_visible' ? '#dc3545' : '#ffc107'
+                            }">
+                                ${site.eclipse_visibility === 'visible' ? '🌑 Visible' :
+                                  site.eclipse_visibility === 'not_visible' ? '🌑 Not Visible' :
+                                  '🌑 ' + site.eclipse_visibility}
+                            </div>
+                        </div>
+                        ` : ''}
                     </div>
 
                     <div class="images-section">
                         <h3>📷 Images</h3>
-                        <div class="images-grid" id="imagesGrid">
-                            <div class="loading">Loading images...</div>
+                        <div id="imagesContainer" class="images-grid">
+                            <div class="loading">Loading images from IGME...</div>
                         </div>
                     </div>
                 </div>
             `;
-
-            // Load images from the site URL
-            await loadSiteImages(site.url);
+            
+            // Load images from IGME
+            loadSiteImages(site);
         }
-
-        // Load images from site URL
-        async function loadSiteImages(url) {
-            const imagesGrid = document.getElementById('imagesGrid');
+        
+        // Load images from IGME website
+        async function loadSiteImages(site) {
+            const container = document.getElementById('imagesContainer');
             
             try {
-                // Use a CORS proxy to fetch the page
-                const proxyUrl = 'https://api.allorigins.win/raw?url=';
-                const response = await fetch(proxyUrl + encodeURIComponent(url));
-                const html = await response.text();
+                const response = await fetch(`/api/images?url=${encodeURIComponent(site.url)}`);
+                const data = await response.json();
                 
-                // Parse HTML to find images
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const images = doc.querySelectorAll('img');
-                
-                // Filter and collect image URLs
-                const imageUrls = Array.from(images)
-                    .map(img => img.src)
-                    .filter(src => src &&
-                        !src.includes('spacer') &&
-                        !src.includes('icon') &&
-                        !src.includes('bocetoGris.gif'))
-                    .map(src => {
-                        // Convert relative URLs to absolute
-                        if (src.startsWith('http')) return src;
-                        const baseUrl = new URL(url);
-                        return new URL(src, baseUrl.origin).href;
-                    });
-
-                if (imageUrls.length === 0) {
-                    imagesGrid.innerHTML = '<div class="no-images">No images found for this site</div>';
-                    currentImages = [];
-                    return;
+                if (data.images && data.images.length > 0) {
+                    currentImages = data.images.map(img => `/api/proxy-image?url=${encodeURIComponent(img.src)}`);
+                    
+                    container.innerHTML = data.images.map((img, index) => `
+                        <div class="image-card">
+                            <img src="/api/proxy-image?url=${encodeURIComponent(img.src)}"
+                                 alt="${img.alt}"
+                                 onclick="openModal(${index})"
+                                 onerror="this.parentElement.style.display='none'">
+                            <div class="image-caption">${img.alt}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<div class="no-images">No images found for this site</div>';
                 }
-
-                // Store images for carousel
-                currentImages = imageUrls;
-
-                // Display images
-                imagesGrid.innerHTML = imageUrls.map((imgUrl, index) => `
-                    <div class="image-card">
-                        <img src="${imgUrl}" alt="Site image ${index + 1}" onclick="openModal(${index})"
-                             onerror="this.parentElement.style.display='none'">
-                        <div class="image-caption">Image ${index + 1}</div>
-                    </div>
-                `).join('');
-
             } catch (error) {
-                imagesGrid.innerHTML = `
-                    <div class="error">
-                        Unable to load images. This may be due to CORS restrictions or network issues.
-                        <br><br>
-                        <a href="${url}" target="_blank" class="link-button">View images on IGME website →</a>
-                    </div>
-                `;
+                console.error('Error loading images:', error);
+                container.innerHTML = '<div class="no-images">Error loading images. Please try again later.</div>';
             }
         }
-
-        // Modal functionality
+        
+        // Modal functions
         function openModal(index) {
-            if (currentImages.length === 0) return;
-            
             currentImageIndex = index;
             const modal = document.getElementById('imageModal');
             const modalImg = document.getElementById('modalImage');
             const counter = document.getElementById('modalCounter');
             
-            modal.classList.add('active');
+            modal.style.display = 'block';
             modalImg.src = currentImages[currentImageIndex];
             counter.textContent = `${currentImageIndex + 1} / ${currentImages.length}`;
-            
-            // Show/hide navigation arrows
-            document.getElementById('modalPrev').style.display = currentImages.length > 1 ? 'block' : 'none';
-            document.getElementById('modalNext').style.display = currentImages.length > 1 ? 'block' : 'none';
         }
-
-        function showPrevImage() {
-            if (currentImages.length === 0) return;
-            currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
-            document.getElementById('modalImage').src = currentImages[currentImageIndex];
-            document.getElementById('modalCounter').textContent = `${currentImageIndex + 1} / ${currentImages.length}`;
+        
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
         }
-
-        function showNextImage() {
-            if (currentImages.length === 0) return;
+        
+        function nextImage() {
             currentImageIndex = (currentImageIndex + 1) % currentImages.length;
             document.getElementById('modalImage').src = currentImages[currentImageIndex];
             document.getElementById('modalCounter').textContent = `${currentImageIndex + 1} / ${currentImages.length}`;
         }
-
-        function closeModal() {
-            document.getElementById('imageModal').classList.remove('active');
+        
+        function prevImage() {
+            currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
+            document.getElementById('modalImage').src = currentImages[currentImageIndex];
+            document.getElementById('modalCounter').textContent = `${currentImageIndex + 1} / ${currentImages.length}`;
         }
-
+        
         // Modal event listeners
-        document.getElementById('modalClose').onclick = closeModal;
-        document.getElementById('modalPrev').onclick = showPrevImage;
-        document.getElementById('modalNext').onclick = showNextImage;
-
-        document.getElementById('imageModal').onclick = function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
-        };
-
-        // Keyboard navigation for modal
-        document.addEventListener('keydown', function(e) {
+        document.getElementById('modalClose').addEventListener('click', closeModal);
+        document.getElementById('modalNext').addEventListener('click', nextImage);
+        document.getElementById('modalPrev').addEventListener('click', prevImage);
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
             const modal = document.getElementById('imageModal');
-            if (!modal.classList.contains('active')) return;
-            
-            if (e.key === 'ArrowLeft') {
-                showPrevImage();
-            } else if (e.key === 'ArrowRight') {
-                showNextImage();
-            } else if (e.key === 'Escape') {
-                closeModal();
+            if (modal.style.display === 'block') {
+                if (e.key === 'Escape') closeModal();
+                else if (e.key === 'ArrowRight') nextImage();
+                else if (e.key === 'ArrowLeft') prevImage();
             }
         });
+        
+        // Close modal when clicking outside image
+        document.getElementById('imageModal').addEventListener('click', (e) => {
+            if (e.target.id === 'imageModal') closeModal();
+        });
 
-        // Initialize
+        // Load data on page load
         loadCSV();
     </script>
 </body>
