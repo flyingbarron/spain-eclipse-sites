@@ -1,157 +1,107 @@
-# IGME Tourist Value Scraper & Viewer
+# Spain Eclipse Sites 🦕🌑
 
-A Python web scraper that extracts tourist value (Valor Turístico) data and geographic coordinates from the Spanish Geological Survey (IGME) IELIG database for geological sites. Generates both CSV and KML outputs for data analysis and map visualization, plus an interactive HTML viewer to browse sites and their images. Includes eclipse visibility checker for the 2026 solar eclipse.
+A comprehensive data collection and visualization tool for Spanish geological sites with 2026 solar eclipse visibility information. Combines data from IGME (Spanish Geological Survey) with eclipse visibility calculations from IGN (National Geographic Institute).
 
 ## Overview
 
-This script scrapes geological site information from IGME's IELIG (Spanish Inventory of Sites of Geological Interest) database, specifically targeting sites with codes:
-- **IB200** (1 site)
-- **IB200a** through **IB200z** (26 sites)
-- **IB034** (1 site)
-- **IB034a** through **IB034z** (26 sites)
+This project scrapes geological site information from IGME's IELIG database and checks eclipse visibility for the August 12, 2026 total solar eclipse. It provides:
 
-**Total: 54 sites**
-
-For each site, it extracts:
-- Site code
-- Site name (Denominación) - with automatic cleaning of repeated prefixes
-- Tourist value (Valor Turístico/VT) rating
-- Confidencialidad (privacy status: Public/Private)
-- Geographic coordinates (latitude/longitude) from IGME's MapServer API
-- URL to the site's information page
-
-The script outputs data in two formats:
-- **CSV file** for data analysis and spreadsheet applications
-- **KML file** for visualization in Google Earth, Google Maps, and other mapping applications
+- **54 geological sites** in Spain (IB200, IB200a-z, IB034, IB034a-z)
+- **Eclipse visibility data** for each site
+- **Interactive web viewer** with search, filtering, and sorting
+- **KML exports** for Google Earth/Maps visualization
+- **Eclipse visibility profile diagrams**
 
 ## Features
 
-- **Automated URL Generation**: Generates URLs for all 54 sites (IB200, IB200a-z, IB034, IB034a-z)
-- **Web Scraping**: Extracts site names and tourist values from HTML pages
-- **Coordinate Extraction**: Retrieves precise coordinates via IGME MapServer REST API
-- **Coordinate Conversion**: Converts Web Mercator (EPSG:3857) to WGS84 (EPSG:4326) lat/lon
-- **Polygon Centroid Calculation**: Calculates centroids for polygon geometries
-- **Name Cleaning**: Removes redundant prefixes from site names (e.g., "Icnitas de dinosaurio del Weald de Cameros")
-- **CSV Export**: Saves all results to a structured CSV file
-- **KML Export**: Generates color-coded KML file for map visualization
-  - **Green markers** (>5.0): High tourist value sites
-  - **Yellow markers** (4.0-5.0): Medium tourist value sites
-  - **Red markers** (<4.0): Lower tourist value sites
-  - **Gray markers**: Sites with missing/invalid tourist values
-- **Error Handling**: Gracefully handles network errors and missing data
-- **Rate Limiting**: Includes 1-second delays between requests to be respectful to the server
-- **Progress Tracking**: Real-time console output showing scraping progress
+### Data Collection
+- ✅ Automated scraping of IGME IELIG database
+- ✅ Tourist value ratings and site information
+- ✅ Precise GPS coordinates from MapServer API
+- ✅ Eclipse visibility checking via IGN Eclipse 2026 viewer
+- ✅ Automated profile diagram capture
 
-## Requirements
+### Web Viewer
+- 🔍 **Search** by site code or name
+- 🌑 **Filter** eclipse-visible sites
+- 📊 **Sort** by code, name, or tourist value
+- 🖼️ **Image gallery** with full-screen carousel
+- 🗺️ **Direct links** to Google Maps, Shademap, and IGN Eclipse viewer
+- 📈 **Eclipse profile diagrams** with hover preview
+- 🦕 **Dinosaur emoji** favicon (because dinosaur footprints!)
 
-- Python 3.7+
-- requests >= 2.31.0
-- beautifulsoup4 >= 4.12.0
+### Output Formats
+- **CSV** - Complete dataset with all fields
+- **KML** - Single file with 6 organized folders by tourist value and eclipse visibility
+  - 🟢 High Tourist Value (>5.0) - Eclipse Visible/Not Visible
+  - 🟡 Medium Tourist Value (4.0-5.0) - Eclipse Visible/Not Visible
+  - 🔴 Lower Tourist Value (<4.0) - Eclipse Visible/Not Visible
+- **PNG** - Eclipse visibility profile diagrams
 
 ## Installation
 
-1. Clone this repository or download the script
-2. Create a virtual environment (recommended):
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/spain-eclipse-sites.git
+cd spain-eclipse-sites
+```
 
+2. Create a virtual environment (recommended):
 ```bash
 python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
 3. Install dependencies:
-
 ```bash
 pip install -r requirements.txt
 ```
 
+4. Install ChromeDriver (for eclipse visibility checking):
+```bash
+# macOS
+brew install chromedriver
+
+# Linux (Ubuntu/Debian)
+sudo apt-get install chromium-chromedriver
+
+# Or download from: https://chromedriver.chromium.org/
+```
+
 ## Usage
 
-### Scrape All Sites
+### Generate Data
 
-Run the script without parameters to scrape all 54 sites:
-
+Collect all data (IGME sites + eclipse visibility):
 ```bash
-python scrape_igme_sites.py
+python3 generate_eclipse_site_data.py
 ```
 
-### Scrape a Specific Site
-
-Use the `--code` or `-c` parameter to scrape only a specific site:
-
+Skip eclipse checking (faster, IGME data only):
 ```bash
-# Scrape a specific site by code
-python scrape_igme_sites.py --code IB200a
-python scrape_igme_sites.py -c IB034
-
-# Works with any valid code
-python scrape_igme_sites.py --code IB200
-python scrape_igme_sites.py -c IB034z
+python3 generate_eclipse_site_data.py --no-eclipse
 ```
 
-### Help
-
-View all available options:
-
+Check specific site only:
 ```bash
-python scrape_igme_sites.py --help
+python3 generate_eclipse_site_data.py --code IB200a
 ```
 
-### What the Script Does
+### Add Eclipse Azimuth Lines (Optional)
 
-The script will:
-1. Generate URLs for the specified site(s)
-2. Scrape each site's information page
-3. Extract tourist values and site names
-4. Fetch coordinates from the MapServer API
-5. Save results to `igme_tourist_values.csv`
-6. Generate color-coded KML file `igme_tourist_values.kml`
-7. Display a summary of the scraping operation
-
-## Eclipse Visibility Checker
-
-Check which sites will have visibility of the 2026 solar eclipse:
-
+Add directional lines pointing toward the eclipse azimuth to your KML file:
 ```bash
-python3 check_eclipse_visibility.py
+python3 add_eclipse_azimuth.py data/sites.kml data/sites_with_azimuth.kml
 ```
 
-### What It Does
+Custom azimuth and distance:
+```bash
+python3 add_eclipse_azimuth.py data/sites.kml output.kml --azimuth 283.7753 --distance 100
+```
 
-1. Reads all sites from `igme_tourist_values.csv`
-2. For each site with valid coordinates:
-   - Checks if the site is within the 2026 eclipse path zone
-   - Uses geographic boundaries (41°N-44°N across Spain)
-   - Determines visibility based on location
-3. Saves results to `eclipse_visibility_results.csv`
+### View Data
 
-### Output
-
-The script generates `eclipse_visibility_results.csv` with columns:
-- `code`: Site code
-- `denominacion`: Site name
-- `latitude`: Latitude
-- `longitude`: Longitude
-- `eclipse_visibility`: One of:
-  - `visible`: Site is within the eclipse path zone (41°N-44°N)
-  - `partial`: Site is near the eclipse path (36°N-41°N)
-  - `not_visible`: Site is outside the eclipse path
-  - `error`: Error checking the site
-  - `no_coordinates`: Site has no coordinate data
-
-### Note
-
-The script uses geographic approximation based on the known 2026 eclipse path across northern Spain. For precise eclipse timing and coverage percentage, use the IGN Eclipse 2026 visualizer button in the viewer.
-
-## Interactive Viewer
-
-After scraping, you can view the results in an interactive web interface:
-
-### Using the Viewer
-
-**Option 1: Using the Python Server (Recommended)**
-
-Run the included server script:
-
+Start the web viewer:
 ```bash
 python3 serve_viewer.py
 ```
@@ -159,213 +109,173 @@ python3 serve_viewer.py
 This will:
 - Start a local web server on port 8000
 - Automatically open the viewer in your default browser
-- Avoid CORS issues when loading the CSV file
+- Load data from `data/eclipse_site_data.csv`
 
-**Option 2: Direct File Access**
-
-If your browser allows local file access, you can open `viewer.html` directly. However, some browsers block loading local CSV files due to CORS restrictions.
-
-### What You'll See
-
-1. The viewer automatically loads data from `igme_tourist_values.csv`
-2. Browse sites in the left sidebar
-3. Click on any site to view:
-   - Site details (code, name, tourist value, privacy status, coordinates)
-   - Images from the IGME website
-   - Direct link to the original IGME page
-
-### Viewer Features
-
-- **Search functionality**: Filter sites by code or name
-- **Color-coded badges**: Visual indicators for tourist value and privacy status
-- **Image gallery**: Automatically extracts and displays images from site pages
-- **Image carousel**: Navigate through images with left/right arrows or keyboard
-  - Click any image to open in full-screen mode
-  - Use arrow keys (← →) or click navigation buttons to browse
-  - Press ESC to close
-  - Image counter shows current position (e.g., "3 / 8")
-- **Google Maps integration**: Direct link to view site location on Google Maps
-- **Shademap.app integration**: View sun/shadow patterns at the site location
-- **Eclipse 2026 visualizer**: IGN's eclipse viewer for the 2026 solar eclipse
-- **Responsive design**: Works on desktop and mobile devices
-- **Direct links**: Quick access to original IGME pages and mapping services
-
-### Note on Images
-
-The viewer attempts to load images from IGME pages using a CORS proxy. If images fail to load due to network restrictions, you can click the "View on IGME Website" button to see them on the original site.
-
-### Sample Output
+## Project Structure
 
 ```
-============================================================
-IGME Tourist Value Scraper
-============================================================
-Starting to scrape 54 websites...
-------------------------------------------------------------
-Scraping IB200: https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200
-  ✓ Found VT: 4.2
-  ✓ Found coordinates: 39.123456, 2.654321
-Scraping IB200a: https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200a
-  ✓ Found VT: 3.5
-  ✓ Found coordinates: 39.123456, 2.654321
-Scraping IB200b: https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200b
-  ✗ VT not found
-...
-
-✓ Results saved to igme_tourist_values.csv
-✓ KML file saved to igme_tourist_values.kml
-
-============================================================
-SUMMARY
-============================================================
-Total sites scraped: 54
-Successfully extracted: 47
-VT not found: 5
-Errors: 2
-Sites with coordinates: 50
-
-✓ Check 'igme_tourist_values.csv' for results
-✓ Check 'igme_tourist_values.kml' for map visualization
+spain-eclipse-sites/
+├── archive/                          # Legacy scripts
+│   ├── scrape_igme_sites.py
+│   ├── check_eclipse_visibility.py
+│   └── favicon.svg
+├── data/                             # Generated data (gitignored)
+│   ├── eclipse_profiles/             # Profile diagram images
+│   ├── eclipse_site_data.csv         # Main dataset
+│   └── sites.kml                     # All sites organized in 6 folders
+├── src/                              # Modular source code
+│   ├── __init__.py
+│   ├── igme_scraper.py              # IGME site scraping
+│   ├── eclipse_checker.py           # Eclipse visibility checking
+│   └── output_generator.py          # CSV/KML generation
+├── generate_eclipse_site_data.py     # Main data generation script
+├── add_eclipse_azimuth.py            # Add azimuth lines to KML
+├── serve_viewer.py                   # Web viewer server
+├── viewer.html                       # Interactive web interface
+├── requirements.txt                  # Python dependencies
+├── README.md                         # This file
+└── .gitignore                        # Git ignore rules
 ```
 
-## Output Formats
+## Data Sources
 
-### CSV File
+### IGME (Instituto Geológico y Minero de España)
+- **IELIG Database**: Spanish Inventory of Sites of Geological Interest
+- **Site Information**: Names, tourist values, privacy status
+- **MapServer API**: Precise GPS coordinates
 
-The script generates a CSV file (`igme_tourist_values.csv`) with the following columns:
+### IGN (Instituto Geográfico Nacional)
+- **Eclipse 2026 Viewer**: Official eclipse visibility calculator
+- **Visibility Profiles**: Detailed eclipse path diagrams
+- **Authoritative Data**: Based on precise astronomical calculations
+
+## Output Files
+
+### CSV File (`data/eclipse_site_data.csv`)
 
 | Column | Description |
 |--------|-------------|
-| `code` | Site code (e.g., IB200a, IB034b) |
+| `code` | Site code (e.g., IB200a) |
 | `denominacion` | Site name (cleaned) |
-| `url` | URL to the site's information page |
+| `url` | IGME information page URL |
 | `valor_turistico` | Tourist value rating (numeric) |
 | `confidencialidad` | Privacy status (Public/Private) |
 | `latitude` | Latitude in decimal degrees (WGS84) |
 | `longitude` | Longitude in decimal degrees (WGS84) |
-| `status` | Scraping status (success/not_found/error) |
+| `eclipse_visibility` | Eclipse visibility status |
+| `status` | Scraping status |
 
-#### Status Values
+### Eclipse Visibility Values
 
-- `success`: Tourist value and coordinates successfully extracted
-- `not_found`: Page exists but tourist value not found
-- `error: [message]`: Request failed with error message
+- `visible` - Eclipse IS visible from this location
+- `not_visible` - Eclipse IS NOT visible from this location
+- `unknown` - Could not determine visibility
+- `timeout` - Page took too long to load
+- `error` - Error occurred while checking
+- `no_coordinates` - Site has no coordinate data
+- `not_checked` - Eclipse checking was skipped
 
-### KML File
+### KML Files
 
-The script also generates a KML file (`igme_tourist_values.kml`) for visualization in mapping applications like Google Earth and Google Maps. The KML file includes:
+**`data/sites.kml`** - All sites organized into 6 folders:
+- 🟢 **High Tourist Value (>5.0)** - Eclipse Visible
+- 🟢 **High Tourist Value (>5.0)** - Eclipse Not Visible
+- 🟡 **Medium Tourist Value (4.0-5.0)** - Eclipse Visible
+- 🟡 **Medium Tourist Value (4.0-5.0)** - Eclipse Not Visible
+- 🔴 **Lower Tourist Value (<4.0)** - Eclipse Visible
+- 🔴 **Lower Tourist Value (<4.0)** - Eclipse Not Visible
 
-- **Color-coded markers** based on tourist value:
-  - 🟢 **Green** (>5.0): High tourist value sites
-  - 🟡 **Yellow** (4.0-5.0): Medium tourist value sites
-  - 🔴 **Red** (<4.0): Lower tourist value sites
-  - ⚪ **Gray**: Sites with missing or invalid tourist values
+Each folder contains sites with the corresponding tourist value and eclipse visibility status.
 
-- **Rich descriptions** for each site including:
-  - Site name (Denominación)
-  - Site code
-  - Tourist value rating
-  - Privacy status (Confidencialidad)
-  - Clickable URL link to the IGME information page
+### Profile Diagrams
 
-- **Precise coordinates**: Only sites with valid coordinates are included in the KML file
-
-#### Using the KML File
-
-1. **Google Earth**: Open the KML file directly in Google Earth Desktop or Google Earth Pro
-2. **Google Maps**:
-   - Go to [Google My Maps](https://www.google.com/maps/d/u/0/)
-   - Create a new map
-   - Import the KML file
-3. **Other GIS Software**: Most GIS applications support KML import (QGIS, ArcGIS, etc.)
+**`data/eclipse_profiles/{code}_profile.png`** - Eclipse visibility profile for each site showing the eclipse path and visibility details
 
 ## Technical Details
 
-### Data Sources
+### Coordinate Systems
 
-1. **Web Pages**: `https://info.igme.es/ielig/LIGInfo.aspx?codigo=[CODE]`
-   - Extracts site names and tourist values from HTML
-   
-2. **MapServer API**: `https://mapas.igme.es/gis/rest/services/BasesDatos/IGME_IELIG/MapServer/0/query`
-   - Retrieves polygon geometries in Web Mercator projection
-   - Calculates centroids for coordinate representation
+The project handles two coordinate systems:
+- **WGS84 (EPSG:4326)**: Standard GPS coordinates (latitude/longitude)
+- **Web Mercator (EPSG:3857)**: Used by IGME MapServer and IGN Eclipse viewer
 
-### Coordinate System Conversion
+Automatic conversion between systems is handled by the scripts.
 
-The script converts coordinates from Web Mercator (EPSG:3857) to WGS84 (EPSG:4326):
-- Web Mercator is used by the IGME MapServer API
-- WGS84 lat/lon is the standard for GPS and mapping applications
+### Web Scraping
 
-### Name Cleaning
+- **BeautifulSoup**: HTML parsing for IGME pages
+- **Selenium WebDriver**: JavaScript rendering for IGN Eclipse viewer
+- **Rate Limiting**: 1-second delays between requests
+- **Error Handling**: Graceful handling of network errors and missing data
 
-The script automatically removes redundant prefixes from site names, including:
-- "Icnitas de dinosaurio del Weald de Cameros (La Rioja). Yacimiento de "
-- "Icnitas de dinosaurio del Weald de Cameros (Soria). "
-- And other variations
+### Eclipse Visibility Checking
 
-This makes the site names more concise and readable.
+The script uses Selenium to:
+1. Navigate to IGN Eclipse 2026 viewer with site coordinates
+2. Wait for JavaScript to render (up to 60 seconds)
+3. Wait for visibility profile to load (up to 30 seconds)
+4. Capture screenshot of profile diagram
+5. Extract visibility text from rendered page
 
-## Error Handling
+**Note**: The IGN viewer requires full browser rendering, so visible Chrome windows will open during the process.
 
-The script handles various error scenarios:
-- Network timeouts (10-second timeout per request)
-- HTTP errors (404, 500, etc.)
-- Missing data fields
-- Invalid coordinate data
-- API failures
+## Viewer Features
 
-All errors are logged in the CSV with appropriate status messages.
+### Search and Filter
+- **Text search**: Filter by site code or name
+- **Eclipse filter**: Show only eclipse-visible sites
+- **Sort options**: By code, name, or tourist value
 
-## Rate Limiting
+### Site Details
+- Site information (code, name, tourist value, privacy)
+- GPS coordinates
+- Eclipse visibility status
+- Eclipse profile diagram (hover to preview, click to enlarge)
+- Image gallery from IGME website
+- Direct links to:
+  - IGME information page
+  - Google Maps location
+  - Shademap.app (sun/shadow visualization)
+  - IGN Eclipse 2026 viewer
 
-The script includes a 1-second delay between requests to avoid overwhelming the IGME servers and to be a good web citizen.
+### Image Carousel
+- Full-screen image viewing
+- Keyboard navigation (← → arrows)
+- Image counter (e.g., "3 / 8")
+- ESC to close
+
+## Requirements
+
+- Python 3.7+
+- requests >= 2.31.0
+- beautifulsoup4 >= 4.12.0
+- selenium >= 4.0.0
+- ChromeDriver (for eclipse visibility checking)
 
 ## License
 
-This script is provided as-is for educational and research purposes.
+This project is provided as-is for educational and research purposes.
 
 ## Data Attribution
 
 Data sourced from:
-- **IGME (Instituto Geológico y Minero de España)**
-- IELIG Database (Inventario Español de Lugares de Interés Geológico)
+- **IGME** (Instituto Geológico y Minero de España) - IELIG Database
+- **IGN** (Instituto Geográfico Nacional) - Eclipse 2026 Viewer
 
-Please respect IGME's terms of service when using this data.
+Please respect IGME and IGN terms of service when using this data.
 
-## Version Control
+## Contributing
 
-This project uses Git for version control. All changes are tracked and committed with descriptive messages.
-
-### Repository Structure
-```
-scrape_igme/
-├── .gitignore                      # Git ignore rules
-├── README.md                       # This file
-├── requirements.txt                # Python dependencies
-├── scrape_igme_sites.py           # Main scraper script
-├── check_eclipse_visibility.py    # Eclipse visibility checker
-├── viewer.html                     # Interactive web viewer
-├── serve_viewer.py                 # Local server for viewer
-├── favicon.svg                     # Favicon for viewer
-├── igme_tourist_values.csv        # Generated CSV output
-├── igme_tourist_values.kml        # Generated KML output (not tracked)
-└── eclipse_visibility_results.csv # Eclipse checker output (not tracked)
-```
-
-### Contributing
-
-When making changes:
-1. Make your modifications
-2. Test the changes
-3. Update the README if functionality changes
-4. Commit with a descriptive message
-
-Example commit:
-```bash
-git add .
-git commit -m "Add feature: description of what changed"
-```
+Contributions are welcome! The modular structure makes it easy to:
+- Add new data sources
+- Enhance the viewer
+- Improve scraping reliability
+- Add new output formats
 
 ## Author
 
-Made with Bob
+Made with Bob 🤖
+
+---
+
+**Note**: The 2026 solar eclipse will be visible from northern Spain on August 12, 2026. This tool helps identify which geological sites will have visibility of this rare astronomical event.
