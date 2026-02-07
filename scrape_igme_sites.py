@@ -237,33 +237,13 @@ def scrape_sites(specific_code=None):
                     'status': 'success'
                 })
             else:
-                print(f"  ✗ VT not found")
-                results.append({
-                    'code': code,
-                    'denominacion': site_name if site_name else 'N/A',
-                    'url': url,
-                    'valor_turistico': 'N/A',
-                    'confidencialidad': confidencialidad if confidencialidad else 'N/A',
-                    'latitude': f"{lat:.6f}" if lat else 'N/A',
-                    'longitude': f"{lon:.6f}" if lon else 'N/A',
-                    'status': 'not_found'
-                })
+                print(f"  ✗ VT not found - skipping site")
             
             # Be polite - add a small delay between requests
             time.sleep(1)
             
         except requests.exceptions.RequestException as e:
-            print(f"  ✗ Error: {str(e)}")
-            results.append({
-                'code': code,
-                'denominacion': 'N/A',
-                'url': url,
-                'valor_turistico': 'ERROR',
-                'confidencialidad': 'N/A',
-                'latitude': 'N/A',
-                'longitude': 'N/A',
-                'status': f'error: {str(e)}'
-            })
+            print(f"  ✗ Error: {str(e)} - skipping site")
             time.sleep(1)
     
     return results
@@ -443,15 +423,12 @@ Examples:
     print("SUMMARY")
     print("=" * 60)
     successful = sum(1 for r in results if r['status'] == 'success')
-    not_found = sum(1 for r in results if r['status'] == 'not_found')
-    errors = sum(1 for r in results if r['status'].startswith('error'))
     sites_with_coords = sum(1 for r in results if r['latitude'] != 'N/A' and r['longitude'] != 'N/A')
     
-    print(f"Total sites scraped: {len(results)}")
+    print(f"Total sites in CSV: {len(results)}")
     print(f"Successfully extracted: {successful}")
-    print(f"VT not found: {not_found}")
-    print(f"Errors: {errors}")
     print(f"Sites with coordinates: {sites_with_coords}")
+    print(f"\nNote: Sites with missing data were skipped and not included in the CSV")
     
     if successful > 0:
         print(f"\n✓ Check 'igme_tourist_values.csv' for results")
