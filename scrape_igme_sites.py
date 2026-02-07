@@ -112,6 +112,21 @@ def extract_tourist_value(html_content):
     
     return None
 
+def extract_confidencialidad(html_content):
+    """Extract the Confidencialidad (privacy status) from the HTML content"""
+    soup = BeautifulSoup(html_content, 'html.parser')
+    
+    # Find the <dt> tag containing "Confidencialidad"
+    dt_tags = soup.find_all('dt')
+    for dt in dt_tags:
+        if 'Confidencialidad' in dt.get_text():
+            # Get the next <dd> sibling tag
+            dd = dt.find_next_sibling('dd')
+            if dd:
+                return dd.get_text().strip()
+    
+    return None
+
 def web_mercator_to_lat_lon(x, y):
     """Convert Web Mercator (EPSG:3857) coordinates to latitude/longitude (EPSG:4326)"""
     lon = (x / 20037508.34) * 180
@@ -187,15 +202,18 @@ def scrape_sites(specific_code=None):
             response = requests.get(url, headers=headers, timeout=10)
             response.raise_for_status()
             
-            # Extract site name and tourist value
+            # Extract site information
             site_name = extract_site_name(response.text)
             tourist_value = extract_tourist_value(response.text)
+            confidencialidad = extract_confidencialidad(response.text)
             
             # Get coordinates from API
             lat, lon = get_coordinates_from_api(code)
             
             if tourist_value:
                 print(f"  ✓ Found VT: {tourist_value}")
+                if confidencialidad:
+                    print(f"  ✓ Found Confidencialidad: {confidencialidad}")
                 if lat and lon:
                     print(f"  ✓ Found coordinates: {lat:.6f}, {lon:.6f}")
                 results.append({
@@ -203,6 +221,7 @@ def scrape_sites(specific_code=None):
                     'denominacion': site_name if site_name else 'N/A',
                     'url': url,
                     'valor_turistico': tourist_value,
+                    'confidencialidad': confidencialidad if confidencialidad else 'N/A',
                     'latitude': f"{lat:.6f}" if lat else 'N/A',
                     'longitude': f"{lon:.6f}" if lon else 'N/A',
                     'status': 'success'
@@ -214,6 +233,7 @@ def scrape_sites(specific_code=None):
                     'denominacion': site_name if site_name else 'N/A',
                     'url': url,
                     'valor_turistico': 'N/A',
+                    'confidencialidad': confidencialidad if confidencialidad else 'N/A',
                     'latitude': f"{lat:.6f}" if lat else 'N/A',
                     'longitude': f"{lon:.6f}" if lon else 'N/A',
                     'status': 'not_found'
@@ -229,6 +249,7 @@ def scrape_sites(specific_code=None):
                 'denominacion': 'N/A',
                 'url': url,
                 'valor_turistico': 'ERROR',
+                'confidencialidad': 'N/A',
                 'latitude': 'N/A',
                 'longitude': 'N/A',
                 'status': f'error: {str(e)}'
@@ -255,7 +276,7 @@ def get_color_for_value(tourist_value):
 def save_to_csv(results, filename='igme_tourist_values.csv'):
     """Save results to CSV file"""
     with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
-        fieldnames = ['code', 'denominacion', 'url', 'valor_turistico', 'latitude', 'longitude', 'status']
+        fieldnames = ['code', 'denominacion', 'url', 'valor_turistico', 'confidencialidad', 'latitude', 'longitude', 'status']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         
         writer.writeheader()
@@ -343,6 +364,7 @@ def save_to_kml(results, filename='igme_tourist_values.kml'):
 <b>Site:</b> {name}<br/>
 <b>Code:</b> {code}<br/>
 <b>Tourist Value:</b> {result['valor_turistico']}<br/>
+<b>Confidencialidad:</b> {result['confidencialidad']}<br/>
 <b>URL:</b> <a href="{result['url']}">{result['url']}</a>
 ]]>'''
             
