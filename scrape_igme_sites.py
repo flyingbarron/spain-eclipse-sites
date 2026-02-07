@@ -125,7 +125,8 @@ def extract_confidencialidad(html_content):
             # Get the next <dd> sibling tag
             dd = dt.find_next_sibling('dd')
             if dd:
-                value = dd.get_text().strip()
+                # Strip whitespace and periods
+                value = dd.get_text().strip().rstrip('.')
                 # Translate Spanish to English
                 if value == 'Público':
                     return 'Public'
