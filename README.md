@@ -50,7 +50,14 @@ The script outputs data in two formats:
 ## Installation
 
 1. Clone this repository or download the script
-2. Install dependencies:
+2. Create a virtual environment (recommended):
+
+```bash
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+3. Install dependencies:
 
 ```bash
 pip install -r requirements.txt
@@ -58,14 +65,40 @@ pip install -r requirements.txt
 
 ## Usage
 
-Run the script:
+### Scrape All Sites
+
+Run the script without parameters to scrape all 54 sites:
 
 ```bash
 python scrape_igme_sites.py
 ```
 
+### Scrape a Specific Site
+
+Use the `--code` or `-c` parameter to scrape only a specific site:
+
+```bash
+# Scrape a specific site by code
+python scrape_igme_sites.py --code IB200a
+python scrape_igme_sites.py -c IB034
+
+# Works with any valid code
+python scrape_igme_sites.py --code IB200
+python scrape_igme_sites.py -c IB034z
+```
+
+### Help
+
+View all available options:
+
+```bash
+python scrape_igme_sites.py --help
+```
+
+### What the Script Does
+
 The script will:
-1. Generate URLs for all 54 sites
+1. Generate URLs for the specified site(s)
 2. Scrape each site's information page
 3. Extract tourist values and site names
 4. Fetch coordinates from the MapServer API

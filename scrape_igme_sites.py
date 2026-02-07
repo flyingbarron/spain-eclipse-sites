@@ -4,11 +4,26 @@ import csv
 import time
 import re
 import math
+import argparse
 
-def generate_urls():
-    """Generate URLs from IB200, IB200a to IB200z, IB034, and IB034a to IB034z"""
+def generate_urls(specific_code=None):
+    """Generate URLs from IB200, IB200a to IB200z, IB034, and IB034a to IB034z
+    
+    Args:
+        specific_code: If provided, only generate URL for this specific code (e.g., 'IB200a')
+    
+    Returns:
+        List of tuples (code, url)
+    """
     urls = []
     
+    # If specific code is requested, generate only that URL
+    if specific_code:
+        code = specific_code.upper()
+        url = f"https://info.igme.es/ielig/LIGInfo.aspx?codigo={code}"
+        return [(code, url)]
+    
+    # Otherwise, generate all URLs
     # Add IB200 without letter suffix
     urls.append(("IB200", "https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200"))
     
@@ -148,9 +163,13 @@ def get_coordinates_from_api(code):
         print(f"    ✗ Error getting coordinates: {str(e)}")
         return None, None
 
-def scrape_sites():
-    """Main function to scrape all sites and save results"""
-    urls = generate_urls()
+def scrape_sites(specific_code=None):
+    """Main function to scrape all sites and save results
+    
+    Args:
+        specific_code: If provided, only scrape this specific site code
+    """
+    urls = generate_urls(specific_code)
     results = []
     
     print(f"Starting to scrape {len(urls)} websites...")
@@ -345,12 +364,41 @@ def save_to_kml(results, filename='igme_tourist_values.kml'):
     print(f"✓ KML file saved to {filename}")
 
 def main():
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(
+        description='Scrape tourist value data from IGME IELIG database',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Scrape all sites (IB200, IB200a-z, IB034, IB034a-z)
+  python scrape_igme_sites.py
+  
+  # Scrape a specific site
+  python scrape_igme_sites.py --code IB200a
+  python scrape_igme_sites.py -c IB034
+        """
+    )
+    parser.add_argument(
+        '-c', '--code',
+        type=str,
+        help='Specific site code to scrape (e.g., IB200a, IB034, IB200z)',
+        metavar='CODE'
+    )
+    
+    args = parser.parse_args()
+    
     print("=" * 60)
     print("IGME Tourist Value Scraper")
     print("=" * 60)
     
-    # Scrape all sites
-    results = scrape_sites()
+    if args.code:
+        print(f"Mode: Single site ({args.code.upper()})")
+    else:
+        print("Mode: All sites (54 sites)")
+    print()
+    
+    # Scrape sites (all or specific)
+    results = scrape_sites(args.code)
     
     # Save to CSV
     save_to_csv(results)
