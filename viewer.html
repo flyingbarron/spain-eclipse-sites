@@ -703,6 +703,12 @@
                             <div class="info-label">Privacy</div>
                             <div class="info-value">${site.confidencialidad}</div>
                         </div>
+                        ${site.route_difficulty && site.route_difficulty !== 'N/A' ? `
+                        <div class="info-item">
+                            <div class="info-label">Route Difficulty</div>
+                            <div class="info-value">${site.route_difficulty}</div>
+                        </div>
+                        ` : ''}
                         <div class="info-item">
                             <div class="info-label">Coordinates</div>
                             <div class="info-value">${site.latitude}, ${site.longitude}</div>

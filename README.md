@@ -17,6 +17,7 @@ This project scrapes geological site information from IGME's IELIG database and 
 ### Data Collection
 - ✅ Automated scraping of IGME IELIG database
 - ✅ Tourist value ratings and site information
+- ✅ Route difficulty levels (translated from Spanish)
 - ✅ Precise GPS coordinates from MapServer API
 - ✅ Eclipse visibility checking via IGN Eclipse 2026 viewer
 - ✅ Automated profile diagram capture
@@ -160,6 +161,7 @@ spain-eclipse-sites/
 | `url` | IGME information page URL |
 | `valor_turistico` | Tourist value rating (numeric) |
 | `confidencialidad` | Privacy status (Public/Private) |
+| `route_difficulty` | Route difficulty (Low/Medium/High/Very High) |
 | `latitude` | Latitude in decimal degrees (WGS84) |
 | `longitude` | Longitude in decimal degrees (WGS84) |
 | `eclipse_visibility` | Eclipse visibility status |
