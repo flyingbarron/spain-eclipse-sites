@@ -520,7 +520,10 @@
                 // Filter and collect image URLs
                 const imageUrls = Array.from(images)
                     .map(img => img.src)
-                    .filter(src => src && !src.includes('spacer') && !src.includes('icon'))
+                    .filter(src => src &&
+                        !src.includes('spacer') &&
+                        !src.includes('icon') &&
+                        !src.includes('bocetoGris.gif'))
                     .map(src => {
                         // Convert relative URLs to absolute
                         if (src.startsWith('http')) return src;
