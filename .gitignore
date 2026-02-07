@@ -39,6 +39,7 @@ env/
 # Output files (commented out so viewer can use CSV)
 # igme_tourist_values.csv
 igme_tourist_values.kml
+eclipse_visibility_results.csv
 
 # OS
 .DS_Store

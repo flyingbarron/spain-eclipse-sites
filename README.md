@@ -1,6 +1,6 @@
 # IGME Tourist Value Scraper & Viewer
 
-A Python web scraper that extracts tourist value (Valor Turístico) data and geographic coordinates from the Spanish Geological Survey (IGME) IELIG database for geological sites. Generates both CSV and KML outputs for data analysis and map visualization, plus an interactive HTML viewer to browse sites and their images.
+A Python web scraper that extracts tourist value (Valor Turístico) data and geographic coordinates from the Spanish Geological Survey (IGME) IELIG database for geological sites. Generates both CSV and KML outputs for data analysis and map visualization, plus an interactive HTML viewer to browse sites and their images. Includes eclipse visibility checker for the 2026 solar eclipse.
 
 ## Overview
 
@@ -106,6 +106,41 @@ The script will:
 5. Save results to `igme_tourist_values.csv`
 6. Generate color-coded KML file `igme_tourist_values.kml`
 7. Display a summary of the scraping operation
+
+## Eclipse Visibility Checker
+
+Check which sites will have visibility of the 2026 solar eclipse:
+
+```bash
+python3 check_eclipse_visibility.py
+```
+
+### What It Does
+
+1. Reads all sites from `igme_tourist_values.csv`
+2. For each site with valid coordinates:
+   - Converts coordinates to Web Mercator projection
+   - Queries the IGN Eclipse 2026 viewer
+   - Checks if "The eclipse is visible from the observation point"
+3. Saves results to `eclipse_visibility_results.csv`
+
+### Output
+
+The script generates `eclipse_visibility_results.csv` with columns:
+- `code`: Site code
+- `denominacion`: Site name
+- `latitude`: Latitude
+- `longitude`: Longitude
+- `eclipse_visibility`: One of:
+  - `visible`: Eclipse is visible from this site
+  - `not_visible`: Eclipse is NOT visible from this site
+  - `unknown`: Could not determine visibility
+  - `error`: Error checking the site
+  - `no_coordinates`: Site has no coordinate data
+
+### Note
+
+The script includes a 2-second delay between requests to be respectful to the IGN server. Checking all sites may take several minutes.
 
 ## Interactive Viewer
 
@@ -304,14 +339,17 @@ This project uses Git for version control. All changes are tracked and committed
 ### Repository Structure
 ```
 scrape_igme/
-├── .gitignore              # Git ignore rules
-├── README.md               # This file
-├── requirements.txt        # Python dependencies
-├── scrape_igme_sites.py   # Main scraper script
-├── viewer.html             # Interactive web viewer
-├── serve_viewer.py         # Local server for viewer
-├── igme_tourist_values.csv # Generated CSV output
-└── igme_tourist_values.kml # Generated KML output (not tracked)
+├── .gitignore                      # Git ignore rules
+├── README.md                       # This file
+├── requirements.txt                # Python dependencies
+├── scrape_igme_sites.py           # Main scraper script
+├── check_eclipse_visibility.py    # Eclipse visibility checker
+├── viewer.html                     # Interactive web viewer
+├── serve_viewer.py                 # Local server for viewer
+├── favicon.svg                     # Favicon for viewer
+├── igme_tourist_values.csv        # Generated CSV output
+├── igme_tourist_values.kml        # Generated KML output (not tracked)
+└── eclipse_visibility_results.csv # Eclipse checker output (not tracked)
 ```
 
 ### Contributing
