@@ -209,6 +209,35 @@ Data sourced from:
 
 Please respect IGME's terms of service when using this data.
 
+## Version Control
+
+This project uses Git for version control. All changes are tracked and committed with descriptive messages.
+
+### Repository Structure
+```
+scrape_igme/
+├── .gitignore              # Git ignore rules
+├── README.md               # This file
+├── requirements.txt        # Python dependencies
+├── scrape_igme_sites.py   # Main scraper script
+├── igme_tourist_values.csv # Generated output (not tracked)
+└── igme_tourist_values.kml # Generated output (not tracked)
+```
+
+### Contributing
+
+When making changes:
+1. Make your modifications
+2. Test the changes
+3. Update the README if functionality changes
+4. Commit with a descriptive message
+
+Example commit:
+```bash
+git add .
+git commit -m "Add feature: description of what changed"
+```
+
 ## Author
 
 Made with Bob
