@@ -485,7 +485,12 @@
             const shademapUrl = `https://shademap.app/@${lat},${lon},17z,1786559455614t,0b,0p,0m!1786512158844!1786563246912,${coordsBase64}!${lat}!${lon}`;
             
             // Generate IGN Eclipse 2026 visualizer URL
-            const eclipseUrl = `https://visualizadores.ign.es/eclipses/2026?lat=${lat}&lon=${lon}`;
+            // Convert WGS84 (lat/lon) to Web Mercator (EPSG:3857)
+            const x = lon * 20037508.34 / 180;
+            const y = Math.log(Math.tan((90 + lat) * Math.PI / 360)) / (Math.PI / 180);
+            const yMercator = y * 20037508.34 / 180;
+            
+            const eclipseUrl = `https://visualizadores.ign.es/eclipses/2026?center=${x},${yMercator}&zoom=16&srs=EPSG:3857&layers=GeoJSON*Oscurecimiento_0*https%3A%2F%2Fwww.ign.es%2Fweb%2Fresources%2Fviewer%2Feclipses%2Foscurez_estandard_2026.geojson*false*eyJwYXJhbWV0ZXJzIjpbeyJwb2x5Z29uIjp7ImZpbGwiOnsiY29sb3IiOiJ7e2Z9fWZ1bmN0aW9uKGUpe3ZhciByPWUuZ2V0QXR0cmlidXRlKFwiT3NjdXJlY2ltaWVudG9cIik7bGV0IGk9MjAyNT09PXQuZGF0ZS5zdWJzdHJpbmcoMCw0KT9FOkE7Zm9yKGxldCBlPTA7ZTxpLmxlbmd0aC0xO2UrKylpZihyPj1pW2VdWzBdJiZyPGlbZSsxXVswXSlyZXR1cm4gaVtlXVsxXTtyZXR1cm4gaS5hdCgtMSlbMV19Iiwib3BhY2l0eSI6MC40fSwic3Ryb2tlIjp7Im9wYWNpdHkiOjB9fSwicG9pbnQiOnsicmFkaXVzIjo1fX1dLCJkZXNlcmlhbGl6ZWRNZXRob2QiOiIoKHNlcmlhbGl6ZWRQYXJhbWV0ZXJzKSA9PiBJREVFLnN0eWxlLlNpbXBsZS5kZXNlcmlhbGl6ZShzZXJpYWxpemVkUGFyYW1ldGVycywgJ0lERUUuc3R5bGUuR2VuZXJpYycpKSJ9,GeoJSON*Duracion_0*https%3A%2F%2Fwww.ign.es%2Fweb%2Fresources%2Fviewer%2Feclipses%2Fdurtot_estandard_2026.geojson*false*eyJwYXJhbWV0ZXJzIjpbeyJwb2x5Z29uIjp7InN0cm9rZSI6eyJjb2xvciI6IndoaXRlIiwid2lkdGgiOjAuNX0sImxhYmVsIjp7InRleHQiOiJ7e2Z9fWZ1bmN0aW9uKGUpe3JldHVybiB2b2lkIDAhPT1lLmdldEF0dHJpYnV0ZShcIkR1cmFjaW9uVG90YWxTZWdcIik/YCR7ZS5nZXRBdHRyaWJ1dGUoXCJEdXJhY2lvblRvdGFsU2VnXCIpfXNgOmAke2UuZ2V0QXR0cmlidXRlKFwiRHVyYWNpb25BbnVsYXJTZWdcIil9c2B9IiwiZm9udCI6ImJvbGQgMTJweCBDb3VyaWVyIE5ldyIsImNvbG9yIjoid2hpdGUiLCJzY2FsZSI6MC45fX0sInBvaW50Ijp7InJhZGl1cyI6NX19XSwiZGVzZXJpYWxpemVkTWV0aG9kIjoiKChzZXJpYWxpemVkUGFyYW1ldGVycykgPT4gSURFRS5zdHlsZS5TaW1wbGUuZGVzZXJpYWxpemUoc2VyaWFsaXplZFBhcmFtZXRlcnMsICdJREVFLnN0eWxlLkdlbmVyaWMnKSkifQ==`;
             
             content.innerHTML = `
                 <div class="site-details">
