@@ -244,10 +244,20 @@
             border-radius: 4px;
             font-size: 0.9rem;
             transition: background 0.2s;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
         }
 
         .link-button:hover {
             background: #0056b3;
+        }
+
+        .link-button.maps {
+            background: #28a745;
+        }
+
+        .link-button.maps:hover {
+            background: #218838;
         }
 
         /* Modal for full-size images */
@@ -281,10 +291,51 @@
             font-size: 40px;
             font-weight: bold;
             cursor: pointer;
+            z-index: 1001;
         }
 
         .modal-close:hover {
             color: #ccc;
+        }
+
+        .modal-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 1rem;
+            user-select: none;
+            z-index: 1001;
+            background: rgba(0,0,0,0.5);
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .modal-nav:hover {
+            background: rgba(0,0,0,0.8);
+        }
+
+        .modal-nav.prev {
+            left: 20px;
+        }
+
+        .modal-nav.next {
+            right: 20px;
+        }
+
+        .modal-counter {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            background: rgba(0,0,0,0.7);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
         }
     </style>
 </head>
@@ -311,12 +362,17 @@
     <!-- Modal for full-size images -->
     <div class="modal" id="imageModal">
         <span class="modal-close" id="modalClose">&times;</span>
+        <span class="modal-nav prev" id="modalPrev">&#10094;</span>
+        <span class="modal-nav next" id="modalNext">&#10095;</span>
         <img class="modal-content" id="modalImage">
+        <div class="modal-counter" id="modalCounter"></div>
     </div>
 
     <script>
         let sitesData = [];
         let currentSite = null;
+        let currentImages = [];
+        let currentImageIndex = 0;
 
         // Load CSV file
         async function loadCSV() {
@@ -402,11 +458,16 @@
         async function displaySiteDetails(site) {
             const content = document.getElementById('content');
             
+            const mapsUrl = `https://www.google.com/maps?q=${site.latitude},${site.longitude}`;
+            
             content.innerHTML = `
                 <div class="site-details">
                     <div class="detail-header">
                         <h2>${site.denominacion || site.code}</h2>
-                        <a href="${site.url}" target="_blank" class="link-button">View on IGME Website →</a>
+                        <div>
+                            <a href="${site.url}" target="_blank" class="link-button">View on IGME Website →</a>
+                            <a href="${mapsUrl}" target="_blank" class="link-button maps">📍 Open in Google Maps</a>
+                        </div>
                     </div>
 
                     <div class="detail-info">
@@ -469,13 +530,17 @@
 
                 if (imageUrls.length === 0) {
                     imagesGrid.innerHTML = '<div class="no-images">No images found for this site</div>';
+                    currentImages = [];
                     return;
                 }
+
+                // Store images for carousel
+                currentImages = imageUrls;
 
                 // Display images
                 imagesGrid.innerHTML = imageUrls.map((imgUrl, index) => `
                     <div class="image-card">
-                        <img src="${imgUrl}" alt="Site image ${index + 1}" onclick="openModal('${imgUrl}')" 
+                        <img src="${imgUrl}" alt="Site image ${index + 1}" onclick="openModal(${index})"
                              onerror="this.parentElement.style.display='none'">
                         <div class="image-caption">Image ${index + 1}</div>
                     </div>
@@ -493,22 +558,65 @@
         }
 
         // Modal functionality
-        function openModal(imgUrl) {
+        function openModal(index) {
+            if (currentImages.length === 0) return;
+            
+            currentImageIndex = index;
             const modal = document.getElementById('imageModal');
             const modalImg = document.getElementById('modalImage');
+            const counter = document.getElementById('modalCounter');
+            
             modal.classList.add('active');
-            modalImg.src = imgUrl;
+            modalImg.src = currentImages[currentImageIndex];
+            counter.textContent = `${currentImageIndex + 1} / ${currentImages.length}`;
+            
+            // Show/hide navigation arrows
+            document.getElementById('modalPrev').style.display = currentImages.length > 1 ? 'block' : 'none';
+            document.getElementById('modalNext').style.display = currentImages.length > 1 ? 'block' : 'none';
         }
 
-        document.getElementById('modalClose').onclick = function() {
+        function showPrevImage() {
+            if (currentImages.length === 0) return;
+            currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
+            document.getElementById('modalImage').src = currentImages[currentImageIndex];
+            document.getElementById('modalCounter').textContent = `${currentImageIndex + 1} / ${currentImages.length}`;
+        }
+
+        function showNextImage() {
+            if (currentImages.length === 0) return;
+            currentImageIndex = (currentImageIndex + 1) % currentImages.length;
+            document.getElementById('modalImage').src = currentImages[currentImageIndex];
+            document.getElementById('modalCounter').textContent = `${currentImageIndex + 1} / ${currentImages.length}`;
+        }
+
+        function closeModal() {
             document.getElementById('imageModal').classList.remove('active');
-        };
+        }
+
+        // Modal event listeners
+        document.getElementById('modalClose').onclick = closeModal;
+        document.getElementById('modalPrev').onclick = showPrevImage;
+        document.getElementById('modalNext').onclick = showNextImage;
 
         document.getElementById('imageModal').onclick = function(e) {
             if (e.target === this) {
-                this.classList.remove('active');
+                closeModal();
             }
         };
+
+        // Keyboard navigation for modal
+        document.addEventListener('keydown', function(e) {
+            const modal = document.getElementById('imageModal');
+            if (!modal.classList.contains('active')) return;
+            
+            if (e.key === 'ArrowLeft') {
+                showPrevImage();
+            } else if (e.key === 'ArrowRight') {
+                showNextImage();
+            } else if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
 
         // Initialize
         loadCSV();

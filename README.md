@@ -144,7 +144,12 @@ If your browser allows local file access, you can open `viewer.html` directly. H
 - **Search functionality**: Filter sites by code or name
 - **Color-coded badges**: Visual indicators for tourist value and privacy status
 - **Image gallery**: Automatically extracts and displays images from site pages
-- **Full-screen images**: Click any image to view it in full size
+- **Image carousel**: Navigate through images with left/right arrows or keyboard
+  - Click any image to open in full-screen mode
+  - Use arrow keys (← →) or click navigation buttons to browse
+  - Press ESC to close
+  - Image counter shows current position (e.g., "3 / 8")
+- **Google Maps integration**: Direct link to view site location on Google Maps
 - **Responsive design**: Works on desktop and mobile devices
 - **Direct links**: Quick access to original IGME pages
 
