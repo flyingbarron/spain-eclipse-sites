@@ -119,9 +119,9 @@ python3 check_eclipse_visibility.py
 
 1. Reads all sites from `igme_tourist_values.csv`
 2. For each site with valid coordinates:
-   - Converts coordinates to Web Mercator projection
-   - Queries the IGN Eclipse 2026 viewer
-   - Checks if "The eclipse is visible from the observation point"
+   - Checks if the site is within the 2026 eclipse path zone
+   - Uses geographic boundaries (41°N-44°N across Spain)
+   - Determines visibility based on location
 3. Saves results to `eclipse_visibility_results.csv`
 
 ### Output
@@ -132,15 +132,15 @@ The script generates `eclipse_visibility_results.csv` with columns:
 - `latitude`: Latitude
 - `longitude`: Longitude
 - `eclipse_visibility`: One of:
-  - `visible`: Eclipse is visible from this site
-  - `not_visible`: Eclipse is NOT visible from this site
-  - `unknown`: Could not determine visibility
+  - `visible`: Site is within the eclipse path zone (41°N-44°N)
+  - `partial`: Site is near the eclipse path (36°N-41°N)
+  - `not_visible`: Site is outside the eclipse path
   - `error`: Error checking the site
   - `no_coordinates`: Site has no coordinate data
 
 ### Note
 
-The script includes a 2-second delay between requests to be respectful to the IGN server. Checking all sites may take several minutes.
+The script uses geographic approximation based on the known 2026 eclipse path across northern Spain. For precise eclipse timing and coverage percentage, use the IGN Eclipse 2026 visualizer button in the viewer.
 
 ## Interactive Viewer
 
