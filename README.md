@@ -16,7 +16,7 @@ For each site, it extracts:
 - Site code
 - Site name (Denominación) - with automatic cleaning of repeated prefixes
 - Tourist value (Valor Turístico/VT) rating
-- Confidencialidad (privacy status: Público/Privado)
+- Confidencialidad (privacy status: Public/Private)
 - Geographic coordinates (latitude/longitude) from IGME's MapServer API
 - URL to the site's information page
 
@@ -153,7 +153,7 @@ The script generates a CSV file (`igme_tourist_values.csv`) with the following c
 | `denominacion` | Site name (cleaned) |
 | `url` | URL to the site's information page |
 | `valor_turistico` | Tourist value rating (numeric) |
-| `confidencialidad` | Privacy status (Público/Privado) |
+| `confidencialidad` | Privacy status (Public/Private) |
 | `latitude` | Latitude in decimal degrees (WGS84) |
 | `longitude` | Longitude in decimal degrees (WGS84) |
 | `status` | Scraping status (success/not_found/error) |

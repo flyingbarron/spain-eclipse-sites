@@ -113,7 +113,9 @@ def extract_tourist_value(html_content):
     return None
 
 def extract_confidencialidad(html_content):
-    """Extract the Confidencialidad (privacy status) from the HTML content"""
+    """Extract the Confidencialidad (privacy status) from the HTML content
+    Translates Spanish values to English: Público -> Public, Privado -> Private
+    """
     soup = BeautifulSoup(html_content, 'html.parser')
     
     # Find the <dt> tag containing "Confidencialidad"
@@ -123,7 +125,14 @@ def extract_confidencialidad(html_content):
             # Get the next <dd> sibling tag
             dd = dt.find_next_sibling('dd')
             if dd:
-                return dd.get_text().strip()
+                value = dd.get_text().strip()
+                # Translate Spanish to English
+                if value == 'Público':
+                    return 'Public'
+                elif value == 'Privado':
+                    return 'Private'
+                else:
+                    return value  # Return as-is if not recognized
     
     return None
 
