@@ -468,23 +468,27 @@ async function displaySiteDetails(site) {
         <div class="site-details">
             <div class="detail-header">
                 <h2>${site.denominacion || site.code}</h2>
-                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-                    <a href="${site.url}" target="_blank" class="link-button">🪨 View on IGME Website</a>
-                    <a href="${mapsUrl}" target="_blank" class="link-button maps">📍 Open in Google Maps</a>
-                    <a href="${shademapUrl}" target="_blank" class="link-button shademap">🌄 View on Shademap</a>
-                    ${cloudButton}
-                    <a href="${eclipseUrl}" target="_blank" class="link-button eclipse">🌑 Eclipse 2026 View</a>
-                    <a href="${eclipseFanUrl}" target="_blank" class="link-button eclipsefan">🌒 EclipseFan.org</a>
-                    <div style="position: relative; display: inline-block;">
-                        <img src="data/eclipse_profiles/${site.code}_profile.png"
-                             alt="Eclipse visibility profile for ${site.code}"
-                             class="eclipse-profile-thumbnail"
-                             onclick="window.open('data/eclipse_profiles/${site.code}_profile.png', '_blank')"
-                             onerror="this.parentElement.style.display='none'"
-                             title="Hover to preview, click to open full-size">
-                        <div class="eclipse-profile-overlay">
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                        <a href="${site.url}" target="_blank" class="link-button">🪨 View on IGME Website</a>
+                        <a href="${mapsUrl}" target="_blank" class="link-button maps">📍 Open in Google Maps</a>
+                        <a href="${shademapUrl}" target="_blank" class="link-button shademap">🌄 View on Shademap</a>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                        ${cloudButton}
+                        <a href="${eclipseFanUrl}" target="_blank" class="link-button eclipsefan">🌒 EclipseFan.org</a>
+                        <a href="${eclipseUrl}" target="_blank" class="link-button eclipse">🌑 Eclipse 2026 View</a>
+                        <div style="position: relative; display: inline-block;">
                             <img src="data/eclipse_profiles/${site.code}_profile.png"
-                                 alt="Eclipse visibility profile for ${site.code}">
+                                 alt="Eclipse visibility profile for ${site.code}"
+                                 class="eclipse-profile-thumbnail"
+                                 onclick="window.open('data/eclipse_profiles/${site.code}_profile.png', '_blank')"
+                                 onerror="this.parentElement.style.display='none'"
+                                 title="Hover to preview, click to open full-size">
+                            <div class="eclipse-profile-overlay">
+                                <img src="data/eclipse_profiles/${site.code}_profile.png"
+                                     alt="Eclipse visibility profile for ${site.code}">
+                            </div>
                         </div>
                     </div>
                 </div>
