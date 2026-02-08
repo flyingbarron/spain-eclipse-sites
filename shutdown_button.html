@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Shutdown Button</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .shutdown-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .shutdown-btn:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+        .shutdown-btn:active {
+            transform: scale(0.95);
+        }
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Server Control Panel</h1>
+        <p>Click the button below to cleanly shut down the server</p>
+        <button class="shutdown-btn" onclick="shutdownServer()">
+            🛑 Shutdown Server
+        </button>
+        <div id="message" class="message"></div>
+    </div>
+
+    <script>
+        async function shutdownServer() {
+            const messageDiv = document.getElementById('message');
+            const button = document.querySelector('.shutdown-btn');
+            
+            button.disabled = true;
+            button.textContent = 'Shutting down...';
+            
+            try {
+                const response = await fetch('/api/shutdown');
+                const data = await response.json();
+                
+                messageDiv.textContent = data.message || 'Server is shutting down...';
+                messageDiv.className = 'message success';
+                messageDiv.style.display = 'block';
+                
+                // Close window after a delay
+                setTimeout(() => {
+                    messageDiv.textContent += ' You can close this window.';
+                }, 2000);
+                
+            } catch (error) {
+                messageDiv.textContent = 'Server has shut down or connection lost.';
+                messageDiv.className = 'message success';
+                messageDiv.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

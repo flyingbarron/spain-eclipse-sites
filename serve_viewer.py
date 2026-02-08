@@ -12,8 +12,14 @@ import urllib.request
 import urllib.parse
 from bs4 import BeautifulSoup
 import json
+import signal
+import sys
+import threading
 
 PORT = 8000
+
+# Global server reference for clean shutdown
+server_instance = None
 
 class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
@@ -24,8 +30,11 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
     
     def do_GET(self):
+        # Handle shutdown endpoint
+        if self.path == '/api/shutdown':
+            self.handle_shutdown()
         # Handle image scraping API endpoint
-        if self.path.startswith('/api/images?'):
+        elif self.path.startswith('/api/images?'):
             self.handle_images_api()
         # Handle image proxy endpoint
         elif self.path.startswith('/api/proxy-image?'):
@@ -33,6 +42,27 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         else:
             # Default file serving
             super().do_GET()
+    
+    def handle_shutdown(self):
+        """Handle graceful server shutdown"""
+        try:
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({'message': 'Server shutting down...'}).encode())
+            
+            # Schedule immediate shutdown after response is sent
+            def shutdown():
+                import time
+                time.sleep(0.1)  # Brief delay to ensure response is sent
+                print("\n\nShutdown requested via API...")
+                print("Server stopped cleanly. Socket released.")
+                os._exit(0)  # Immediate clean exit
+            
+            threading.Thread(target=shutdown, daemon=True).start()
+            
+        except Exception as e:
+            self.send_error(500, f"Error during shutdown: {str(e)}")
     
     def handle_images_api(self):
         """Scrape images from IGME site and return as JSON"""
@@ -123,19 +153,39 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         except Exception as e:
             self.send_error(500, f"Error proxying image: {str(e)}")
 
+def signal_handler(signum, frame):
+    """Handle shutdown signals gracefully"""
+    print("\n\nReceived shutdown signal. Cleaning up...")
+    print("Server stopped cleanly. Socket released.")
+    os._exit(0)  # Immediate clean exit
+
 def main():
+    global server_instance
+    
     # Change to the script's directory
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     
+    # Register signal handlers for clean shutdown
+    signal.signal(signal.SIGINT, signal_handler)   # Ctrl+C
+    signal.signal(signal.SIGTERM, signal_handler)  # kill command
+    
     Handler = MyHTTPRequestHandler
     
+    # Allow socket reuse to avoid "Address already in use" errors
+    socketserver.TCPServer.allow_reuse_address = True
+    
     with socketserver.TCPServer(("", PORT), Handler) as httpd:
+        server_instance = httpd
+        
         print("=" * 60)
         print("IGME Sites Viewer Server")
         print("=" * 60)
         print(f"Server running at: http://localhost:{PORT}")
         print(f"Opening viewer in browser...")
-        print("\nPress Ctrl+C to stop the server")
+        print("\nShutdown options:")
+        print("  • Press Ctrl+C in this terminal")
+        print("  • Visit http://localhost:{PORT}/api/shutdown")
+        print("  • Use 'kill' command with the process ID")
         print("=" * 60)
         
         # Open browser
@@ -144,7 +194,10 @@ def main():
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:
-            print("\n\nServer stopped.")
+            print("\n\nShutdown via Ctrl+C...")
+        finally:
+            print("Server stopped cleanly. Socket released.")
+            server_instance = None
 
 if __name__ == "__main__":
     main()
