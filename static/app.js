@@ -8,6 +8,24 @@ let returnToHotel = false; // Track if return to hotel is enabled
 let currentRouteControl = null; // Track current route control
 let routeSegments = []; // Store route segment data
 
+// Convert decimal degrees to DMS (Degrees, Minutes, Seconds)
+function decimalToDMS(decimal, isLat) {
+    const absolute = Math.abs(decimal);
+    const degrees = Math.floor(absolute);
+    const minutesDecimal = (absolute - degrees) * 60;
+    const minutes = Math.floor(minutesDecimal);
+    const seconds = ((minutesDecimal - minutes) * 60).toFixed(2);
+    
+    let direction;
+    if (isLat) {
+        direction = decimal >= 0 ? 'N' : 'S';
+    } else {
+        direction = decimal >= 0 ? 'E' : 'W';
+    }
+    
+    return `${degrees}° ${minutes}' ${seconds}" ${direction}`;
+}
+
 // Load CSV file
 async function loadCSV() {
     try {
@@ -496,7 +514,14 @@ async function displaySiteDetails(site) {
                 ` : ''}
                 <div class="info-item">
                     <div class="info-label">Coordinates</div>
-                    <div class="info-value">${site.latitude}, ${site.longitude}</div>
+                    <div class="info-value">
+                        <div style="margin-bottom: 0.25rem;">
+                            <strong>Decimal:</strong> ${site.latitude}, ${site.longitude}
+                        </div>
+                        <div style="font-size: 0.9em; color: #6c757d;">
+                            <strong>DMS:</strong> ${decimalToDMS(parseFloat(site.latitude), true)}, ${decimalToDMS(parseFloat(site.longitude), false)}
+                        </div>
+                    </div>
                 </div>
                 ${site.eclipse_visibility ? `
                 <div class="info-item">
