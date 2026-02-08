@@ -469,13 +469,13 @@ async function displaySiteDetails(site) {
             <div class="detail-header">
                 <h2>${site.denominacion || site.code}</h2>
                 <div style="display: flex; align-items: flex-start; gap: 0.5rem; flex-wrap: wrap;">
-                    <a href="${site.url}" target="_blank" class="link-button" style="font-size: 0.85rem; padding: 0.4rem 0.7rem;">🪨 IGME</a>
-                    <a href="${mapsUrl}" target="_blank" class="link-button maps" style="font-size: 0.85rem; padding: 0.4rem 0.7rem;">📍 Maps</a>
-                    <a href="${shademapUrl}" target="_blank" class="link-button shademap" style="font-size: 0.85rem; padding: 0.4rem 0.7rem;">🌄 Shademap</a>
-                    ${cloudButton ? cloudButton.replace('class="link-button cloud"', 'class="link-button cloud" style="font-size: 0.85rem; padding: 0.4rem 0.7rem;"').replace('☁️ Cloud Coverage Data', '☁️ Cloud') : ''}
-                    <a href="${eclipseFanUrl}" target="_blank" class="link-button eclipsefan" style="font-size: 0.85rem; padding: 0.4rem 0.7rem;">🌒 EclipseFan</a>
+                    <a href="${site.url}" target="_blank" class="link-button" style="font-size: 0.9rem; padding: 0.5rem 0.8rem; white-space: nowrap;">🪨 IGME</a>
+                    <a href="${mapsUrl}" target="_blank" class="link-button maps" style="font-size: 0.9rem; padding: 0.5rem 0.8rem; white-space: nowrap;">📍 Maps</a>
+                    <a href="${shademapUrl}" target="_blank" class="link-button shademap" style="font-size: 0.9rem; padding: 0.5rem 0.8rem; white-space: nowrap;">🌄 Shademap</a>
+                    ${cloudButton ? cloudButton.replace('class="link-button cloud"', 'class="link-button cloud" style="font-size: 0.9rem; padding: 0.5rem 0.8rem; white-space: nowrap;"').replace('☁️ Cloud Coverage Data', '☁️ Cloud') : ''}
+                    <a href="${eclipseFanUrl}" target="_blank" class="link-button eclipsefan" style="font-size: 0.9rem; padding: 0.5rem 0.8rem; white-space: nowrap;">🌒 EclipseFan</a>
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
-                        <a href="${eclipseUrl}" target="_blank" class="link-button eclipse" style="font-size: 0.85rem; padding: 0.4rem 0.7rem;">🌑 Eclipse 2026</a>
+                        <a href="${eclipseUrl}" target="_blank" class="link-button eclipse" style="font-size: 0.9rem; padding: 0.5rem 0.8rem; white-space: nowrap;">🌑 Eclipse 2026</a>
                         <div style="position: relative; display: inline-block;">
                             <img src="data/eclipse_profiles/${site.code}_profile.png"
                                  alt="Eclipse visibility profile for ${site.code}"
