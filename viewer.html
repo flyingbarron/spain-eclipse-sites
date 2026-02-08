@@ -928,7 +928,7 @@
                 .addTo(currentMap)
                 .bindPopup('<b>Hotel Parras Arnedillo</b><br>Starting point');
             
-            // Add markers and routes for each site
+            // Add markers for each site
             sites.forEach((site, index) => {
                 const lat = parseFloat(site.latitude);
                 const lon = parseFloat(site.longitude);
@@ -952,34 +952,40 @@
                     </div>
                 `;
                 
-                // Add site marker
-                L.marker([lat, lon])
+                // Add site marker with numbered label
+                const markerIcon = L.divIcon({
+                    html: `<div style="background: #007bff; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">${index + 1}</div>`,
+                    className: 'numbered-marker',
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15]
+                });
+                
+                L.marker([lat, lon], { icon: markerIcon })
                     .addTo(currentMap)
                     .bindPopup(popupContent);
-                
-                // Add route from hotel to this site
-                const routeColors = ['#007bff', '#28a745', '#dc3545', '#ffc107', '#6f42c1', '#fd7e14'];
-                const color = routeColors[index % routeColors.length];
-                
-                L.Routing.control({
-                    waypoints: [
-                        L.latLng(HOTEL_LAT, HOTEL_LON),
-                        L.latLng(lat, lon)
-                    ],
-                    routeWhileDragging: false,
-                    addWaypoints: false,
-                    draggableWaypoints: false,
-                    fitSelectedRoutes: false,
-                    showAlternatives: false,
-                    lineOptions: {
-                        styles: [{ color: color, weight: 4, opacity: 0.7 }]
-                    },
-                    createMarker: function() { return null; },
-                    router: L.Routing.osrmv1({
-                        serviceUrl: 'https://router.project-osrm.org/route/v1'
-                    })
-                }).addTo(currentMap);
             });
+            
+            // Create single route through all sites
+            const waypoints = [
+                L.latLng(HOTEL_LAT, HOTEL_LON),
+                ...sites.map(site => L.latLng(parseFloat(site.latitude), parseFloat(site.longitude)))
+            ];
+            
+            L.Routing.control({
+                waypoints: waypoints,
+                routeWhileDragging: false,
+                addWaypoints: false,
+                draggableWaypoints: false,
+                fitSelectedRoutes: false,
+                showAlternatives: false,
+                lineOptions: {
+                    styles: [{ color: '#007bff', weight: 4, opacity: 0.7 }]
+                },
+                createMarker: function() { return null; },
+                router: L.Routing.osrmv1({
+                    serviceUrl: 'https://router.project-osrm.org/route/v1'
+                })
+            }).addTo(currentMap);
         }
         
         // Initialize Leaflet map
