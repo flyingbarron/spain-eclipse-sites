@@ -11,7 +11,6 @@ Also requires: Firefox browser and geckodriver
 import sys
 import time
 import os
-import urllib.parse
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
@@ -61,47 +60,28 @@ def download_shademap_export(url, output_dir="data", output_filename="shademap_e
         sys.exit(1)
     
     try:
-        # Decode URL if it's already encoded (from command line)
-        if '%' in url:
-            url = urllib.parse.unquote(url)
-            print(f"Decoded URL: {url}")
-        
         # Load the page
         print("Loading Shademap page...")
         print(f"URL: {url}")
-        
-        # Selenium expects a plain URL, not URL-encoded
         driver.get(url)
         
-        # Wait for page to load - Shademap is a heavy JavaScript app
-        print("Waiting for page to load (this may take 15-20 seconds)...")
-        time.sleep(15)  # Increased wait time for complex JS app
+        # Wait for page to load
+        print("Waiting for page to load...")
+        time.sleep(10)  # Give it extra time
         
         # Check if page loaded
         try:
-            WebDriverWait(driver, 20).until(
+            WebDriverWait(driver, 15).until(
                 lambda d: d.execute_script("return document.readyState") == "complete"
             )
-            print("✓ Page DOM loaded")
+            print("✓ Page loaded successfully")
         except:
-            print("⚠️  Page DOM may not be complete")
-        
-        # Wait for Shademap's canvas/map to render
-        print("Waiting for Shademap canvas to render...")
-        time.sleep(5)
-        
-        # Check current URL to see if we were redirected
-        current_url = driver.current_url
-        print(f"Current URL: {current_url}")
+            print("⚠️  Page may not have loaded completely")
         
         # Take a screenshot to see what loaded
         initial_screenshot = os.path.join(output_dir, "shademap_initial.png")
         driver.save_screenshot(initial_screenshot)
         print(f"Initial screenshot saved to: {initial_screenshot}")
-        
-        # Check page title
-        page_title = driver.title
-        print(f"Page title: {page_title}")
         
         # Step 1: Click "OK" to dismiss popup
         print("\nLooking for popup to dismiss...")
@@ -264,8 +244,6 @@ def download_shademap_export(url, output_dir="data", output_filename="shademap_e
 def main():
     # Default URL for the eclipse location
     default_url = "https://shademap.app/@42.13096,-2.15972,20z,1786559455614t,0b,0p,0m"
-    default_url = "https%3A%2F%2Fshademap.app%2F%4042.13096%2C-2.15972%2C20z%2C1786559455614t%2C0b%2C0p%2C0m"
-    print (default_url)
     
     # Allow custom URL from command line
     url = sys.argv[1] if len(sys.argv) > 1 else default_url
