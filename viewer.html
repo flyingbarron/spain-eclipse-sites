@@ -509,15 +509,17 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
             padding: 1rem;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            max-width: 300px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            max-width: 320px;
             max-height: 80%;
             overflow-y: auto;
             z-index: 1000;
             font-size: 0.85rem;
+            pointer-events: auto;
         }
 
         #routeSummary h4 {
@@ -953,6 +955,13 @@
                             </div>
                             <div id="routeSegments"></div>
                             <div id="routeTotal" class="route-total"></div>
+                            <div id="routeDirections" style="display: none; margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 4px; max-height: 400px; overflow-y: auto;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                                    <h4 style="margin: 0; font-size: 1rem;">Turn-by-Turn Directions</h4>
+                                    <button onclick="closeDirections()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #6c757d; padding: 0; line-height: 1;">&times;</button>
+                                </div>
+                                <div id="directionsContent"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1073,6 +1082,7 @@
             let totalTime = 0;
             let segmentsCompleted = 0;
             const totalSegments = waypoints.length - 1;
+            const allRouteBounds = L.latLngBounds();
             
             // Create individual route for each segment
             for (let i = 0; i < waypoints.length - 1; i++) {
@@ -1101,30 +1111,35 @@
                     const segmentDist = route.summary.totalDistance;
                     const segmentTime = route.summary.totalTime;
                     
+                    // Extend bounds with all coordinates from this route
+                    route.coordinates.forEach(coord => {
+                        allRouteBounds.extend([coord.lat, coord.lng]);
+                    });
+                    
                     routeSegments[segmentIndex] = {
                         from: waypointNames[segmentIndex],
                         to: waypointNames[segmentIndex + 1],
                         distance: segmentDist,
                         time: segmentTime,
                         color: color,
-                        index: segmentIndex
+                        index: segmentIndex,
+                        instructions: route.instructions // Store turn-by-turn instructions
                     };
                     
                     totalDistance += segmentDist;
                     totalTime += segmentTime;
                     segmentsCompleted++;
                     
-                    // When all segments are loaded, display summary
+                    // When all segments are loaded, display summary and adjust bounds
                     if (segmentsCompleted === totalSegments) {
                         displayRouteSummary(totalDistance, totalTime);
+                        // Fit map to show all route coordinates
+                        if (allRouteBounds.isValid()) {
+                            currentMap.fitBounds(allRouteBounds, { padding: [80, 80] });
+                        }
                     }
                 }).addTo(currentMap);
             }
-            
-            // Adjust map bounds to show all routes with padding
-            setTimeout(() => {
-                currentMap.fitBounds(bounds, { padding: [100, 100] });
-            }, 1000);
         }
         
         // Display route summary
@@ -1152,18 +1167,85 @@
             document.getElementById('routeSummary').style.display = 'block';
         }
         
-        // Highlight a specific segment
+        // Highlight a specific segment and show directions
         function highlightSegment(index) {
             const segment = routeSegments[index];
             if (!segment) return;
             
-            // Show detailed info in an alert or popup
-            alert(`Route Segment ${index + 1}\n\n` +
-                  `From: ${segment.from}\n` +
-                  `To: ${segment.to}\n` +
-                  `Distance: ${(segment.distance / 1000).toFixed(2)} km\n` +
-                  `Time: ${Math.round(segment.time / 60)} minutes\n` +
-                  `Average Speed: ${((segment.distance / 1000) / (segment.time / 3600)).toFixed(1)} km/h`);
+            const directionsPanel = document.getElementById('routeDirections');
+            const directionsContent = document.getElementById('directionsContent');
+            
+            if (!directionsPanel || !directionsContent) return;
+            
+            // Build the directions HTML
+            let directionsHTML = `
+                <div style="border-left: 4px solid ${segment.color}; padding-left: 1rem; margin-bottom: 1rem; background: white; padding: 0.75rem; border-radius: 4px;">
+                    <div style="font-weight: 600; font-size: 1rem; margin-bottom: 0.25rem;">${segment.from}</div>
+                    <div style="color: #6c757d; margin: 0.5rem 0;">↓</div>
+                    <div style="font-weight: 600; font-size: 1rem;">${segment.to}</div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+                    <div style="background: white; padding: 0.5rem; border-radius: 4px; text-align: center;">
+                        <div style="font-size: 0.7rem; color: #6c757d; margin-bottom: 0.25rem;">DISTANCE</div>
+                        <div style="font-size: 1rem; font-weight: 600; color: #2c3e50;">${(segment.distance / 1000).toFixed(1)} km</div>
+                    </div>
+                    <div style="background: white; padding: 0.5rem; border-radius: 4px; text-align: center;">
+                        <div style="font-size: 0.7rem; color: #6c757d; margin-bottom: 0.25rem;">TIME</div>
+                        <div style="font-size: 1rem; font-weight: 600; color: #2c3e50;">${Math.round(segment.time / 60)} min</div>
+                    </div>
+                    <div style="background: white; padding: 0.5rem; border-radius: 4px; text-align: center;">
+                        <div style="font-size: 0.7rem; color: #6c757d; margin-bottom: 0.25rem;">AVG SPEED</div>
+                        <div style="font-size: 1rem; font-weight: 600; color: #2c3e50;">${((segment.distance / 1000) / (segment.time / 3600)).toFixed(0)} km/h</div>
+                    </div>
+                </div>
+            `;
+            
+            // Add turn-by-turn instructions if available
+            if (segment.instructions && segment.instructions.length > 0) {
+                directionsHTML += '<div style="background: white; padding: 0.75rem; border-radius: 4px;">';
+                segment.instructions.forEach((instruction, i) => {
+                    const distance = instruction.distance > 1000
+                        ? `${(instruction.distance / 1000).toFixed(1)} km`
+                        : `${Math.round(instruction.distance)} m`;
+                    
+                    // Get direction icon based on instruction type
+                    let icon = '➡️';
+                    const type = instruction.type || '';
+                    if (type.includes('left')) icon = '⬅️';
+                    else if (type.includes('right')) icon = '➡️';
+                    else if (type.includes('straight')) icon = '⬆️';
+                    else if (type.includes('uturn')) icon = '↩️';
+                    else if (type === 'WaypointReached') icon = '🎯';
+                    else if (i === 0) icon = '🚗';
+                    
+                    directionsHTML += `
+                        <div style="display: flex; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid #e9ecef;">
+                            <div style="font-size: 1.25rem; flex-shrink: 0;">${icon}</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.9rem; color: #2c3e50; margin-bottom: 0.25rem;">${instruction.text || 'Continue'}</div>
+                                ${instruction.road ? `<div style="font-size: 0.75rem; color: #6c757d;">on ${instruction.road}</div>` : ''}
+                                <div style="font-size: 0.75rem; color: #6c757d; margin-top: 0.25rem;">${distance}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                directionsHTML += '</div>';
+            } else {
+                directionsHTML += '<div style="background: white; padding: 1rem; border-radius: 4px; text-align: center; color: #6c757d;">No detailed directions available for this segment.</div>';
+            }
+            
+            directionsContent.innerHTML = directionsHTML;
+            directionsPanel.style.display = 'block';
+            
+            // Scroll to directions panel
+            directionsPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        function closeDirections() {
+            const directionsPanel = document.getElementById('routeDirections');
+            if (directionsPanel) {
+                directionsPanel.style.display = 'none';
+            }
         }
         
         // Toggle return to hotel
