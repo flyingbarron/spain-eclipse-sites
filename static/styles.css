@@ -580,4 +580,19 @@ footer a:hover {
     text-decoration: underline;
 }
 
-/* Made with Bob */
+/* Hide Leaflet Routing Machine control widgets */
+.leaflet-routing-container {
+    display: none !important;
+}
+
+.leaflet-control-container .leaflet-routing-container {
+    display: none !important;
+}
+
+.leaflet-top.leaflet-right {
+    pointer-events: none;
+}
+
+.leaflet-top.leaflet-right > * {
+    pointer-events: auto;
+}
