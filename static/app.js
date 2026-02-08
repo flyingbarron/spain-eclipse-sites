@@ -477,7 +477,7 @@ async function displaySiteDetails(site) {
     // Build cloud coverage button if available
     let cloudButton = '';
     if (site.cloud_url && site.cloud_status === 'success') {
-        cloudButton = `<a href="${site.cloud_url}" target="_blank" class="link-button cloud">☁️ Cloud Coverage Data</a>`;
+        cloudButton = `<a href="${site.cloud_url}" target="_blank" class="link-button cloud">☁️ timeanddate.com</a>`;
     }
     
     content.innerHTML = `
