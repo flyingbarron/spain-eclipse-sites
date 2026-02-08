@@ -1047,7 +1047,7 @@
                     .bindPopup(popupContent);
             });
             
-            // Create single route through all sites
+            // Create waypoints list
             const waypoints = [
                 L.latLng(HOTEL_LAT, HOTEL_LON),
                 ...sites.map(site => L.latLng(parseFloat(site.latitude), parseFloat(site.longitude)))
@@ -1058,84 +1058,112 @@
                 waypoints.push(L.latLng(HOTEL_LAT, HOTEL_LON));
             }
             
-            currentRouteControl = L.Routing.control({
-                waypoints: waypoints,
-                routeWhileDragging: false,
-                addWaypoints: false,
-                draggableWaypoints: false,
-                fitSelectedRoutes: false,
-                showAlternatives: false,
-                lineOptions: {
-                    styles: [{ color: '#007bff', weight: 4, opacity: 0.7 }]
-                },
-                createMarker: function() { return null; },
-                router: L.Routing.osrmv1({
-                    serviceUrl: 'https://router.project-osrm.org/route/v1'
-                })
-            }).on('routesfound', function(e) {
-                const routes = e.routes;
-                const route = routes[0];
+            // Create segments between waypoints
+            const waypointNames = ['Hotel Parras Arnedillo', ...sites.map((s, i) => `${i + 1}. ${s.denominacion || s.code}`)];
+            if (returnToHotel) {
+                waypointNames.push('Hotel Parras Arnedillo');
+            }
+            
+            // Colors for different segments
+            const segmentColors = ['#007bff', '#28a745', '#dc3545', '#ffc107', '#6f42c1', '#fd7e14', '#17a2b8', '#e83e8c'];
+            
+            // Clear previous segments
+            routeSegments = [];
+            let totalDistance = 0;
+            let totalTime = 0;
+            let segmentsCompleted = 0;
+            const totalSegments = waypoints.length - 1;
+            
+            // Create individual route for each segment
+            for (let i = 0; i < waypoints.length - 1; i++) {
+                const color = segmentColors[i % segmentColors.length];
+                const segmentIndex = i;
                 
-                // Clear previous segments
-                routeSegments = [];
-                
-                // Build segment information
-                let segmentHTML = '';
-                let totalDistance = 0;
-                let totalTime = 0;
-                
-                // Create segments between waypoints
-                const waypointNames = ['Hotel Parras Arnedillo', ...sites.map((s, i) => `${i + 1}. ${s.denominacion || s.code}`)];
-                if (returnToHotel) {
-                    waypointNames.push('Hotel Parras Arnedillo');
-                }
-                
-                // Calculate segments from route legs
-                route.coordinates.forEach((coord, i) => {
-                    if (i > 0) {
-                        // This is a simplified approach - in reality we'd need to match coordinates to waypoints
-                        // For now, we'll use the route summary
-                    }
-                });
-                
-                // Use route summary for total
-                totalDistance = route.summary.totalDistance;
-                totalTime = route.summary.totalTime;
-                
-                // Create segment display (simplified - showing waypoint to waypoint)
-                for (let i = 0; i < waypoints.length - 1; i++) {
-                    const segmentDist = totalDistance / (waypoints.length - 1); // Simplified equal distribution
-                    const segmentTime = totalTime / (waypoints.length - 1);
+                L.Routing.control({
+                    waypoints: [waypoints[i], waypoints[i + 1]],
+                    routeWhileDragging: false,
+                    addWaypoints: false,
+                    draggableWaypoints: false,
+                    fitSelectedRoutes: false,
+                    showAlternatives: false,
+                    lineOptions: {
+                        styles: [{ color: color, weight: 4, opacity: 0.7 }],
+                        extendToWaypoints: false,
+                        missingRouteTolerance: 0
+                    },
+                    createMarker: function() { return null; },
+                    router: L.Routing.osrmv1({
+                        serviceUrl: 'https://router.project-osrm.org/route/v1'
+                    }),
+                    show: false // Hide the default routing instructions
+                }).on('routesfound', function(e) {
+                    const route = e.routes[0];
+                    const segmentDist = route.summary.totalDistance;
+                    const segmentTime = route.summary.totalTime;
                     
-                    routeSegments.push({
-                        from: waypointNames[i],
-                        to: waypointNames[i + 1],
+                    routeSegments[segmentIndex] = {
+                        from: waypointNames[segmentIndex],
+                        to: waypointNames[segmentIndex + 1],
                         distance: segmentDist,
-                        time: segmentTime
-                    });
+                        time: segmentTime,
+                        color: color,
+                        index: segmentIndex
+                    };
                     
-                    segmentHTML += `
-                        <div class="route-segment">
-                            <div class="route-segment-header">${waypointNames[i]} → ${waypointNames[i + 1]}</div>
-                            <div class="route-segment-details">
-                                ${(segmentDist / 1000).toFixed(1)} km • ${Math.round(segmentTime / 60)} min
-                            </div>
+                    totalDistance += segmentDist;
+                    totalTime += segmentTime;
+                    segmentsCompleted++;
+                    
+                    // When all segments are loaded, display summary
+                    if (segmentsCompleted === totalSegments) {
+                        displayRouteSummary(totalDistance, totalTime);
+                    }
+                }).addTo(currentMap);
+            }
+            
+            // Adjust map bounds to show all routes with padding
+            setTimeout(() => {
+                currentMap.fitBounds(bounds, { padding: [100, 100] });
+            }, 1000);
+        }
+        
+        // Display route summary
+        function displayRouteSummary(totalDistance, totalTime) {
+            let segmentHTML = '';
+            
+            routeSegments.forEach((segment, i) => {
+                segmentHTML += `
+                    <div class="route-segment" onclick="highlightSegment(${i})" style="cursor: pointer; border-left-color: ${segment.color};">
+                        <div class="route-segment-header">${segment.from} → ${segment.to}</div>
+                        <div class="route-segment-details">
+                            ${(segment.distance / 1000).toFixed(1)} km • ${Math.round(segment.time / 60)} min
                         </div>
-                    `;
-                }
-                
-                // Display segments
-                document.getElementById('routeSegments').innerHTML = segmentHTML;
-                
-                // Display total
-                document.getElementById('routeTotal').innerHTML = `
-                    <div><strong>Total Distance:</strong> ${(totalDistance / 1000).toFixed(1)} km</div>
-                    <div><strong>Total Time:</strong> ${Math.round(totalTime / 60)} min (${(totalTime / 3600).toFixed(1)} hrs)</div>
+                    </div>
                 `;
-                
-                // Show route summary
-                document.getElementById('routeSummary').style.display = 'block';
-            }).addTo(currentMap);
+            });
+            
+            document.getElementById('routeSegments').innerHTML = segmentHTML;
+            
+            document.getElementById('routeTotal').innerHTML = `
+                <div><strong>Total Distance:</strong> ${(totalDistance / 1000).toFixed(1)} km</div>
+                <div><strong>Total Time:</strong> ${Math.round(totalTime / 60)} min (${(totalTime / 3600).toFixed(1)} hrs)</div>
+            `;
+            
+            document.getElementById('routeSummary').style.display = 'block';
+        }
+        
+        // Highlight a specific segment
+        function highlightSegment(index) {
+            const segment = routeSegments[index];
+            if (!segment) return;
+            
+            // Show detailed info in an alert or popup
+            alert(`Route Segment ${index + 1}\n\n` +
+                  `From: ${segment.from}\n` +
+                  `To: ${segment.to}\n` +
+                  `Distance: ${(segment.distance / 1000).toFixed(2)} km\n` +
+                  `Time: ${Math.round(segment.time / 60)} minutes\n` +
+                  `Average Speed: ${((segment.distance / 1000) / (segment.time / 3600)).toFixed(1)} km/h`);
         }
         
         // Toggle return to hotel
