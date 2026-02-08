@@ -516,10 +516,10 @@ async function displaySiteDetails(site) {
                     <div class="info-label">Coordinates</div>
                     <div class="info-value">
                         <div style="margin-bottom: 0.25rem;">
-                            ${site.latitude}, ${site.longitude}
+                            ${decimalToDMS(parseFloat(site.latitude), true)} ${decimalToDMS(parseFloat(site.longitude), false)}
                         </div>
                         <div style="font-size: 0.85em; color: #6c757d;">
-                            ${decimalToDMS(parseFloat(site.latitude), true)} ${decimalToDMS(parseFloat(site.longitude), false)}
+                            ${site.latitude}, ${site.longitude}
                         </div>
                     </div>
                 </div>
