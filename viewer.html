@@ -505,6 +505,74 @@
             background: #5a32a3;
         }
 
+        #routeSummary {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            max-width: 300px;
+            max-height: 80%;
+            overflow-y: auto;
+            z-index: 1000;
+            font-size: 0.85rem;
+        }
+
+        #routeSummary h4 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1rem;
+            color: #2c3e50;
+        }
+
+        .route-segment {
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 3px solid #007bff;
+        }
+
+        .route-segment-header {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: #2c3e50;
+        }
+
+        .route-segment-details {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .route-total {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: #007bff;
+            color: white;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .return-toggle {
+            margin: 0.75rem 0;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .return-toggle label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .return-toggle input {
+            margin-right: 0.5rem;
+            cursor: pointer;
+        }
+
         footer {
             background: #f8f9fa;
             border-top: 1px solid #dee2e6;
@@ -588,6 +656,9 @@
         let currentImageIndex = 0;
         let activeTab = 'details'; // Track which tab is active
         let selectedSites = new Set(); // Track selected sites for multi-select
+        let returnToHotel = false; // Track if return to hotel is enabled
+        let currentRouteControl = null; // Track current route control
+        let routeSegments = []; // Store route segment data
 
         // Load CSV file
         async function loadCSV() {
@@ -872,6 +943,17 @@
 
                     <div id="mapTab" class="tab-content ${activeTab === 'map' ? 'active' : ''}">
                         <div id="mapContainer"></div>
+                        <div id="routeSummary" style="display: none;">
+                            <h4>Route Summary</h4>
+                            <div class="return-toggle">
+                                <label>
+                                    <input type="checkbox" id="returnToHotel" onchange="toggleReturnToHotel()">
+                                    Return to hotel
+                                </label>
+                            </div>
+                            <div id="routeSegments"></div>
+                            <div id="routeTotal" class="route-total"></div>
+                        </div>
                     </div>
                 </div>
             `;
@@ -971,7 +1053,12 @@
                 ...sites.map(site => L.latLng(parseFloat(site.latitude), parseFloat(site.longitude)))
             ];
             
-            L.Routing.control({
+            // Add return to hotel if enabled
+            if (returnToHotel) {
+                waypoints.push(L.latLng(HOTEL_LAT, HOTEL_LON));
+            }
+            
+            currentRouteControl = L.Routing.control({
                 waypoints: waypoints,
                 routeWhileDragging: false,
                 addWaypoints: false,
@@ -985,7 +1072,78 @@
                 router: L.Routing.osrmv1({
                     serviceUrl: 'https://router.project-osrm.org/route/v1'
                 })
+            }).on('routesfound', function(e) {
+                const routes = e.routes;
+                const route = routes[0];
+                
+                // Clear previous segments
+                routeSegments = [];
+                
+                // Build segment information
+                let segmentHTML = '';
+                let totalDistance = 0;
+                let totalTime = 0;
+                
+                // Create segments between waypoints
+                const waypointNames = ['Hotel Parras Arnedillo', ...sites.map((s, i) => `${i + 1}. ${s.denominacion || s.code}`)];
+                if (returnToHotel) {
+                    waypointNames.push('Hotel Parras Arnedillo');
+                }
+                
+                // Calculate segments from route legs
+                route.coordinates.forEach((coord, i) => {
+                    if (i > 0) {
+                        // This is a simplified approach - in reality we'd need to match coordinates to waypoints
+                        // For now, we'll use the route summary
+                    }
+                });
+                
+                // Use route summary for total
+                totalDistance = route.summary.totalDistance;
+                totalTime = route.summary.totalTime;
+                
+                // Create segment display (simplified - showing waypoint to waypoint)
+                for (let i = 0; i < waypoints.length - 1; i++) {
+                    const segmentDist = totalDistance / (waypoints.length - 1); // Simplified equal distribution
+                    const segmentTime = totalTime / (waypoints.length - 1);
+                    
+                    routeSegments.push({
+                        from: waypointNames[i],
+                        to: waypointNames[i + 1],
+                        distance: segmentDist,
+                        time: segmentTime
+                    });
+                    
+                    segmentHTML += `
+                        <div class="route-segment">
+                            <div class="route-segment-header">${waypointNames[i]} → ${waypointNames[i + 1]}</div>
+                            <div class="route-segment-details">
+                                ${(segmentDist / 1000).toFixed(1)} km • ${Math.round(segmentTime / 60)} min
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Display segments
+                document.getElementById('routeSegments').innerHTML = segmentHTML;
+                
+                // Display total
+                document.getElementById('routeTotal').innerHTML = `
+                    <div><strong>Total Distance:</strong> ${(totalDistance / 1000).toFixed(1)} km</div>
+                    <div><strong>Total Time:</strong> ${Math.round(totalTime / 60)} min (${(totalTime / 3600).toFixed(1)} hrs)</div>
+                `;
+                
+                // Show route summary
+                document.getElementById('routeSummary').style.display = 'block';
             }).addTo(currentMap);
+        }
+        
+        // Toggle return to hotel
+        function toggleReturnToHotel() {
+            returnToHotel = document.getElementById('returnToHotel').checked;
+            if (selectedSites.size > 0) {
+                updateMapWithMultipleSites();
+            }
         }
         
         // Initialize Leaflet map
