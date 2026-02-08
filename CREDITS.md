@@ -32,7 +32,7 @@ This project uses data and services from multiple sources. We respect the terms 
 > © Instituto Geológico y Minero de España
 
 ### 2. IGN (Instituto Geográfico Nacional)
-**Website**: https://eclipse2026.ign.es/
+**Website**: https://visualizadores.ign.es/eclipses/2026
 
 **Data Used**:
 - Eclipse 2026 Viewer for visibility calculations
