@@ -92,8 +92,8 @@ def download_shademap_export(url, output_dir="data", output_filename="shademap_e
             if not popup_dismissed:
                 print("⚠️  No popup found (or already dismissed)")
             
-            # Step 2: Zoom in 3 times using the + button
-            print("\nZooming in 3 times...")
+            # Step 2: Zoom in 2 times using the + button
+            print("\nZooming in 2 times...")
             zoom_selectors = [
                 'button[aria-label*="Zoom in"]',
                 'button.zoom-in',
@@ -113,15 +113,139 @@ def download_shademap_export(url, output_dir="data", output_filename="shademap_e
                     continue
             
             if zoom_button:
-                for i in range(3):
+                for i in range(2):
                     zoom_button.click()
-                    print(f"  Zoom {i+1}/3")
+                    print(f"  Zoom {i+1}/2")
                     time.sleep(1)
-                print("✓ Zoomed in 3 times")
+                print("✓ Zoomed in 2 times")
             else:
                 print("⚠️  Could not find zoom button")
             
-            # Step 3: Click the export icon
+            # Step 3: Click settings cog to configure shadow display
+            print("\nLooking for settings button...")
+            settings_selectors = [
+                'button[aria-label*="Settings"]',
+                'button[aria-label*="settings"]',
+                'button[title*="Settings"]',
+                'button.settings',
+                'button:has-text("Settings")',
+                # SVG or icon-based buttons
+                'button svg[class*="cog"]',
+                'button svg[class*="gear"]',
+                'button svg[class*="settings"]',
+            ]
+            
+            settings_clicked = False
+            for selector in settings_selectors:
+                try:
+                    button = page.locator(selector).first
+                    if button.is_visible(timeout=5000):
+                        print(f"Found settings button with selector: {selector}")
+                        button.click()
+                        settings_clicked = True
+                        print("✓ Settings button clicked")
+                        time.sleep(2)
+                        break
+                except:
+                    continue
+            
+            if not settings_clicked:
+                print("⚠️  Could not find settings button")
+                # Take a screenshot for debugging
+                debug_file = "shademap_settings_debug.png"
+                page.screenshot(path=debug_file)
+                print(f"Debug screenshot saved to: {debug_file}")
+            else:
+                # Step 3a: Select "current time" option
+                print("\nLooking for 'current time' option...")
+                current_time_selectors = [
+                    'input[value*="current"]',
+                    'input[id*="current"]',
+                    'label:has-text("Current time")',
+                    'label:has-text("current time")',
+                    ':text("Current time")',
+                    ':text("current time")',
+                ]
+                
+                current_time_clicked = False
+                for selector in current_time_selectors:
+                    try:
+                        element = page.locator(selector).first
+                        if element.is_visible(timeout=3000):
+                            print(f"Found 'current time' with selector: {selector}")
+                            element.click()
+                            current_time_clicked = True
+                            print("✓ 'Current time' selected")
+                            time.sleep(1)
+                            break
+                    except:
+                        continue
+                
+                if not current_time_clicked:
+                    print("⚠️  Could not find 'current time' option")
+                
+                # Step 3b: Select "sunset" option
+                print("\nLooking for 'sunset' option...")
+                sunset_selectors = [
+                    'input[value*="sunset"]',
+                    'input[id*="sunset"]',
+                    'label:has-text("Sunset")',
+                    'label:has-text("sunset")',
+                    ':text("Sunset")',
+                    ':text("sunset")',
+                ]
+                
+                sunset_clicked = False
+                for selector in sunset_selectors:
+                    try:
+                        element = page.locator(selector).first
+                        if element.is_visible(timeout=3000):
+                            print(f"Found 'sunset' with selector: {selector}")
+                            element.click()
+                            sunset_clicked = True
+                            print("✓ 'Sunset' selected")
+                            time.sleep(1)
+                            break
+                    except:
+                        continue
+                
+                if not sunset_clicked:
+                    print("⚠️  Could not find 'sunset' option")
+                
+                # Step 3c: Close the settings modal by clicking X
+                print("\nLooking for close button (X)...")
+                close_selectors = [
+                    'button[aria-label*="Close"]',
+                    'button[aria-label*="close"]',
+                    'button:has-text("×")',
+                    'button:has-text("X")',
+                    'button.close',
+                    'button[title*="Close"]',
+                    # SVG close icons
+                    'button svg[class*="close"]',
+                    'button svg[class*="x"]',
+                ]
+                
+                close_clicked = False
+                for selector in close_selectors:
+                    try:
+                        button = page.locator(selector).first
+                        if button.is_visible(timeout=3000):
+                            print(f"Found close button with selector: {selector}")
+                            button.click()
+                            close_clicked = True
+                            print("✓ Settings modal closed")
+                            time.sleep(1)
+                            break
+                    except:
+                        continue
+                
+                if not close_clicked:
+                    print("⚠️  Could not find close button, trying ESC key")
+                    page.keyboard.press("Escape")
+                    time.sleep(1)
+            
+            # Step 4: Click the export icon
             print("\nLooking for export button...")
             export_selectors = [
                 'button[aria-label*="Export"]',
