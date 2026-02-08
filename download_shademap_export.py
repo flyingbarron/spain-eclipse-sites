@@ -11,6 +11,7 @@ Also requires: Chrome/Chromium browser and chromedriver
 import sys
 import time
 import os
+import urllib.parse
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -79,11 +80,29 @@ def download_shademap_export(url, output_dir="data", output_filename="shademap_e
     try:
         # Load the page
         print("Loading Shademap page...")
+        print(f"URL: {url}")
+        
+        # URL is already properly formatted by Shademap, just use it directly
+        # The special characters in the URL are intentional and part of Shademap's format
         driver.get(url)
         
-        # Wait for page to load
+        # Wait for page to load and check if it loaded correctly
         print("Waiting for page to load...")
-        time.sleep(5)
+        time.sleep(8)  # Increased wait time for complex page
+        
+        # Check if page loaded by looking for Shademap elements
+        try:
+            # Wait for the map canvas or container to load
+            WebDriverWait(driver, 10).until(
+                lambda d: d.execute_script("return document.readyState") == "complete"
+            )
+            print("✓ Page loaded successfully")
+        except:
+            print("⚠️  Page may not have loaded completely")
+            # Take a screenshot to see what's on the page
+            debug_file = "shademap_load_debug.png"
+            driver.save_screenshot(debug_file)
+            print(f"Debug screenshot saved to: {debug_file}")
         
         # Step 1: Click "OK" to dismiss popup
         print("Looking for popup to dismiss...")
