@@ -18,27 +18,31 @@
 
     <div class="container">
         <aside class="sidebar">
-            <input type="text" class="search-box" id="searchBox" placeholder="Search sites...">
-            <div style="padding: 0.5rem 0; margin-bottom: 0.5rem; border-bottom: 1px solid #dee2e6;">
-                <label style="display: flex; align-items: center; cursor: pointer; font-size: 0.9rem; margin-bottom: 0.5rem;">
-                    <input type="checkbox" id="eclipseFilter" style="margin-right: 0.5rem; cursor: pointer;">
-                    <span>🌑 Show only eclipse-visible sites</span>
-                </label>
-                <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
-                    <label for="sortBy" style="font-weight: 500;">Sort by:</label>
-                    <select id="sortBy" style="flex: 1; padding: 0.4rem; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.85rem; cursor: pointer;">
-                        <option value="code">Code</option>
-                        <option value="name">Name</option>
-                        <option value="tourist_value">Tourist Value</option>
-                    </select>
-                </div>
-                <div style="font-size: 0.75rem; color: #6c757d; margin-top: 0.5rem; padding: 0.5rem; background: #f8f9fa; border-radius: 4px;">
-                    💡 <b>Tip:</b> Hold Ctrl (Cmd on Mac) and click to select multiple sites for the map
+            <div class="sidebar-controls">
+                <input type="text" class="search-box" id="searchBox" placeholder="Search sites...">
+                <div class="filter-controls">
+                    <label style="display: flex; align-items: center; cursor: pointer; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                        <input type="checkbox" id="eclipseFilter" style="margin-right: 0.5rem; cursor: pointer;">
+                        <span>🌑 Show only eclipse-visible sites</span>
+                    </label>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
+                        <label for="sortBy" style="font-weight: 500;">Sort by:</label>
+                        <select id="sortBy" style="flex: 1; padding: 0.4rem; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.85rem; cursor: pointer;">
+                            <option value="code">Code</option>
+                            <option value="name">Name</option>
+                            <option value="tourist_value">Tourist Value</option>
+                        </select>
+                    </div>
+                    <div style="font-size: 0.75rem; color: #6c757d; margin-top: 0.5rem; padding: 0.5rem; background: #f8f9fa; border-radius: 4px;">
+                        💡 <b>Tip:</b> Hold Ctrl (Cmd on Mac) and click to select multiple sites for the map
+                    </div>
                 </div>
             </div>
-            <ul class="site-list" id="siteList">
-                <li class="loading">Loading sites...</li>
-            </ul>
+            <div class="sidebar-list-container">
+                <ul class="site-list" id="siteList">
+                    <li class="loading">Loading sites...</li>
+                </ul>
+            </div>
         </aside>
 
         <main class="content" id="content">

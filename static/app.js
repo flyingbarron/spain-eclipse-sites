@@ -3,7 +3,7 @@ let currentSite = null;
 let currentImages = [];
 let currentImageIndex = 0;
 let activeTab = 'details'; // Track which tab is active
-let selectedSites = new Set(); // Track selected sites for multi-select
+let selectedSites = []; // Track selected sites for multi-select (array to maintain order)
 let returnToHotel = false; // Track if return to hotel is enabled
 let currentRouteControl = null; // Track current route control
 let routeSegments = []; // Store route segment data
@@ -100,9 +100,9 @@ function displaySites(sites) {
             eclipseLabel = `<span class="site-eclipse ${eclipseClass}">${eclipseText}</span>`;
         }
         
-        const isSelected = selectedSites.has(site.code);
+        const isSelected = selectedSites.includes(site.code);
         return `
-            <li class="site-item ${isSelected ? 'active' : ''}" data-code="${site.code}" onclick="selectSite('${site.code}', event)">
+            <li class="site-item ${isSelected ? 'active' : ''}" data-code="${site.code}">
                 <div class="site-code">${site.code}</div>
                 <div class="site-name">${site.denominacion || 'N/A'}</div>
                 <div>
@@ -163,37 +163,135 @@ function selectSite(code, event) {
 
     if (isMultiSelect) {
         // Toggle selection
-        if (selectedSites.has(code)) {
-            selectedSites.delete(code);
+        const index = selectedSites.indexOf(code);
+        if (index > -1) {
+            selectedSites.splice(index, 1);
         } else {
-            selectedSites.add(code);
+            selectedSites.push(code);
         }
         
-        // Update visual state
-        const item = document.querySelector(`[data-code="${code}"]`);
-        if (item) {
-            item.classList.toggle('active');
-        }
+        console.log('Selected sites:', selectedSites);
+        
+        // Update visual state - refresh the entire list to update draggable attributes
+        filterSites();
+        
+        // Verify draggable was set
+        setTimeout(() => {
+            const item = document.querySelector(`[data-code="${code}"]`);
+            console.log('Item after refresh:', item);
+            console.log('Has draggable:', item?.hasAttribute('draggable'));
+            console.log('Draggable value:', item?.getAttribute('draggable'));
+        }, 100);
         
         // If we have selected sites, update the map
-        if (selectedSites.size > 0 && activeTab === 'map') {
+        if (selectedSites.length > 0 && activeTab === 'map') {
             updateMapWithMultipleSites();
         }
     } else {
         // Single select - clear previous selections
-        selectedSites.clear();
-        selectedSites.add(code);
+        selectedSites = [code];
         currentSite = site;
 
-        // Update active state
+        // Update active state and remove draggable
         document.querySelectorAll('.site-item').forEach(item => {
             item.classList.remove('active');
+            item.removeAttribute('draggable');
+            item.style.cursor = 'pointer';
         });
-        document.querySelector(`[data-code="${code}"]`).classList.add('active');
+        const selectedItem = document.querySelector(`[data-code="${code}"]`);
+        selectedItem.classList.add('active');
 
         // Display site details
         displaySiteDetails(site);
     }
+}
+
+// Drag and drop handlers for reordering sites in the map view
+let draggedElement = null;
+let draggedCode = null;
+
+// Initialize drag and drop for site list (for selection only)
+function initializeDragAndDrop() {
+    const siteList = document.getElementById('siteList');
+    if (!siteList) return;
+
+    // Add click handler for site selection
+    siteList.addEventListener('click', (e) => {
+        const siteItem = e.target.closest('.site-item');
+        if (siteItem) {
+            const code = siteItem.getAttribute('data-code');
+            if (code) {
+                selectSite(code, e);
+            }
+        }
+    });
+}
+
+// Initialize drag and drop for reordering sites in the route summary
+function initializeReorderDragAndDrop() {
+    const reorderList = document.getElementById('reorderSitesList');
+    if (!reorderList) return;
+
+    reorderList.addEventListener('dragstart', (e) => {
+        const item = e.target.closest('.reorder-site-item');
+        if (item) {
+            draggedElement = item;
+            draggedCode = item.getAttribute('data-code');
+            item.style.opacity = '0.5';
+            e.dataTransfer.effectAllowed = 'move';
+        }
+    });
+
+    reorderList.addEventListener('dragend', (e) => {
+        if (e.target.classList.contains('reorder-site-item')) {
+            e.target.style.opacity = '1';
+            // Clear all border highlights
+            document.querySelectorAll('.reorder-site-item').forEach(item => {
+                item.style.borderTop = '';
+            });
+        }
+    });
+
+    reorderList.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const target = e.target.closest('.reorder-site-item');
+        if (target && target !== draggedElement) {
+            e.dataTransfer.dropEffect = 'move';
+            target.style.borderTop = '3px solid #007bff';
+        }
+    });
+
+    reorderList.addEventListener('dragleave', (e) => {
+        const target = e.target.closest('.reorder-site-item');
+        if (target) {
+            target.style.borderTop = '';
+        }
+    });
+
+    reorderList.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const target = e.target.closest('.reorder-site-item');
+        
+        if (target && target !== draggedElement) {
+            target.style.borderTop = '';
+            
+            const targetCode = target.getAttribute('data-code');
+            
+            if (draggedCode && targetCode && draggedCode !== targetCode) {
+                // Reorder the selectedSites array
+                const draggedIndex = selectedSites.indexOf(draggedCode);
+                const targetIndex = selectedSites.indexOf(targetCode);
+                
+                if (draggedIndex > -1 && targetIndex > -1) {
+                    selectedSites.splice(draggedIndex, 1);
+                    selectedSites.splice(targetIndex, 0, draggedCode);
+                    
+                    // Update the map with new order
+                    updateMapWithMultipleSites();
+                }
+            }
+        }
+    });
 }
 
 // Update only the details tab content (without affecting the map)
@@ -592,7 +690,10 @@ function createMapWithSites(sites, options = {}) {
                 }
                 // Fit map to show all route coordinates
                 if (allRouteBounds.isValid()) {
-                    currentMap.fitBounds(allRouteBounds, { padding: [80, 80] });
+                    // Invalidate size to ensure map container dimensions are correct
+                    currentMap.invalidateSize();
+                    // Fit bounds with appropriate padding
+                    currentMap.fitBounds(allRouteBounds, { padding: [50, 50], maxZoom: 15 });
                 }
             }
         }).addTo(currentMap);
@@ -601,10 +702,10 @@ function createMapWithSites(sites, options = {}) {
 
 // Update map with multiple selected sites
 function updateMapWithMultipleSites() {
-    if (selectedSites.size === 0) return;
+    if (selectedSites.length === 0) return;
     
-    // Get all selected site objects
-    const sites = Array.from(selectedSites).map(code =>
+    // Get all selected site objects (in order)
+    const sites = selectedSites.map(code =>
         sitesData.find(s => s.code === code)
     ).filter(s => s && s.latitude !== 'N/A' && s.longitude !== 'N/A');
     
@@ -615,6 +716,31 @@ function updateMapWithMultipleSites() {
 
 // Display route summary
 function displayRouteSummary(totalDistance, totalTime) {
+    // Build reorderable site list (only for multi-site routes)
+    let siteListHTML = '';
+    if (selectedSites.length > 1) {
+        siteListHTML = `
+            <div class="reorder-sites-container">
+                <div class="reorder-sites-header" onclick="toggleReorderList()" style="cursor: pointer;">
+                    <span id="reorderToggleIcon">▶</span> 📍 Route Order (drag to reorder)
+                </div>
+                <ul class="reorder-sites-list" id="reorderSitesList" style="display: none;">
+        `;
+        selectedSites.forEach((code, index) => {
+            const site = sitesData.find(s => s.code === code);
+            if (site) {
+                siteListHTML += `
+                    <li class="reorder-site-item" data-code="${code}" draggable="true">
+                        <span class="reorder-handle">⋮⋮</span>
+                        <span class="reorder-number">${index + 1}</span>
+                        <span class="reorder-name">${site.denominacion || code}</span>
+                    </li>
+                `;
+            }
+        });
+        siteListHTML += '</ul></div>';
+    }
+    
     let segmentHTML = '';
     
     routeSegments.forEach((segment, i) => {
@@ -628,14 +754,59 @@ function displayRouteSummary(totalDistance, totalTime) {
         `;
     });
     
-    document.getElementById('routeSegments').innerHTML = segmentHTML;
+    document.getElementById('routeSegments').innerHTML = siteListHTML + segmentHTML;
+    
+    // Build Google Maps URL for the entire route
+    let googleMapsUrl = 'https://www.google.com/maps/dir/';
+    // Start from hotel
+    googleMapsUrl += `${HOTEL_LAT},${HOTEL_LON}/`;
+    // Add all sites in order
+    selectedSites.forEach(code => {
+        const site = sitesData.find(s => s.code === code);
+        if (site) {
+            googleMapsUrl += `${site.latitude},${site.longitude}/`;
+        }
+    });
+    // Return to hotel if enabled
+    if (returnToHotel) {
+        googleMapsUrl += `${HOTEL_LAT},${HOTEL_LON}/`;
+    }
     
     document.getElementById('routeTotal').innerHTML = `
         <div><strong>Total Distance:</strong> ${(totalDistance / 1000).toFixed(1)} km</div>
         <div><strong>Total Time:</strong> ${Math.round(totalTime / 60)} min (${(totalTime / 3600).toFixed(1)} hrs)</div>
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
+            <a href="${googleMapsUrl}" target="_blank" class="google-maps-route-btn">
+                📍 Open in Google Maps
+            </a>
+            <button onclick="exportRouteAsKML()" class="export-kml-btn">
+                💾 Export as KML
+            </button>
+        </div>
     `;
     
     document.getElementById('routeSummary').style.display = 'block';
+    
+    // Initialize drag-and-drop for reordering if we have multiple sites
+    if (selectedSites.length > 1) {
+        initializeReorderDragAndDrop();
+    }
+}
+
+// Toggle reorder list visibility
+function toggleReorderList() {
+    const list = document.getElementById('reorderSitesList');
+    const icon = document.getElementById('reorderToggleIcon');
+    
+    if (list && icon) {
+        if (list.style.display === 'none') {
+            list.style.display = 'block';
+            icon.textContent = '▼';
+        } else {
+            list.style.display = 'none';
+            icon.textContent = '▶';
+        }
+    }
 }
 
 // Highlight a specific segment and show directions
@@ -722,7 +893,7 @@ function closeDirections() {
 // Toggle return to hotel
 function toggleReturnToHotel() {
     returnToHotel = document.getElementById('returnToHotel').checked;
-    if (selectedSites.size > 0) {
+    if (selectedSites.length > 0) {
         updateMapWithMultipleSites();
     }
 }
@@ -862,8 +1033,138 @@ function switchTab(tabName) {
         document.getElementById('mapTab').classList.add('active');
     }
 }
+// Export route as KML file
+function exportRouteAsKML() {
+    if (selectedSites.length === 0) return;
+    
+    // Build KML content
+    let kml = `<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Spain Eclipse Sites Route</name>
+    <description>Route visiting ${selectedSites.length} geological sites</description>
+    
+    <!-- Style for hotel -->
+    <Style id="hotelIcon">
+      <IconStyle>
+        <Icon>
+          <href>http://maps.google.com/mapfiles/kml/shapes/lodging.png</href>
+        </Icon>
+      </IconStyle>
+    </Style>
+    
+    <!-- Style for sites -->
+    <Style id="siteIcon">
+      <IconStyle>
+        <Icon>
+          <href>http://maps.google.com/mapfiles/kml/paddle/blu-circle.png</href>
+        </Icon>
+      </IconStyle>
+    </Style>
+    
+    <!-- Hotel start point -->
+    <Placemark>
+      <name>Hotel Parras Arnedillo (Start)</name>
+      <description>Starting point</description>
+      <styleUrl>#hotelIcon</styleUrl>
+      <Point>
+        <coordinates>${HOTEL_LON},${HOTEL_LAT},0</coordinates>
+      </Point>
+    </Placemark>
+    
+`;
+    
+    // Add each site as a placemark
+    selectedSites.forEach((code, index) => {
+        const site = sitesData.find(s => s.code === code);
+        if (site) {
+            kml += `    <!-- Site ${index + 1} -->
+    <Placemark>
+      <name>${index + 1}. ${site.denominacion || site.code}</name>
+      <description><![CDATA[
+        <b>Code:</b> ${site.code}<br/>
+        <b>Tourist Value:</b> ${site.valor_turistico}<br/>
+        <b>Privacy:</b> ${site.confidencialidad}<br/>
+        <b>Eclipse Visibility:</b> ${site.eclipse_visibility || 'Unknown'}<br/>
+        <b>URL:</b> <a href="${site.url}">${site.url}</a>
+      ]]></description>
+      <styleUrl>#siteIcon</styleUrl>
+      <Point>
+        <coordinates>${site.longitude},${site.latitude},0</coordinates>
+      </Point>
+    </Placemark>
+    
+`;
+        }
+    });
+    
+    // Add return to hotel if enabled
+    if (returnToHotel) {
+        kml += `    <!-- Return to hotel -->
+    <Placemark>
+      <name>Hotel Parras Arnedillo (Return)</name>
+      <description>End point</description>
+      <styleUrl>#hotelIcon</styleUrl>
+      <Point>
+        <coordinates>${HOTEL_LON},${HOTEL_LAT},0</coordinates>
+      </Point>
+    </Placemark>
+    
+`;
+    }
+    
+    // Add route line
+    kml += `    <!-- Route line -->
+    <Placemark>
+      <name>Route</name>
+      <description>Driving route between sites</description>
+      <Style>
+        <LineStyle>
+          <color>ff0000ff</color>
+          <width>3</width>
+        </LineStyle>
+      </Style>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>
+          ${HOTEL_LON},${HOTEL_LAT},0
+`;
+    
+    selectedSites.forEach(code => {
+        const site = sitesData.find(s => s.code === code);
+        if (site) {
+            kml += `          ${site.longitude},${site.latitude},0\n`;
+        }
+    });
+    
+    if (returnToHotel) {
+        kml += `          ${HOTEL_LON},${HOTEL_LAT},0\n`;
+    }
+    
+    kml += `        </coordinates>
+      </LineString>
+    </Placemark>
+    
+  </Document>
+</kml>`;
+    
+    // Create blob and download
+    const blob = new Blob([kml], { type: 'application/vnd.google-earth.kml+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `spain-eclipse-route-${selectedSites.length}-sites.kml`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
 
-// Load data on page load
-loadCSV();
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    initializeDragAndDrop();
+    loadCSV();
+});
 
 // Made with Bob

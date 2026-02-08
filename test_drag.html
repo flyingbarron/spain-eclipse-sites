@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Drag Test</title>
+    <style>
+        .item {
+            padding: 20px;
+            margin: 10px;
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            cursor: move;
+        }
+        .item[draggable="true"] {
+            cursor: move;
+        }
+    </style>
+</head>
+<body>
+    <h1>Drag Test</h1>
+    <div id="list">
+        <div class="item" draggable="true">Item 1 - Draggable</div>
+        <div class="item" draggable="true">Item 2 - Draggable</div>
+        <div class="item">Item 3 - Not Draggable</div>
+    </div>
+    <script>
+        const list = document.getElementById('list');
+        let draggedElement = null;
+
+        list.addEventListener('dragstart', (e) => {
+            if (e.target.classList.contains('item') && e.target.hasAttribute('draggable')) {
+                draggedElement = e.target;
+                e.target.style.opacity = '0.5';
+                console.log('Drag started:', e.target.textContent);
+            }
+        });
+
+        list.addEventListener('dragend', (e) => {
+            e.target.style.opacity = '1';
+            console.log('Drag ended');
+        });
+
+        list.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const target = e.target.closest('.item');
+            if (target && target !== draggedElement) {
+                target.style.borderTop = '3px solid blue';
+            }
+        });
+
+        list.addEventListener('dragleave', (e) => {
+            const target = e.target.closest('.item');
+            if (target) {
+                target.style.borderTop = '';
+            }
+        });
+
+        list.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const target = e.target.closest('.item');
+            if (target && target !== draggedElement) {
+                target.style.borderTop = '';
+                console.log('Dropped on:', target.textContent);
+                // Swap elements
+                const parent = target.parentNode;
+                const draggedIndex = Array.from(parent.children).indexOf(draggedElement);
+                const targetIndex = Array.from(parent.children).indexOf(target);
+                
+                if (draggedIndex < targetIndex) {
+                    parent.insertBefore(draggedElement, target.nextSibling);
+                } else {
+                    parent.insertBefore(draggedElement, target);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
