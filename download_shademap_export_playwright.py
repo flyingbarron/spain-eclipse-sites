@@ -212,38 +212,68 @@ def download_shademap_export(url, output_dir="data", output_filename="shademap_e
                 if not sunset_clicked:
                     print("⚠️  Could not find 'sunset' option")
                 
-                # Step 3c: Close the settings modal by clicking X
-                print("\nLooking for close button (X)...")
+                # Step 3c: Close the settings modal by clicking X symbol in upper right
+                print("\nLooking for X symbol to close modal...")
+                
+                # Take a screenshot to see the modal
+                debug_file = "shademap_modal_debug.png"
+                page.screenshot(path=debug_file)
+                print(f"Debug screenshot saved to: {debug_file}")
+                
                 close_selectors = [
-                    'button[aria-label*="Close"]',
-                    'button[aria-label*="close"]',
-                    'button:has-text("×")',
+                    # Try various ways to find the X symbol in upper right
+                    'button:has-text("×")',  # Multiplication sign
+                    'button:has-text("✕")',  # Heavy multiplication X
+                    'button:has-text("✖")',  # Heavy multiplication X
                     'button:has-text("X")',
-                    'button.close',
-                    'button[title*="Close"]',
-                    # SVG close icons
-                    'button svg[class*="close"]',
-                    'button svg[class*="x"]',
+                    'button:has-text("x")',
+                    # Look for buttons in the modal header/top area
+                    '[role="dialog"] button:last-child',
+                    '.modal button:last-child',
+                    '.modal-header button',
+                    'header button',
+                    # SVG-based close buttons
+                    'button svg',
+                    'button path[d*="M"]',  # SVG paths often start with M for close icons
+                    # Generic close patterns
+                    'button[class*="close"]',
+                    'button[class*="dismiss"]',
+                    '[aria-label*="close" i]',
+                    '[aria-label*="dismiss" i]',
                 ]
                 
                 close_clicked = False
                 for selector in close_selectors:
                     try:
-                        button = page.locator(selector).first
-                        if button.is_visible(timeout=3000):
-                            print(f"Found close button with selector: {selector}")
-                            button.click()
-                            close_clicked = True
-                            print("✓ Settings modal closed")
-                            time.sleep(1)
+                        # Get all matching elements and try each one
+                        buttons = page.locator(selector).all()
+                        for button in buttons:
+                            try:
+                                if button.is_visible(timeout=1000):
+                                    # Check if it's in the upper right area
+                                    box = button.bounding_box()
+                                    if box:
+                                        # If it's in the right half and upper portion, likely the close button
+                                        viewport = page.viewport_size
+                                        if box['x'] > viewport['width'] * 0.5 and box['y'] < viewport['height'] * 0.3:
+                                            print(f"Found X button with selector: {selector} at position ({box['x']}, {box['y']})")
+                                            button.click()
+                                            close_clicked = True
+                                            print("✓ Settings modal closed")
+                                            time.sleep(1)
+                                            break
+                            except:
+                                continue
+                        if close_clicked:
                             break
                     except:
                         continue
                 
                 if not close_clicked:
-                    print("⚠️  Could not find close button, trying ESC key")
+                    print("⚠️  Could not find X button, trying ESC key")
                     page.keyboard.press("Escape")
                     time.sleep(1)
+                    print("✓ Pressed ESC to close modal")
             
             # Step 4: Click the export icon
             print("\nLooking for export button...")
