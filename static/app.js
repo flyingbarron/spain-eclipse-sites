@@ -469,13 +469,13 @@ async function displaySiteDetails(site) {
             <div class="detail-header">
                 <h2>${site.denominacion || site.code}</h2>
                 <div style="display: flex; align-items: flex-start; gap: 0.5rem; flex-wrap: wrap;">
-                    <a href="${site.url}" target="_blank" class="link-button" style="font-size: 1rem; padding: 0.6rem 1rem; white-space: nowrap;">🪨 IGME</a>
-                    <a href="${mapsUrl}" target="_blank" class="link-button maps" style="font-size: 1rem; padding: 0.6rem 1rem; white-space: nowrap;">📍 Maps</a>
-                    <a href="${shademapUrl}" target="_blank" class="link-button shademap" style="font-size: 1rem; padding: 0.6rem 1rem; white-space: nowrap;">🌄 Shademap</a>
-                    ${cloudButton ? cloudButton.replace('class="link-button cloud"', 'class="link-button cloud" style="font-size: 1rem; padding: 0.6rem 1rem; white-space: nowrap;"').replace('☁️ Cloud Coverage Data', '☁️ Cloud') : ''}
-                    <a href="${eclipseFanUrl}" target="_blank" class="link-button eclipsefan" style="font-size: 1rem; padding: 0.6rem 1rem; white-space: nowrap;">🌒 EclipseFan</a>
+                    <a href="${site.url}" target="_blank" class="link-button">🪨 View on IGME Website</a>
+                    <a href="${mapsUrl}" target="_blank" class="link-button maps">📍 Open in Google Maps</a>
+                    <a href="${shademapUrl}" target="_blank" class="link-button shademap">🌄 View on Shademap</a>
+                    ${cloudButton}
+                    <a href="${eclipseFanUrl}" target="_blank" class="link-button eclipsefan">🌒 EclipseFan.org</a>
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
-                        <a href="${eclipseUrl}" target="_blank" class="link-button eclipse" style="font-size: 1rem; padding: 0.6rem 1rem; white-space: nowrap;">🌑 Eclipse 2026</a>
+                        <a href="${eclipseUrl}" target="_blank" class="link-button eclipse">🌑 Eclipse 2026 View</a>
                         <div style="position: relative; display: inline-block;">
                             <img src="data/eclipse_profiles/${site.code}_profile.png"
                                  alt="Eclipse visibility profile for ${site.code}"
