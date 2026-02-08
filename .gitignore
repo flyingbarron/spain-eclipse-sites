@@ -36,10 +36,8 @@ env/
 *.swo
 *~
 
-# Output files (commented out so viewer can use CSV)
-# igme_tourist_values.csv
-igme_tourist_values.kml
-eclipse_visibility_results.csv
+# Data directory - all generated data files
+data/
 
 # OS
 .DS_Store

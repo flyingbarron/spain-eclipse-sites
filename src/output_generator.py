@@ -5,10 +5,56 @@ Functions for generating CSV and KML output files
 
 import csv
 import os
+import math
 
 # Ensure data directory exists
 DATA_DIR = "data"
 os.makedirs(DATA_DIR, exist_ok=True)
+
+# Eclipse azimuth constant (degrees)
+ECLIPSE_AZIMUTH = 283.7753
+AZIMUTH_LINE_DISTANCE_KM = 50
+
+
+def calculate_endpoint(lat, lon, azimuth, distance_km=50):
+    """Calculate endpoint coordinates given start point, azimuth, and distance
+    
+    Args:
+        lat: Starting latitude in decimal degrees
+        lon: Starting longitude in decimal degrees
+        azimuth: Bearing in degrees (0=North, 90=East, 180=South, 270=West)
+        distance_km: Distance in kilometers
+    
+    Returns:
+        Tuple of (end_lat, end_lon)
+    """
+    # Earth's radius in kilometers
+    R = 6371.0
+    
+    # Convert to radians
+    lat_rad = math.radians(lat)
+    lon_rad = math.radians(lon)
+    azimuth_rad = math.radians(azimuth)
+    
+    # Angular distance
+    angular_distance = distance_km / R
+    
+    # Calculate end point
+    end_lat_rad = math.asin(
+        math.sin(lat_rad) * math.cos(angular_distance) +
+        math.cos(lat_rad) * math.sin(angular_distance) * math.cos(azimuth_rad)
+    )
+    
+    end_lon_rad = lon_rad + math.atan2(
+        math.sin(azimuth_rad) * math.sin(angular_distance) * math.cos(lat_rad),
+        math.cos(angular_distance) - math.sin(lat_rad) * math.sin(end_lat_rad)
+    )
+    
+    # Convert back to degrees
+    end_lat = math.degrees(end_lat_rad)
+    end_lon = math.degrees(end_lon_rad)
+    
+    return end_lat, end_lon
 
 
 def save_to_csv(results, filename='eclipse_site_data.csv'):
@@ -118,6 +164,12 @@ def save_to_kml(results, filename='sites.kml'):
         </Icon>
       </IconStyle>
     </Style>
+    <Style id="azimuthLine">
+      <LineStyle>
+        <color>ff00ffff</color>
+        <width>3</width>
+      </LineStyle>
+    </Style>
 '''
     
     kml_footer = '''  </Document>
@@ -180,6 +232,29 @@ def save_to_kml(results, filename='sites.kml'):
       </Placemark>
 '''
                 kmlfile.write(placemark)
+                
+                # Add azimuth line for this site
+                try:
+                    lat = float(result['latitude'])
+                    lon = float(result['longitude'])
+                    end_lat, end_lon = calculate_endpoint(lat, lon, ECLIPSE_AZIMUTH, AZIMUTH_LINE_DISTANCE_KM)
+                    
+                    azimuth_placemark = f'''
+      <Placemark>
+        <name>{name} - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: {ECLIPSE_AZIMUTH}° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>{lon},{lat},0 {end_lon},{end_lat},0</coordinates>
+        </LineString>
+      </Placemark>
+'''
+                    kmlfile.write(azimuth_placemark)
+                except (ValueError, TypeError):
+                    # Skip azimuth line if coordinates are invalid
+                    pass
             
             kmlfile.write('    </Folder>\n')
         

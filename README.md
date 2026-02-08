@@ -37,6 +37,7 @@ This project scrapes geological site information from IGME's IELIG database and 
   - 🟢 High Tourist Value (>5.0) - Eclipse Visible/Not Visible
   - 🟡 Medium Tourist Value (4.0-5.0) - Eclipse Visible/Not Visible
   - 🔴 Lower Tourist Value (<4.0) - Eclipse Visible/Not Visible
+  - 🧭 **Eclipse azimuth lines** automatically included (283.7753°, 50km length)
 - **PNG** - Eclipse visibility profile diagrams
 
 ## Installation
@@ -88,17 +89,7 @@ Check specific site only:
 python3 generate_eclipse_site_data.py --code IB200a
 ```
 
-### Add Eclipse Azimuth Lines (Optional)
-
-Add directional lines pointing toward the eclipse azimuth to your KML file:
-```bash
-python3 add_eclipse_azimuth.py data/sites.kml data/sites_with_azimuth.kml
-```
-
-Custom azimuth and distance:
-```bash
-python3 add_eclipse_azimuth.py data/sites.kml output.kml --azimuth 283.7753 --distance 100
-```
+**Note**: Eclipse azimuth lines (283.7753°, 50km length) are automatically included in the generated KML file, showing the direction toward the eclipse for each site.
 
 ### View Data
 
@@ -119,6 +110,7 @@ spain-eclipse-sites/
 ├── archive/                          # Legacy scripts
 │   ├── scrape_igme_sites.py
 │   ├── check_eclipse_visibility.py
+│   ├── add_eclipse_azimuth.py       # Standalone azimuth tool (deprecated)
 │   └── favicon.svg
 ├── data/                             # Generated data (gitignored)
 │   ├── eclipse_profiles/             # Profile diagram images
@@ -128,9 +120,8 @@ spain-eclipse-sites/
 │   ├── __init__.py
 │   ├── igme_scraper.py              # IGME site scraping
 │   ├── eclipse_checker.py           # Eclipse visibility checking
-│   └── output_generator.py          # CSV/KML generation
+│   └── output_generator.py          # CSV/KML generation with azimuth lines
 ├── generate_eclipse_site_data.py     # Main data generation script
-├── add_eclipse_azimuth.py            # Add azimuth lines to KML
 ├── serve_viewer.py                   # Web viewer server
 ├── viewer.html                       # Interactive web interface
 ├── requirements.txt                  # Python dependencies
@@ -187,7 +178,9 @@ spain-eclipse-sites/
 - 🔴 **Lower Tourist Value (<4.0)** - Eclipse Visible
 - 🔴 **Lower Tourist Value (<4.0)** - Eclipse Not Visible
 
-Each folder contains sites with the corresponding tourist value and eclipse visibility status.
+Each folder contains:
+- Site markers with detailed information
+- 🧭 **Eclipse azimuth lines** (yellow, 50km) pointing toward the eclipse direction (283.7753°)
 
 ### Profile Diagrams
 
