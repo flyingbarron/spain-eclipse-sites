@@ -326,7 +326,7 @@ header h1 {
 }
 
 .eclipse-profile-thumbnail {
-    height: 80px;
+    height: 60px;
     border: 2px solid #6f42c1;
     border-radius: 4px;
     cursor: pointer;
