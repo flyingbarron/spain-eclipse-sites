@@ -147,15 +147,14 @@ header h1 {
 }
 
 .detail-header {
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #dee2e6;
+    margin-bottom: 1rem;
+    padding-bottom: 0;
 }
 
 .detail-header h2 {
     font-size: 2rem;
     color: #2c3e50;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
 }
 
 .detail-info {
