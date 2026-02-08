@@ -367,13 +367,23 @@ def process_all_sites():
     with open(csv_file, 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for row in reader:
-            if row.get('latitude') and row.get('longitude'):
+            lat = row.get('latitude', '').strip()
+            lon = row.get('longitude', '').strip()
+            
+            # Skip sites without valid coordinates
+            if not lat or not lon or lat == 'N/A' or lon == 'N/A':
+                continue
+            
+            try:
                 sites.append({
                     'code': row['code'],
                     'name': row.get('denominacion', row['code']),
-                    'lat': float(row['latitude']),
-                    'lon': float(row['longitude'])
+                    'lat': float(lat),
+                    'lon': float(lon)
                 })
+            except ValueError:
+                print(f"Warning: Skipping {row['code']} - invalid coordinates: {lat}, {lon}")
+                continue
     
     print(f"Found {len(sites)} sites with coordinates")
     print("=" * 60)
