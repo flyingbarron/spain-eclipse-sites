@@ -9,6 +9,7 @@ import argparse
 import sys
 from src.igme_scraper import scrape_all_sites
 from src.eclipse_checker import check_sites_eclipse_visibility
+from src.cloud_coverage_scraper import scrape_cloud_coverage_for_sites
 from src.output_generator import save_to_csv, save_to_kml, print_summary
 
 
@@ -19,20 +20,25 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Generate all data (IGME + eclipse visibility)
+  # Generate all data (IGME + eclipse visibility + cloud coverage)
   python3 generate_eclipse_site_data.py
   
   # Skip eclipse checking (faster, IGME data only)
   python3 generate_eclipse_site_data.py --no-eclipse
   
+  # Skip cloud coverage scraping (faster)
+  python3 generate_eclipse_site_data.py --no-cloud
+  
   # Check specific site only
   python3 generate_eclipse_site_data.py --code IB200a
         """
     )
-    parser.add_argument('--code', '-c', 
+    parser.add_argument('--code', '-c',
                        help='Scrape only a specific site code (e.g., IB200a)')
     parser.add_argument('--no-eclipse', action='store_true',
                        help='Skip eclipse visibility checking')
+    parser.add_argument('--no-cloud', action='store_true',
+                       help='Skip cloud coverage scraping')
     args = parser.parse_args()
     
     print("=" * 60)
@@ -62,6 +68,21 @@ Examples:
         print("\n⚠️  Skipping eclipse visibility checking (--no-eclipse flag)")
         for site in results:
             site['eclipse_visibility'] = 'not_checked'
+    
+    # Step 2.5: Scrape cloud coverage (if enabled)
+    if not args.no_cloud:
+        print("\n" + "=" * 60)
+        print("STEP 2.5: Scraping cloud coverage data...")
+        print("=" * 60)
+        print("This will take a while (2 second delay between requests)...")
+        results = scrape_cloud_coverage_for_sites(results, delay=2.0)
+        print(f"\n✓ Cloud coverage scraped for all sites")
+    else:
+        print("\n⚠️  Skipping cloud coverage scraping (--no-cloud flag)")
+        for site in results:
+            site['cloud_coverage'] = None
+            site['cloud_status'] = 'not_checked'
+            site['cloud_url'] = None
     
     # Step 3: Generate outputs
     print("\n" + "=" * 60)

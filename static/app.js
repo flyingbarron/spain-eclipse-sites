@@ -11,7 +11,7 @@ let routeSegments = []; // Store route segment data
 // Load CSV file
 async function loadCSV() {
     try {
-        const response = await fetch('data/eclipse_site_data.csv');
+        const response = await fetch('data/eclipse_site_data_with_cloud.csv');
         const text = await response.text();
         
         parseCSV(text);
@@ -100,6 +100,22 @@ function displaySites(sites) {
             eclipseLabel = `<span class="site-eclipse ${eclipseClass}">${eclipseText}</span>`;
         }
         
+        // Add cloud coverage label
+        let cloudLabel = '';
+        if (site.cloud_coverage && site.cloud_status === 'success') {
+            const cloudPct = parseInt(site.cloud_coverage);
+            let cloudEmoji = '☀️';
+            let cloudClass = 'low';
+            if (cloudPct >= 60) {
+                cloudEmoji = '☁️';
+                cloudClass = 'high';
+            } else if (cloudPct >= 30) {
+                cloudEmoji = '⛅';
+                cloudClass = 'medium';
+            }
+            cloudLabel = `<span class="site-cloud ${cloudClass}">${cloudEmoji} ${cloudPct}%</span>`;
+        }
+        
         const isSelected = selectedSites.includes(site.code);
         return `
             <li class="site-item ${isSelected ? 'active' : ''}" data-code="${site.code}">
@@ -109,6 +125,7 @@ function displaySites(sites) {
                     <span class="site-value">VT: ${site.valor_turistico}</span>
                     <span class="site-privacy">${site.confidencialidad}</span>
                     ${eclipseLabel}
+                    ${cloudLabel}
                 </div>
             </li>
         `;
@@ -119,6 +136,7 @@ function displaySites(sites) {
 function filterSites() {
     const searchTerm = document.getElementById('searchBox').value.toLowerCase();
     const eclipseFilter = document.getElementById('eclipseFilter').checked;
+    const cloudFilter = document.getElementById('cloudFilter').value;
     const sortBy = document.getElementById('sortBy').value;
     
     let filtered = sitesData.filter(site => {
@@ -127,7 +145,22 @@ function filterSites() {
         
         const matchesEclipse = !eclipseFilter || site.eclipse_visibility === 'visible';
         
-        return matchesSearch && matchesEclipse;
+        // Cloud coverage filter
+        let matchesCloud = true;
+        if (cloudFilter !== 'all' && site.cloud_coverage && site.cloud_status === 'success') {
+            const cloudPct = parseInt(site.cloud_coverage);
+            if (cloudFilter === 'low') {
+                matchesCloud = cloudPct < 30;
+            } else if (cloudFilter === 'medium') {
+                matchesCloud = cloudPct >= 30 && cloudPct < 60;
+            } else if (cloudFilter === 'high') {
+                matchesCloud = cloudPct >= 60;
+            }
+        } else if (cloudFilter !== 'all') {
+            matchesCloud = false; // Exclude sites without cloud data when filter is active
+        }
+        
+        return matchesSearch && matchesEclipse && matchesCloud;
     });
     
     // Sort
@@ -151,6 +184,7 @@ function filterSites() {
 // Event listeners
 document.getElementById('searchBox').addEventListener('input', filterSites);
 document.getElementById('eclipseFilter').addEventListener('change', filterSites);
+document.getElementById('cloudFilter').addEventListener('change', filterSites);
 document.getElementById('sortBy').addEventListener('change', filterSites);
 
 // Select a site
@@ -404,6 +438,12 @@ async function displaySiteDetails(site) {
     
     const eclipseUrl = `https://visualizadores.ign.es/eclipses/2026?center=${x},${yMercator}&zoom=16&srs=EPSG:3857`;
     
+    // Build cloud coverage button if available
+    let cloudButton = '';
+    if (site.cloud_url && site.cloud_status === 'success') {
+        cloudButton = `<a href="${site.cloud_url}" target="_blank" class="link-button cloud">☁️ Cloud Coverage Data</a>`;
+    }
+    
     content.innerHTML = `
         <div class="site-details">
             <div class="detail-header">
@@ -412,6 +452,7 @@ async function displaySiteDetails(site) {
                     <a href="${site.url}" target="_blank" class="link-button">🪨 View on IGME Website</a>
                     <a href="${mapsUrl}" target="_blank" class="link-button maps">📍 Open in Google Maps</a>
                     <a href="${shademapUrl}" target="_blank" class="link-button shademap">🌄 View on Shademap</a>
+                    ${cloudButton}
                     <a href="${eclipseUrl}" target="_blank" class="link-button eclipse">🌑 Eclipse 2026 View</a>
                     <div style="position: relative; display: inline-block;">
                         <img src="data/eclipse_profiles/${site.code}_profile.png"
@@ -467,6 +508,20 @@ async function displaySiteDetails(site) {
                         ${site.eclipse_visibility === 'visible' ? '🌑 Visible' :
                           site.eclipse_visibility === 'not_visible' ? '🌑 Not Visible' :
                           '🌑 ' + site.eclipse_visibility}
+                    </div>
+                </div>
+                ` : ''}
+                ${site.cloud_coverage && site.cloud_status === 'success' ? `
+                <div class="info-item">
+                    <div class="info-label">Cloud Coverage (Aug 12)</div>
+                    <div class="info-value" style="color: ${
+                        parseInt(site.cloud_coverage) < 30 ? '#28a745' :
+                        parseInt(site.cloud_coverage) < 60 ? '#ffc107' : '#dc3545'
+                    }">
+                        ${parseInt(site.cloud_coverage) < 30 ? '☀️' :
+                          parseInt(site.cloud_coverage) < 60 ? '⛅' : '☁️'} ${site.cloud_coverage}%
+                        ${parseInt(site.cloud_coverage) < 30 ? ' (Low - Good!)' :
+                          parseInt(site.cloud_coverage) < 60 ? ' (Medium)' : ' (High)'}
                     </div>
                 </div>
                 ` : ''}

@@ -148,6 +148,29 @@ header h1 {
     color: #000;
 }
 
+.site-cloud {
+    font-size: 0.75rem;
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    margin-left: 0.25rem;
+}
+
+.site-cloud.low {
+    background: #28a745;
+    color: white;
+}
+
+.site-cloud.medium {
+    background: #ffc107;
+    color: #000;
+}
+
+.site-cloud.high {
+    background: #dc3545;
+    color: white;
+}
+
 .content {
     flex: 1;
     overflow-y: auto;

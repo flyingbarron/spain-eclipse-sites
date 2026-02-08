@@ -67,7 +67,8 @@ def save_to_csv(results, filename='eclipse_site_data.csv'):
     filepath = os.path.join(DATA_DIR, filename)
     with open(filepath, 'w', newline='', encoding='utf-8') as csvfile:
         fieldnames = ['code', 'denominacion', 'url', 'valor_turistico', 'confidencialidad',
-                     'route_difficulty', 'latitude', 'longitude', 'eclipse_visibility', 'status']
+                     'route_difficulty', 'latitude', 'longitude', 'eclipse_visibility', 'status',
+                     'cloud_coverage', 'cloud_status', 'cloud_url']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         
         writer.writeheader()
@@ -214,6 +215,15 @@ def save_to_kml(results, filename='sites.kml'):
                     'not_visible': '🌑 Eclipse not visible',
                 }.get(eclipse_status, eclipse_status)
                 
+                # Add cloud coverage info if available
+                cloud_info = ''
+                if result.get('cloud_coverage') is not None:
+                    cloud_pct = result['cloud_coverage']
+                    cloud_emoji = '☀️' if cloud_pct < 30 else '⛅' if cloud_pct < 60 else '☁️'
+                    cloud_info = f'<b>Cloud Coverage:</b> {cloud_emoji} {cloud_pct}%<br/>'
+                    if result.get('cloud_url'):
+                        cloud_info += f'<b>Cloud Data:</b> <a href="{result["cloud_url"]}">View Details</a><br/>'
+                
                 placemark = f'''
       <Placemark>
         <name>{name}</name>
@@ -223,7 +233,7 @@ def save_to_kml(results, filename='sites.kml'):
           <b>Privacy:</b> {result['confidencialidad']}<br/>
           <b>Route Difficulty:</b> {result.get('route_difficulty', 'N/A')}<br/>
           <b>Eclipse 2026:</b> {eclipse_text}<br/>
-          <b>URL:</b> <a href="{url}">{url}</a>
+          {cloud_info}<b>URL:</b> <a href="{url}">{url}</a>
         ]]></description>
         <styleUrl>#{style}</styleUrl>
         <Point>
@@ -285,10 +295,23 @@ def print_summary(results):
     eclipse_visible = sum(1 for r in results if r.get('eclipse_visibility') == 'visible')
     eclipse_not_visible = sum(1 for r in results if r.get('eclipse_visibility') == 'not_visible')
     
+    # Cloud coverage statistics
+    with_cloud_data = sum(1 for r in results if r.get('cloud_coverage') is not None)
+    low_cloud = sum(1 for r in results if r.get('cloud_coverage') is not None and r['cloud_coverage'] < 30)
+    medium_cloud = sum(1 for r in results if r.get('cloud_coverage') is not None and 30 <= r['cloud_coverage'] < 60)
+    high_cloud = sum(1 for r in results if r.get('cloud_coverage') is not None and r['cloud_coverage'] >= 60)
+    
     print(f"Total sites collected: {total}")
     print(f"Sites with coordinates: {with_coords}")
     print(f"Eclipse visible: {eclipse_visible}")
     print(f"Eclipse not visible: {eclipse_not_visible}")
+    
+    if with_cloud_data > 0:
+        print(f"\nCloud coverage data:")
+        print(f"  Sites with cloud data: {with_cloud_data}")
+        print(f"  ☀️  Low cloud (<30%): {low_cloud}")
+        print(f"  ⛅ Medium cloud (30-60%): {medium_cloud}")
+        print(f"  ☁️  High cloud (≥60%): {high_cloud}")
     print("\nOutput files:")
     print("  • data/eclipse_site_data.csv - Complete dataset")
     print("  • data/sites.kml - All sites organized in 6 folders")

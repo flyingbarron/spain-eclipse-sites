@@ -25,6 +25,15 @@
                         <input type="checkbox" id="eclipseFilter" style="margin-right: 0.5rem; cursor: pointer;">
                         <span>🌑 Show only eclipse-visible sites</span>
                     </label>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                        <label for="cloudFilter" style="font-weight: 500;">Cloud coverage:</label>
+                        <select id="cloudFilter" style="flex: 1; padding: 0.4rem; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.85rem; cursor: pointer;">
+                            <option value="all">All sites</option>
+                            <option value="low">☀️ Low (<30%)</option>
+                            <option value="medium">⛅ Medium (30-60%)</option>
+                            <option value="high">☁️ High (≥60%)</option>
+                        </select>
+                    </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
                         <label for="sortBy" style="font-weight: 500;">Sort by:</label>
                         <select id="sortBy" style="flex: 1; padding: 0.4rem; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.85rem; cursor: pointer;">
@@ -54,9 +63,10 @@
 
     <footer>
         <p>
-            Data sources: 
-            <a href="https://info.igme.es/ielig/" target="_blank">IGME IELIG Database</a> (Instituto Geológico y Minero de España) • 
-            <a href="https://visualizadores.ign.es/eclipses/2026" target="_blank">IGN Eclipse 2026 Viewer</a> (Instituto Geográfico Nacional)
+            Data sources:
+            <a href="https://info.igme.es/ielig/" target="_blank">IGME IELIG Database</a> (Instituto Geológico y Minero de España) •
+            <a href="https://visualizadores.ign.es/eclipses/2026" target="_blank">IGN Eclipse 2026 Viewer</a> (Instituto Geográfico Nacional) •
+            <a href="https://www.timeanddate.com/" target="_blank">timeanddate.com</a> (Cloud Coverage Data)
         </p>
         <p style="margin-top: 0.5rem; font-size: 0.8rem;">
             Made with Bob 🤖
