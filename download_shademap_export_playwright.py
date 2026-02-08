@@ -212,68 +212,54 @@ def download_shademap_export(url, output_dir="data", output_filename="shademap_e
                 if not sunset_clicked:
                     print("⚠️  Could not find 'sunset' option")
                 
-                # Step 3c: Close the settings modal by clicking X symbol in upper right
-                print("\nLooking for X symbol to close modal...")
-                
-                # Take a screenshot to see the modal
-                debug_file = "shademap_modal_debug.png"
-                page.screenshot(path=debug_file)
-                print(f"Debug screenshot saved to: {debug_file}")
+                # Step 3c: Close the settings modal by clicking X button with "close" tooltip
+                print("\nLooking for close button (has 'close' tooltip)...")
                 
                 close_selectors = [
-                    # Try various ways to find the X symbol in upper right
-                    'button:has-text("×")',  # Multiplication sign
-                    'button:has-text("✕")',  # Heavy multiplication X
-                    'button:has-text("✖")',  # Heavy multiplication X
-                    'button:has-text("X")',
-                    'button:has-text("x")',
-                    # Look for buttons in the modal header/top area
-                    '[role="dialog"] button:last-child',
-                    '.modal button:last-child',
-                    '.modal-header button',
-                    'header button',
-                    # SVG-based close buttons
-                    'button svg',
-                    'button path[d*="M"]',  # SVG paths often start with M for close icons
-                    # Generic close patterns
-                    'button[class*="close"]',
-                    'button[class*="dismiss"]',
-                    '[aria-label*="close" i]',
-                    '[aria-label*="dismiss" i]',
+                    # Button with title="close" (mouseover tooltip)
+                    'button[title="close"]',
+                    'button[title="Close"]',
+                    # ARIA label
+                    'button[aria-label="close"]',
+                    'button[aria-label="Close"]',
+                    # Try finding by the tooltip text using Playwright's getByTitle
                 ]
                 
                 close_clicked = False
-                for selector in close_selectors:
-                    try:
-                        # Get all matching elements and try each one
-                        buttons = page.locator(selector).all()
-                        for button in buttons:
-                            try:
-                                if button.is_visible(timeout=1000):
-                                    # Check if it's in the upper right area
-                                    box = button.bounding_box()
-                                    if box:
-                                        # If it's in the right half and upper portion, likely the close button
-                                        viewport = page.viewport_size
-                                        if box['x'] > viewport['width'] * 0.5 and box['y'] < viewport['height'] * 0.3:
-                                            print(f"Found X button with selector: {selector} at position ({box['x']}, {box['y']})")
-                                            button.click()
-                                            close_clicked = True
-                                            print("✓ Settings modal closed")
-                                            time.sleep(1)
-                                            break
-                            except:
-                                continue
-                        if close_clicked:
-                            break
-                    except:
-                        continue
+                
+                # First try using Playwright's getByTitle which matches tooltip/title attribute
+                try:
+                    button = page.get_by_title("close", exact=False)
+                    if button.is_visible(timeout=3000):
+                        print("Found close button using getByTitle('close')")
+                        button.click()
+                        close_clicked = True
+                        print("✓ Settings modal closed")
+                        time.sleep(1)
+                except Exception as e:
+                    print(f"getByTitle failed: {e}")
+                
+                # If that didn't work, try the selectors
+                if not close_clicked:
+                    for selector in close_selectors:
+                        try:
+                            button = page.locator(selector).first
+                            if button.is_visible(timeout=3000):
+                                print(f"Found close button with selector: {selector}")
+                                button.click()
+                                close_clicked = True
+                                print("✓ Settings modal closed")
+                                time.sleep(1)
+                                break
+                        except:
+                            continue
                 
                 if not close_clicked:
-                    print("⚠️  Could not find X button, trying ESC key")
-                    page.keyboard.press("Escape")
-                    time.sleep(1)
-                    print("✓ Pressed ESC to close modal")
+                    print("⚠️  Could not find close button")
+                    # Take a screenshot for debugging
+                    debug_file = "shademap_modal_close_debug.png"
+                    page.screenshot(path=debug_file)
+                    print(f"Debug screenshot saved to: {debug_file}")
             
             # Step 4: Click the export icon
             print("\nLooking for export button...")
