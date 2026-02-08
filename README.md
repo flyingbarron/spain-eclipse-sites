@@ -23,11 +23,14 @@ This project scrapes geological site information from IGME's IELIG database and 
 - ✅ Automated profile diagram capture
 
 ### Web Viewer
-- 🔍 **Search** by site code or name
+- 🔍 **Search** by site code or name (sticky controls)
 - 🌑 **Filter** eclipse-visible sites
 - 📊 **Sort** by code, name, or tourist value
 - 🖼️ **Image gallery** with full-screen carousel
-- 🗺️ **Direct links** to Google Maps, Shademap, and IGN Eclipse viewer
+- 🗺️ **Interactive maps** with routing from Hotel Parras Arnedillo
+- 🚗 **Multi-site route planning** with drag-and-drop reordering
+- 🧭 **Turn-by-turn directions** for each route segment
+- 📍 **Export routes** to Google Maps or KML for GPS devices
 - 📈 **Eclipse profile diagrams** with hover preview
 - 🦕 **Dinosaur emoji** favicon (because dinosaur footprints!)
 
@@ -121,6 +124,9 @@ spain-eclipse-sites/
 │   ├── igme_scraper.py              # IGME site scraping
 │   ├── eclipse_checker.py           # Eclipse visibility checking
 │   └── output_generator.py          # CSV/KML generation with azimuth lines
+├── static/                           # Web viewer assets
+│   ├── app.js                       # Interactive viewer logic
+│   └── styles.css                   # Viewer styling
 ├── generate_eclipse_site_data.py     # Main data generation script
 ├── serve_viewer.py                   # Web viewer server
 ├── viewer.html                       # Interactive web interface
@@ -220,6 +226,7 @@ The script uses Selenium to:
 - **Text search**: Filter by site code or name
 - **Eclipse filter**: Show only eclipse-visible sites
 - **Sort options**: By code, name, or tourist value
+- **Sticky controls**: Search and filters stay visible while scrolling
 
 ### Site Details
 - Site information (code, name, tourist value, privacy)
@@ -232,6 +239,23 @@ The script uses Selenium to:
   - Google Maps location
   - Shademap.app (sun/shadow visualization)
   - IGN Eclipse 2026 viewer
+
+### Interactive Maps
+- **Single-site view**: Map with route from Hotel Parras Arnedillo
+- **Multi-site planning**: Select multiple sites (Ctrl/Cmd+Click)
+- **Route visualization**: Color-coded segments with distance/time
+- **Drag-and-drop reordering**: Rearrange sites in route order widget
+- **Turn-by-turn directions**: Click route segments for detailed navigation
+- **Export options**:
+  - 📍 Open complete route in Google Maps
+  - 💾 Download as KML file for GPS devices/Google Earth
+
+### Route Planning
+1. **Select sites**: Ctrl/Cmd+Click multiple sites in the sidebar
+2. **View route**: Switch to Map tab to see the route
+3. **Reorder sites**: Click "Route Order" to expand, drag sites to reorder
+4. **Get directions**: Click route segments for turn-by-turn instructions
+5. **Export**: Use buttons to open in Google Maps or download KML
 
 ### Image Carousel
 - Full-screen image viewing
