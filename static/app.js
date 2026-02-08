@@ -374,7 +374,7 @@ function updateDetailsTabContent(site) {
                     <div style="position: relative; display: inline-block;">
                         <img src="data/shademap/${site.code}_shademap.jpg"
                              alt="Shademap visualization for ${site.code}"
-                             class="eclipse-profile-thumbnail"
+                             class="eclipse-profile-thumbnail shademap-thumbnail"
                              onclick="window.open('data/shademap/${site.code}_shademap.jpg', '_blank')"
                              onerror="this.parentElement.style.display='none'"
                              title="Hover to preview, click to open full-size">
@@ -492,7 +492,7 @@ async function displaySiteDetails(site) {
                         <div style="position: relative; display: inline-block;">
                             <img src="data/shademap/${site.code}_shademap.jpg"
                                  alt="Shademap visualization for ${site.code}"
-                                 class="eclipse-profile-thumbnail"
+                                 class="eclipse-profile-thumbnail shademap-thumbnail"
                                  onclick="window.open('data/shademap/${site.code}_shademap.jpg', '_blank')"
                                  onerror="this.parentElement.style.display='none'"
                                  title="Hover to preview, click to open full-size">

@@ -340,6 +340,14 @@ header h1 {
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
+.eclipse-profile-thumbnail.shademap-thumbnail {
+    border-color: #fd7e14;
+}
+
+.eclipse-profile-thumbnail.shademap-thumbnail:hover {
+    border-color: #e8590c;
+}
+
 .eclipse-profile-overlay {
     display: none;
     position: absolute;
