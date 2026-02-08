@@ -298,10 +298,15 @@ The script uses Selenium to:
 
 ## License
 
-This project's code is provided as-is for educational and research purposes. Data remains the property of respective sources (see [CREDITS.md](CREDITS.md)).
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
-**Code**: Educational use
-**Data**: Subject to original providers' terms of service
+**Important Notes**:
+- **Code**: Open source under MIT License
+- **Data**: Subject to original providers' terms of service (see [CREDITS.md](CREDITS.md))
+- **Intended Use**: Educational and non-commercial purposes
+- **Commercial Use**: May require additional permissions from data providers
+
+The MIT License applies to the software code. All data remains the property of respective sources and is subject to their terms of service.
 
 ## Data Attribution
 
