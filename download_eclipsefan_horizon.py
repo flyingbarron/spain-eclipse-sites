@@ -145,47 +145,79 @@ def download_horizon_image(url, output_file="horizon_image.png", headless=False)
         # Look for the horizon image
         print("Looking for horizon image...")
         
-        image_selectors = [
-            (By.CSS_SELECTOR, 'img[src*="horizon"]'),
-            (By.CSS_SELECTOR, 'img[alt*="horizon"]'),
-            (By.CSS_SELECTOR, 'img[alt*="Horizon"]'),
-            (By.CSS_SELECTOR, '.horizon-image img'),
-            (By.CSS_SELECTOR, '#horizon img'),
-            (By.TAG_NAME, 'canvas'),
-        ]
+        # Wait a bit more for dynamic content
+        time.sleep(2)
         
         image_element = None
-        for by, selector in image_selectors:
+        
+        # Strategy 1: Look for all images and find the largest one (likely the horizon image)
+        try:
+            all_images = driver.find_elements(By.TAG_NAME, 'img')
+            print(f"Found {len(all_images)} img elements on page")
+            
+            # Filter for visible images with actual src
+            visible_images = []
+            for img in all_images:
+                try:
+                    src = img.get_attribute('src')
+                    if src and img.is_displayed():
+                        # Get image dimensions
+                        width = img.size.get('width', 0)
+                        height = img.size.get('height', 0)
+                        alt = img.get_attribute('alt') or ''
+                        print(f"  - Image: {width}x{height}, src: {src[:80]}..., alt: {alt}")
+                        visible_images.append((img, width * height, src))
+                except:
+                    continue
+            
+            # Sort by size and take the largest
+            if visible_images:
+                visible_images.sort(key=lambda x: x[1], reverse=True)
+                image_element = visible_images[0][0]
+                print(f"Selected largest image: {visible_images[0][2][:80]}...")
+        except Exception as e:
+            print(f"Error finding images: {e}")
+        
+        # Strategy 2: Look for canvas elements
+        if not image_element:
             try:
-                element = WebDriverWait(driver, 5).until(
-                    EC.presence_of_element_located((by, selector))
-                )
-                if element:
-                    tag_name = element.tag_name.lower()
-                    if tag_name == 'img':
-                        image_element = element
-                        print(f"Found image with selector: {selector}")
-                        break
-                    elif tag_name == 'canvas':
-                        # If it's a canvas, take a screenshot of it
-                        print("Horizon is rendered on canvas, taking screenshot...")
-                        element.screenshot(output_file)
-                        print(f"✓ Canvas screenshot saved to: {output_file}")
-                        return
-            except:
-                continue
+                canvases = driver.find_elements(By.TAG_NAME, 'canvas')
+                print(f"Found {len(canvases)} canvas elements")
+                
+                for canvas in canvases:
+                    if canvas.is_displayed():
+                        width = canvas.size.get('width', 0)
+                        height = canvas.size.get('height', 0)
+                        print(f"  - Canvas: {width}x{height}")
+                        
+                        # If canvas is reasonably sized, screenshot it
+                        if width > 100 and height > 100:
+                            print("Using canvas element, taking screenshot...")
+                            canvas.screenshot(output_file)
+                            print(f"✓ Canvas screenshot saved to: {output_file}")
+                            return
+            except Exception as e:
+                print(f"Error finding canvas: {e}")
         
         if not image_element:
-            # Try to find any images loaded after clicking
-            print("Searching for any images in the page...")
-            all_images = driver.find_elements(By.TAG_NAME, 'img')
-            print(f"Found {len(all_images)} images on page")
+            print("\nCould not find horizon image. Debug information:")
+            print("=" * 60)
             
-            for img in all_images:
-                src = img.get_attribute('src')
-                alt = img.get_attribute('alt') or ''
-                print(f"  - {src} (alt: {alt})")
+            # List all images again with more details
+            all_imgs = driver.find_elements(By.TAG_NAME, 'img')
+            print(f"\nAll {len(all_imgs)} img elements:")
+            for i, img in enumerate(all_imgs):
+                try:
+                    src = img.get_attribute('src') or 'no src'
+                    alt = img.get_attribute('alt') or 'no alt'
+                    displayed = img.is_displayed()
+                    size = img.size
+                    print(f"  {i+1}. Displayed: {displayed}, Size: {size}, Alt: '{alt}'")
+                    print(f"      Src: {src[:100]}")
+                except Exception as e:
+                    print(f"  {i+1}. Error: {e}")
             
+            print("=" * 60)
             raise Exception("Could not find horizon image")
         
         # Get the image source
