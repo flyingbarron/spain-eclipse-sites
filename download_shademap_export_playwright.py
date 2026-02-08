@@ -350,7 +350,79 @@ def download_shademap_export(url, output_dir="data", output_filename="shademap_e
         finally:
             browser.close()
 
+def process_all_sites():
+    """Process all sites from eclipse_site_data_with_cloud.csv"""
+    import csv
+    
+    csv_file = "data/eclipse_site_data_with_cloud.csv"
+    
+    # Check if CSV file exists
+    if not os.path.exists(csv_file):
+        print(f"Error: {csv_file} not found")
+        print("Please run generate_eclipse_site_data.py first")
+        sys.exit(1)
+    
+    # Read sites from CSV
+    sites = []
+    with open(csv_file, 'r', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if row.get('latitude') and row.get('longitude'):
+                sites.append({
+                    'code': row['code'],
+                    'name': row.get('denominacion', row['code']),
+                    'lat': float(row['latitude']),
+                    'lon': float(row['longitude'])
+                })
+    
+    print(f"Found {len(sites)} sites with coordinates")
+    print("=" * 60)
+    
+    # Eclipse time in milliseconds (August 12, 2026)
+    eclipse_time = "1786559455614"
+    
+    # Process each site
+    for i, site in enumerate(sites, 1):
+        print(f"\n[{i}/{len(sites)}] Processing {site['code']} - {site['name']}")
+        print("-" * 60)
+        
+        # Build Shademap URL
+        lat = site['lat']
+        lon = site['lon']
+        coords_base64 = btoa(f"{lat}, {lon}")
+        url = f"https://shademap.app/@{lat},{lon},20z,{eclipse_time}t,0b,0p,0m!1786511647543!1786562164762,{coords_base64}!{lat}!{lon}"
+        
+        # Output filename
+        output_filename = f"{site['code']}_shademap.jpg"
+        
+        try:
+            download_shademap_export(url, output_dir="data/shademap", output_filename=output_filename, headless=False)
+            print(f"✓ Successfully exported {output_filename}")
+        except Exception as e:
+            print(f"✗ Failed to export {site['code']}: {e}")
+            # Continue with next site instead of stopping
+            continue
+        
+        # Small delay between sites to avoid overwhelming the server
+        if i < len(sites):
+            print("\nWaiting 2 seconds before next site...")
+            time.sleep(2)
+    
+    print("\n" + "=" * 60)
+    print(f"Completed processing {len(sites)} sites")
+    print(f"Shademap exports saved to: data/shademap/")
+
+def btoa(s):
+    """Base64 encode a string (like JavaScript's btoa)"""
+    import base64
+    return base64.b64encode(s.encode()).decode()
+
 def main():
+    # Check if --all flag is provided
+    if len(sys.argv) > 1 and sys.argv[1] == '--all':
+        process_all_sites()
+        return
+    
     # Default URL for the eclipse location
     default_url = "https://shademap.app/@42.13096,-2.15972,20z,1786559455614t,0b,0p,0m!1786511647543!1786562164762,qDMKLwoxMyo5NTgsIC0zCi8KMTU5NzIw=!42.13096!-2.15972"
     
