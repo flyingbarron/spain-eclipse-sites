@@ -456,6 +456,8 @@ async function displaySiteDetails(site) {
     
     const eclipseUrl = `https://visualizadores.ign.es/eclipses/2026?center=${x},${yMercator}&zoom=16&srs=EPSG:3857`;
     
+    const eclipseFanUrl = `https://www.eclipsefan.org/?lat=${lat}&lng=${lon}&zoom=6&oz=5&lang=en`;
+    
     // Build cloud coverage button if available
     let cloudButton = '';
     if (site.cloud_url && site.cloud_status === 'success') {
@@ -472,6 +474,7 @@ async function displaySiteDetails(site) {
                     <a href="${shademapUrl}" target="_blank" class="link-button shademap">🌄 View on Shademap</a>
                     ${cloudButton}
                     <a href="${eclipseUrl}" target="_blank" class="link-button eclipse">🌑 Eclipse 2026 View</a>
+                    <a href="${eclipseFanUrl}" target="_blank" class="link-button eclipsefan">🌒 EclipseFan.org</a>
                     <div style="position: relative; display: inline-block;">
                         <img src="data/eclipse_profiles/${site.code}_profile.png"
                              alt="Eclipse visibility profile for ${site.code}"
