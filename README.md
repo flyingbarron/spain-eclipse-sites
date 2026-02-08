@@ -72,11 +72,6 @@ sudo apt-get install chromium-chromedriver
 
 # Or download from: https://chromedriver.chromium.org/
 ```
-5. Install Playwright browsers (for screenshot/horizon tools):
-```bash
-playwright install chromium
-```
-
 ## Usage
 
 ### Generate Data
