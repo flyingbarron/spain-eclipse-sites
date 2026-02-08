@@ -11,6 +11,7 @@ Also requires: Firefox browser and geckodriver
 import sys
 import time
 import os
+import urllib.parse
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
@@ -60,11 +61,16 @@ def download_shademap_export(url, output_dir="data", output_filename="shademap_e
         sys.exit(1)
     
     try:
+        # Decode URL if it's already encoded (from command line)
+        if '%' in url:
+            url = urllib.parse.unquote(url)
+            print(f"Decoded URL: {url}")
+        
         # Load the page
         print("Loading Shademap page...")
         print(f"URL: {url}")
         
-        # Note: Selenium handles URL encoding automatically, no need to manually encode
+        # Selenium expects a plain URL, not URL-encoded
         driver.get(url)
         
         # Wait for page to load - Shademap is a heavy JavaScript app
