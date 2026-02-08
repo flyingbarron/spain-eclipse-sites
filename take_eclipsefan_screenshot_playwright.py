@@ -9,7 +9,7 @@ import sys
 import asyncio
 from playwright.async_api import async_playwright
 
-async def take_screenshot(url, output_file="eclipsefan_screenshot.png", wait_time=5000):
+async def take_screenshot(url, output_file="eclipsefan_screenshot.png", wait_time=8000, headless=False):
     """
     Take a screenshot of the given URL using Playwright.
     
@@ -17,44 +17,69 @@ async def take_screenshot(url, output_file="eclipsefan_screenshot.png", wait_tim
         url: The URL to screenshot
         output_file: Output filename for the screenshot
         wait_time: Time to wait for page to load (milliseconds)
+        headless: Whether to run in headless mode (False shows browser)
     """
     print(f"Taking screenshot of: {url}")
     
     async with async_playwright() as p:
-        # Launch browser
+        # Launch browser with visible window to avoid detection
         print("Launching browser...")
-        browser = await p.chromium.launch(headless=True)
+        browser = await p.chromium.launch(
+            headless=headless,
+            args=[
+                '--disable-blink-features=AutomationControlled',
+            ]
+        )
         
-        # Create a new page with specific viewport
-        page = await browser.new_page(viewport={"width": 1920, "height": 1080})
+        # Create context with realistic user agent
+        context = await browser.new_context(
+            viewport={"width": 1920, "height": 1080},
+            user_agent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        )
+        
+        # Create a new page
+        page = await context.new_page()
+        
+        # Remove webdriver property to avoid detection
+        await page.add_init_script("""
+            Object.defineProperty(navigator, 'webdriver', {
+                get: () => undefined
+            });
+        """)
         
         try:
             # Navigate to the URL
             print("Loading page...")
-            await page.goto(url, wait_until="networkidle")
+            await page.goto(url, wait_until="domcontentloaded", timeout=30000)
             
             # Wait additional time for map to render
             print(f"Waiting {wait_time/1000} seconds for map to fully render...")
             await page.wait_for_timeout(wait_time)
             
-            # Optional: Wait for map element
+            # Optional: Wait for canvas or map element
             try:
-                await page.wait_for_selector("#map", timeout=10000)
-                print("Map element detected")
+                # EclipseFan uses canvas for the map
+                await page.wait_for_selector("canvas", timeout=10000)
+                print("Map canvas detected")
             except:
-                print("Map element not found, but continuing anyway...")
+                print("Map canvas not found, but continuing anyway...")
             
             # Take screenshot
             print(f"Taking screenshot and saving to: {output_file}")
             await page.screenshot(path=output_file, full_page=False)
             
             print(f"✓ Screenshot saved successfully!")
+            print(f"\nNote: Browser window will close in 2 seconds...")
+            await page.wait_for_timeout(2000)
             
         except Exception as e:
             print(f"Error taking screenshot: {e}")
+            import traceback
+            traceback.print_exc()
             sys.exit(1)
             
         finally:
+            await context.close()
             await browser.close()
 
 def main():

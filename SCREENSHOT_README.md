@@ -2,6 +2,8 @@
 
 Two scripts are provided to take screenshots of the EclipseFan.org eclipse map.
 
+**Important:** Both scripts run with a **visible browser window** by default to avoid bot detection. The browser will automatically close after taking the screenshot.
+
 ## Option 1: Selenium (take_eclipsefan_screenshot.py)
 
 ### Installation
@@ -63,10 +65,12 @@ This shows the eclipse path over Spain.
 
 ## Features
 
-- **Headless mode**: Runs in background without opening a browser window
+- **Visible browser**: Runs with visible window to avoid bot detection (auto-closes after screenshot)
+- **Anti-detection**: Removes webdriver properties and uses realistic user agent
 - **Full HD resolution**: 1920x1080 screenshot
-- **Automatic waiting**: Waits for page and map to load
+- **Automatic waiting**: Waits 8 seconds for page and map canvas to load
 - **Customizable**: Can specify any URL and output filename
+- **Canvas detection**: Specifically waits for EclipseFan's canvas map element
 
 ## Troubleshooting
 
@@ -88,8 +92,18 @@ playwright install chromium --force
 
 ### Map Not Fully Loaded
 Increase wait time by editing the script:
-- Selenium: Change `wait_time=5` to `wait_time=10`
-- Playwright: Change `wait_time=5000` to `wait_time=10000`
+- Selenium: Change `wait_time=8` to `wait_time=15`
+- Playwright: Change `wait_time=8000` to `wait_time=15000`
+
+### Getting a Form Instead of Map
+The scripts now run with a **visible browser** by default to avoid bot detection. If you still see a form:
+1. The browser window will appear - wait for it to load
+2. The map should render after 8 seconds
+3. Screenshot is taken automatically
+4. Browser closes after 2 seconds
+
+To force headless mode (may trigger bot detection):
+- Edit the script and change `headless=False` to `headless=True`
 
 ## Output
 

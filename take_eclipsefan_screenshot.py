@@ -14,7 +14,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-def take_screenshot(url, output_file="eclipsefan_screenshot.png", wait_time=5):
+def take_screenshot(url, output_file="eclipsefan_screenshot.png", wait_time=8, headless=False):
     """
     Take a screenshot of the given URL.
     
@@ -22,20 +22,38 @@ def take_screenshot(url, output_file="eclipsefan_screenshot.png", wait_time=5):
         url: The URL to screenshot
         output_file: Output filename for the screenshot
         wait_time: Time to wait for page to load (seconds)
+        headless: Whether to run in headless mode (False shows browser)
     """
     print(f"Taking screenshot of: {url}")
     
     # Set up Chrome options
     chrome_options = Options()
-    chrome_options.add_argument("--headless")  # Run in background
+    if headless:
+        chrome_options.add_argument("--headless")  # Run in background
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--window-size=1920,1080")  # Set window size
     chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    chrome_options.add_experimental_option('useAutomationExtension', False)
+    
+    # Set realistic user agent
+    chrome_options.add_argument('user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
     
     # Initialize the driver
     try:
         driver = webdriver.Chrome(options=chrome_options)
+        
+        # Remove webdriver property to avoid detection
+        driver.execute_cdp_cmd('Page.addScriptToEvaluateOnNewDocument', {
+            'source': '''
+                Object.defineProperty(navigator, 'webdriver', {
+                    get: () => undefined
+                });
+            '''
+        })
+        
     except Exception as e:
         print(f"Error initializing Chrome driver: {e}")
         print("\nPlease ensure you have:")
@@ -53,14 +71,14 @@ def take_screenshot(url, output_file="eclipsefan_screenshot.png", wait_time=5):
         print(f"Waiting {wait_time} seconds for page to fully load...")
         time.sleep(wait_time)
         
-        # Optional: Wait for specific element (map container)
+        # Optional: Wait for canvas element (EclipseFan uses canvas for map)
         try:
             WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.ID, "map"))
+                EC.presence_of_element_located((By.TAG_NAME, "canvas"))
             )
-            print("Map element detected")
+            print("Map canvas detected")
         except:
-            print("Map element not found, but continuing anyway...")
+            print("Map canvas not found, but continuing anyway...")
         
         # Take screenshot
         print(f"Taking screenshot and saving to: {output_file}")
@@ -68,8 +86,14 @@ def take_screenshot(url, output_file="eclipsefan_screenshot.png", wait_time=5):
         
         print(f"✓ Screenshot saved successfully!")
         
+        if not headless:
+            print("\nBrowser window will close in 2 seconds...")
+            time.sleep(2)
+        
     except Exception as e:
         print(f"Error taking screenshot: {e}")
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
         
     finally:
