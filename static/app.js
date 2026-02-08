@@ -401,7 +401,7 @@ function updateMapWithMultipleSites() {
             .addTo(currentMap)
             .bindPopup(popupContent);
         
-        // Add click handler to switch to details tab and show this site
+        // Add click handler to update details in background (without switching tabs)
         marker.on('click', () => {
             // Update current site
             currentSite = site;
@@ -417,9 +417,22 @@ function updateMapWithMultipleSites() {
                 siteItem.classList.add('active');
             }
             
-            // Switch to details tab
-            activeTab = 'details';
+            // Update details content in background (stay on map tab)
+            const currentActiveTab = activeTab; // Remember current tab
             displaySiteDetails(site);
+            
+            // Restore the map tab as active if we were on it
+            if (currentActiveTab === 'map') {
+                activeTab = 'map';
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.querySelector('.tab:nth-child(2)').classList.add('active');
+                document.getElementById('mapTab').classList.add('active');
+            }
         });
     });
     
@@ -687,18 +700,8 @@ function initializeMap(site, mapsUrl, shademapUrl, eclipseUrl) {
                 .addTo(currentMap)
                 .bindPopup(popupContent);
             
-            // Add click handler to switch to details tab
-            marker.on('click', () => {
-                activeTab = 'details';
-                document.querySelectorAll('.tab').forEach(tab => {
-                    tab.classList.remove('active');
-                });
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
-                document.querySelector('.tab:nth-child(1)').classList.add('active');
-                document.getElementById('detailsTab').classList.add('active');
-            });
+            // Marker click doesn't need handler for single-site view
+            // (already showing this site's details)
 
             // Add routing
             currentRoutingControl = L.Routing.control({
