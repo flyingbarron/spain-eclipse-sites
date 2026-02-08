@@ -1,5 +1,13 @@
 # Credits and Data Attribution
 
+## Project Creator
+
+**Robert Barron**
+- Project conception and development
+- Data collection and integration
+- Web viewer design and implementation
+- Documentation and attribution
+
 This project uses data and services from multiple sources. We respect the terms of service and provide proper attribution.
 
 ## Data Sources

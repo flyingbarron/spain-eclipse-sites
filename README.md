@@ -325,7 +325,9 @@ Contributions are welcome! The modular structure makes it easy to:
 
 ## Author
 
-Made with Bob 🤖
+**Robert Barron**
+
+Created with assistance from Bob 🤖
 
 ---
 
