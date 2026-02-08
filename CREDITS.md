@@ -56,21 +56,21 @@ This project uses data and services from multiple sources. We respect the terms 
 > Horizon visualizations from EclipseFan.org
 > © EclipseFan.org
 
-### 4. AEMET (Agencia Estatal de Meteorología)
-**Website**: https://www.aemet.es/
+### 4. timeanddate.com
+**Website**: https://www.timeanddate.com/
 
 **Data Used**:
-- Historical cloud coverage data
-- Weather statistics for site locations
+- Historical cloud coverage statistics for eclipse date (August 12)
+- Weather pattern data for site locations
 
 **Usage**:
-- AEMET data is publicly available for non-commercial use
-- Used for educational and research purposes
-- Proper attribution provided
+- Data scraped from publicly accessible pages
+- Used for educational eclipse planning purposes
+- Non-commercial use only
 
 **Attribution**:
-> Cloud coverage data from AEMET (Agencia Estatal de Meteorología)
-> © AEMET - Agencia Estatal de Meteorología
+> Historical cloud coverage data from timeanddate.com
+> © Time and Date AS
 
 ## Third-Party Services
 

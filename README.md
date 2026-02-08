@@ -311,7 +311,7 @@ This project uses data from multiple sources. See **[CREDITS.md](CREDITS.md)** f
 - **IGME** (Instituto Geológico y Minero de España) - IELIG Database
 - **IGN** (Instituto Geográfico Nacional) - Eclipse 2026 Viewer
 - **EclipseFan.org** - Horizon visualizations
-- **AEMET** - Cloud coverage data
+- **timeanddate.com** - Historical cloud coverage data
 
 **Important**: This project is for educational and non-commercial use only. Please respect all data providers' terms of service.
 
