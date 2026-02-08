@@ -15,7 +15,7 @@ import time
 import os
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
 
-def download_shademap_export(url, output_dir="data", output_filename="shademap_export.jpg", headless=True):
+def download_shademap_export(url, output_dir="data", output_filename="shademap_export.jpg", headless=False):
     """
     Open Shademap, dismiss popup, zoom in, and export as JPG.
     
@@ -23,7 +23,7 @@ def download_shademap_export(url, output_dir="data", output_filename="shademap_e
         url: The Shademap URL with location and time parameters
         output_dir: Directory to save the exported file
         output_filename: Name for the output file
-        headless: Whether to run in headless mode (default: True)
+        headless: Whether to run in headless mode (default: False - visible browser)
     """
     print(f"Opening Shademap (headless={headless}): {url}")
     
