@@ -580,19 +580,7 @@ footer a:hover {
     text-decoration: underline;
 }
 
-/* Hide Leaflet Routing Machine control widgets */
-.leaflet-routing-container {
+/* Hide only the routing control buttons/widgets, not the instructions panel */
+.leaflet-routing-container.leaflet-bar.leaflet-control {
     display: none !important;
-}
-
-.leaflet-control-container .leaflet-routing-container {
-    display: none !important;
-}
-
-.leaflet-top.leaflet-right {
-    pointer-events: none;
-}
-
-.leaflet-top.leaflet-right > * {
-    pointer-events: auto;
 }
