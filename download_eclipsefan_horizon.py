@@ -142,75 +142,85 @@ def download_horizon_image(url, output_file="horizon_image.png", headless=False)
         print("Clicked Horizon tab, waiting for image to load...")
         time.sleep(5)  # Wait for horizon image to generate
         
-        # Look for the horizon image in the left sidebar
-        print("Looking for horizon image in left sidebar...")
+        # Look for the specific skyline canvas
+        print("Looking for skyline canvas...")
         
-        # Wait a bit more for dynamic content
+        # Wait a bit more for canvas to render
         time.sleep(2)
         
         image_element = None
         
-        # Strategy 1: Find images in the left sidebar/panel (x position < 500 pixels typically)
+        # Strategy 1: Look for the specific skyline-canvas-v2
+        try:
+            print("Searching for canvas#skyline-canvas-v2...")
+            canvas = driver.find_element(By.ID, 'skyline-canvas-v2')
+            
+            if canvas and canvas.is_displayed():
+                width = canvas.size.get('width', 0)
+                height = canvas.size.get('height', 0)
+                print(f"Found skyline canvas: {width}x{height}")
+                print("Taking screenshot of canvas...")
+                canvas.screenshot(output_file)
+                print(f"✓ Horizon canvas saved to: {output_file}")
+                return
+            else:
+                print("Canvas found but not displayed")
+        except Exception as e:
+            print(f"Could not find skyline-canvas-v2: {e}")
+        
+        # Strategy 2: Look for any canvas in the left sidebar
+        try:
+            canvases = driver.find_elements(By.TAG_NAME, 'canvas')
+            print(f"Found {len(canvases)} canvas elements total")
+            
+            for i, canvas in enumerate(canvases):
+                try:
+                    canvas_id = canvas.get_attribute('id') or 'no-id'
+                    if canvas.is_displayed():
+                        location = canvas.location
+                        width = canvas.size.get('width', 0)
+                        height = canvas.size.get('height', 0)
+                        x_pos = location.get('x', 0)
+                        
+                        print(f"  Canvas {i+1}: id='{canvas_id}', x={x_pos}, size={width}x{height}")
+                        
+                        # Look for canvas in left sidebar with reasonable size
+                        if x_pos < 500 and width > 200 and height > 200:
+                            print(f"  ✓ Using this canvas (left sidebar, good size)")
+                            canvas.screenshot(output_file)
+                            print(f"✓ Canvas screenshot saved to: {output_file}")
+                            return
+                except Exception as e:
+                    print(f"  Error processing canvas {i+1}: {e}")
+        except Exception as e:
+            print(f"Error finding canvases: {e}")
+        
+        # Strategy 3: Look for images in the left sidebar as fallback
         try:
             all_images = driver.find_elements(By.TAG_NAME, 'img')
-            print(f"Found {len(all_images)} img elements on page")
+            print(f"\nFallback: Found {len(all_images)} img elements")
             
-            # Filter for images on the left side of the screen
             left_side_images = []
             for img in all_images:
                 try:
                     src = img.get_attribute('src')
                     if src and img.is_displayed():
-                        # Get image position and dimensions
                         location = img.location
                         width = img.size.get('width', 0)
                         height = img.size.get('height', 0)
                         x_pos = location.get('x', 0)
-                        y_pos = location.get('y', 0)
-                        alt = img.get_attribute('alt') or ''
                         
-                        print(f"  - Image at x={x_pos}, y={y_pos}, size={width}x{height}")
-                        print(f"    Src: {src[:80]}...")
-                        print(f"    Alt: {alt}")
-                        
-                        # Images in left sidebar are typically at x < 500
-                        # and have reasonable dimensions (not tiny icons)
                         if x_pos < 500 and width > 100 and height > 100:
-                            left_side_images.append((img, width * height, src, y_pos))
-                            print(f"    ✓ This is a left-side image candidate")
-                except Exception as e:
-                    print(f"    Error processing image: {e}")
+                            left_side_images.append((img, width * height, src))
+                except:
                     continue
             
-            # Sort by y position (top to bottom) and size, prefer larger images near top
             if left_side_images:
-                # Sort by size (largest first)
                 left_side_images.sort(key=lambda x: x[1], reverse=True)
                 image_element = left_side_images[0][0]
-                print(f"\nSelected left sidebar image: {left_side_images[0][2][:80]}...")
+                print(f"Using fallback image: {left_side_images[0][2][:80]}...")
         except Exception as e:
-            print(f"Error finding images: {e}")
-        
-        # Strategy 2: Look for canvas elements
-        if not image_element:
-            try:
-                canvases = driver.find_elements(By.TAG_NAME, 'canvas')
-                print(f"Found {len(canvases)} canvas elements")
-                
-                for canvas in canvases:
-                    if canvas.is_displayed():
-                        width = canvas.size.get('width', 0)
-                        height = canvas.size.get('height', 0)
-                        print(f"  - Canvas: {width}x{height}")
-                        
-                        # If canvas is reasonably sized, screenshot it
-                        if width > 100 and height > 100:
-                            print("Using canvas element, taking screenshot...")
-                            canvas.screenshot(output_file)
-                            print(f"✓ Canvas screenshot saved to: {output_file}")
-                            return
-            except Exception as e:
-                print(f"Error finding canvas: {e}")
+            print(f"Error in fallback: {e}")
         
         if not image_element:
             print("\nCould not find horizon image. Debug information:")
