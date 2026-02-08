@@ -14,7 +14,7 @@ function decimalToDMS(decimal, isLat) {
     const degrees = Math.floor(absolute);
     const minutesDecimal = (absolute - degrees) * 60;
     const minutes = Math.floor(minutesDecimal);
-    const seconds = ((minutesDecimal - minutes) * 60).toFixed(2);
+    const seconds = ((minutesDecimal - minutes) * 60).toFixed(1);
     
     let direction;
     if (isLat) {
@@ -23,7 +23,7 @@ function decimalToDMS(decimal, isLat) {
         direction = decimal >= 0 ? 'E' : 'W';
     }
     
-    return `${degrees}° ${minutes}' ${seconds}" ${direction}`;
+    return `${degrees}°${minutes}'${seconds}"${direction}`;
 }
 
 // Load CSV file
@@ -516,10 +516,10 @@ async function displaySiteDetails(site) {
                     <div class="info-label">Coordinates</div>
                     <div class="info-value">
                         <div style="margin-bottom: 0.25rem;">
-                            <strong>Decimal:</strong> ${site.latitude}, ${site.longitude}
+                            ${site.latitude}, ${site.longitude}
                         </div>
-                        <div style="font-size: 0.9em; color: #6c757d;">
-                            <strong>DMS:</strong> ${decimalToDMS(parseFloat(site.latitude), true)}, ${decimalToDMS(parseFloat(site.longitude), false)}
+                        <div style="font-size: 0.85em; color: #6c757d;">
+                            ${decimalToDMS(parseFloat(site.latitude), true)} ${decimalToDMS(parseFloat(site.longitude), false)}
                         </div>
                     </div>
                 </div>
