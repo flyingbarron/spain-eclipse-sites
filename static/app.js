@@ -369,30 +369,34 @@ function updateDetailsTabContent(site) {
             <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                 <a href="${site.url}" target="_blank" class="link-button">🪨 View on IGME Website</a>
                 <a href="${mapsUrl}" target="_blank" class="link-button maps">📍 Open in Google Maps</a>
-                <a href="${shademapUrl}" target="_blank" class="link-button shademap">🌄 View on Shademap</a>
-                <a href="${eclipseUrl}" target="_blank" class="link-button eclipse">🌑 Eclipse 2026 View</a>
-                <div style="position: relative; display: inline-block;">
-                    <img src="data/eclipse_profiles/${site.code}_profile.png"
-                         alt="Eclipse visibility profile for ${site.code}"
-                         class="eclipse-profile-thumbnail"
-                         onclick="window.open('data/eclipse_profiles/${site.code}_profile.png', '_blank')"
-                         onerror="this.parentElement.style.display='none'"
-                         title="Hover to preview, click to open full-size">
-                    <div class="eclipse-profile-overlay">
-                        <img src="data/eclipse_profiles/${site.code}_profile.png"
-                             alt="Eclipse visibility profile for ${site.code}">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
+                    <a href="${shademapUrl}" target="_blank" class="link-button shademap">🌄 View on Shademap</a>
+                    <div style="position: relative; display: inline-block;">
+                        <img src="data/shademap/${site.code}_shademap.jpg"
+                             alt="Shademap visualization for ${site.code}"
+                             class="eclipse-profile-thumbnail"
+                             onclick="window.open('data/shademap/${site.code}_shademap.jpg', '_blank')"
+                             onerror="this.parentElement.style.display='none'"
+                             title="Hover to preview, click to open full-size">
+                        <div class="eclipse-profile-overlay">
+                            <img src="data/shademap/${site.code}_shademap.jpg"
+                                 alt="Shademap visualization for ${site.code}">
+                        </div>
                     </div>
                 </div>
-                <div style="position: relative; display: inline-block;">
-                    <img src="data/shademap/${site.code}_shademap.jpg"
-                         alt="Shademap visualization for ${site.code}"
-                         class="eclipse-profile-thumbnail"
-                         onclick="window.open('data/shademap/${site.code}_shademap.jpg', '_blank')"
-                         onerror="this.parentElement.style.display='none'"
-                         title="Hover to preview, click to open full-size">
-                    <div class="eclipse-profile-overlay">
-                        <img src="data/shademap/${site.code}_shademap.jpg"
-                             alt="Shademap visualization for ${site.code}">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
+                    <a href="${eclipseUrl}" target="_blank" class="link-button eclipse">🌑 Eclipse 2026 View</a>
+                    <div style="position: relative; display: inline-block;">
+                        <img src="data/eclipse_profiles/${site.code}_profile.png"
+                             alt="Eclipse visibility profile for ${site.code}"
+                             class="eclipse-profile-thumbnail"
+                             onclick="window.open('data/eclipse_profiles/${site.code}_profile.png', '_blank')"
+                             onerror="this.parentElement.style.display='none'"
+                             title="Hover to preview, click to open full-size">
+                        <div class="eclipse-profile-overlay">
+                            <img src="data/eclipse_profiles/${site.code}_profile.png"
+                                 alt="Eclipse visibility profile for ${site.code}">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -483,7 +487,21 @@ async function displaySiteDetails(site) {
                 <div style="display: flex; align-items: flex-start; gap: 0.5rem; flex-wrap: wrap;">
                     <a href="${site.url}" target="_blank" class="link-button">🪨 View on IGME Website</a>
                     <a href="${mapsUrl}" target="_blank" class="link-button maps">📍 Open in Google Maps</a>
-                    <a href="${shademapUrl}" target="_blank" class="link-button shademap">🌄 View on Shademap</a>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
+                        <a href="${shademapUrl}" target="_blank" class="link-button shademap">🌄 View on Shademap</a>
+                        <div style="position: relative; display: inline-block;">
+                            <img src="data/shademap/${site.code}_shademap.jpg"
+                                 alt="Shademap visualization for ${site.code}"
+                                 class="eclipse-profile-thumbnail"
+                                 onclick="window.open('data/shademap/${site.code}_shademap.jpg', '_blank')"
+                                 onerror="this.parentElement.style.display='none'"
+                                 title="Hover to preview, click to open full-size">
+                            <div class="eclipse-profile-overlay">
+                                <img src="data/shademap/${site.code}_shademap.jpg"
+                                     alt="Shademap visualization for ${site.code}">
+                            </div>
+                        </div>
+                    </div>
                     ${cloudButton}
                     <a href="${eclipseFanUrl}" target="_blank" class="link-button eclipsefan">🌒 EclipseFan.org</a>
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
@@ -498,18 +516,6 @@ async function displaySiteDetails(site) {
                             <div class="eclipse-profile-overlay">
                                 <img src="data/eclipse_profiles/${site.code}_profile.png"
                                      alt="Eclipse visibility profile for ${site.code}">
-                            </div>
-                        </div>
-                        <div style="position: relative; display: inline-block;">
-                            <img src="data/shademap/${site.code}_shademap.jpg"
-                                 alt="Shademap visualization for ${site.code}"
-                                 class="eclipse-profile-thumbnail"
-                                 onclick="window.open('data/shademap/${site.code}_shademap.jpg', '_blank')"
-                                 onerror="this.parentElement.style.display='none'"
-                                 title="Hover to preview, click to open full-size">
-                            <div class="eclipse-profile-overlay">
-                                <img src="data/shademap/${site.code}_shademap.jpg"
-                                     alt="Shademap visualization for ${site.code}">
                             </div>
                         </div>
                     </div>
