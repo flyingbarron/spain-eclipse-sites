@@ -741,7 +741,8 @@ function initializeMap(site, mapsUrl, shademapUrl, eclipseUrl) {
     // Function to create/update the map
     function createMap() {
         setTimeout(() => {
-            createMapWithSites([site], { showRouting: true, showRouteSummary: false });
+            // Use same behavior as multi-site (with route summary)
+            createMapWithSites([site], { showRouting: true, showRouteSummary: true });
         }, 100);
     }
 
