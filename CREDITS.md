@@ -82,6 +82,18 @@ This project uses data and services from multiple sources. We respect the terms 
 
 ## Third-Party Services
 
+### Shademap.app
+**Website**: https://shademap.app/
+
+**Usage**:
+- Sun and shadow visualization tool
+- Linked from viewer for site sun/shadow analysis
+- Helps users understand lighting conditions at eclipse time
+
+**Attribution**:
+> Shademap.app - Sun and shadow visualization
+> © Shademap
+
 ### Google Maps
 - Used for location visualization and routing
 - Subject to Google Maps Terms of Service
