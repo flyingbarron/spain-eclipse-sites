@@ -73,31 +73,70 @@ def download_horizon_image(url, output_file="horizon_image.png", headless=False)
         # Look for and click the Horizon tab
         print("Looking for Horizon tab...")
         
-        horizon_selectors = [
-            (By.XPATH, "//*[contains(text(), 'Horizon')]"),
-            (By.LINK_TEXT, "Horizon"),
-            (By.PARTIAL_LINK_TEXT, "Horizon"),
-            (By.CSS_SELECTOR, "button:contains('Horizon')"),
-            (By.CSS_SELECTOR, "a:contains('Horizon')"),
-        ]
-        
+        # Try multiple strategies to find the Horizon tab
         horizon_clicked = False
-        for by, selector in horizon_selectors:
+        
+        # Strategy 1: Find by exact text
+        try:
+            elements = driver.find_elements(By.XPATH, "//*[text()='Horizon']")
+            if elements:
+                print(f"Found Horizon tab by exact text match")
+                elements[0].click()
+                horizon_clicked = True
+        except:
+            pass
+        
+        # Strategy 2: Find by partial text (case-insensitive)
+        if not horizon_clicked:
             try:
-                element = WebDriverWait(driver, 5).until(
-                    EC.presence_of_element_located((by, selector))
-                )
-                if element:
-                    print(f"Found Horizon tab with selector: {selector}")
-                    element.click()
-                    horizon_clicked = True
-                    break
+                elements = driver.find_elements(By.XPATH, "//*[contains(translate(text(), 'HORIZON', 'horizon'), 'horizon')]")
+                for elem in elements:
+                    if 'horizon' in elem.text.lower():
+                        print(f"Found Horizon tab by partial text: {elem.text}")
+                        elem.click()
+                        horizon_clicked = True
+                        break
             except:
-                continue
+                pass
+        
+        # Strategy 3: Find clickable elements and check their text
+        if not horizon_clicked:
+            try:
+                clickable_elements = driver.find_elements(By.XPATH, "//button | //a | //div[@role='button'] | //span[@role='button']")
+                for elem in clickable_elements:
+                    try:
+                        text = elem.text.strip().lower()
+                        if 'horizon' in text:
+                            print(f"Found Horizon tab in clickable element: {elem.text}")
+                            elem.click()
+                            horizon_clicked = True
+                            break
+                    except:
+                        continue
+            except:
+                pass
         
         if not horizon_clicked:
-            print("Could not find Horizon tab. Available text on page:")
-            print(driver.find_element(By.TAG_NAME, "body").text[:500])
+            print("\nCould not find Horizon tab. Debugging information:")
+            print("=" * 60)
+            
+            # Print all clickable elements
+            try:
+                clickable = driver.find_elements(By.XPATH, "//button | //a | //div[@role='button']")
+                print(f"\nFound {len(clickable)} clickable elements:")
+                for i, elem in enumerate(clickable[:20]):  # First 20 only
+                    try:
+                        print(f"  {i+1}. Tag: {elem.tag_name}, Text: '{elem.text[:50]}'")
+                    except:
+                        pass
+            except:
+                pass
+            
+            # Print page text
+            print("\nPage text (first 1000 chars):")
+            print(driver.find_element(By.TAG_NAME, "body").text[:1000])
+            print("=" * 60)
+            
             raise Exception("Horizon tab not found")
         
         print("Clicked Horizon tab, waiting for image to load...")
