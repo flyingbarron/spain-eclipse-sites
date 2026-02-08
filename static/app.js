@@ -196,6 +196,99 @@ function selectSite(code, event) {
     }
 }
 
+// Update only the details tab content (without affecting the map)
+function updateDetailsTabContent(site) {
+    const detailsTab = document.getElementById('detailsTab');
+    if (!detailsTab) return;
+    
+    const mapsUrl = `https://www.google.com/maps?q=${site.latitude},${site.longitude}`;
+    const lat = parseFloat(site.latitude);
+    const lon = parseFloat(site.longitude);
+    const coordsBase64 = btoa(`${lat}, ${lon}`);
+    const shademapUrl = `https://shademap.app/@${lat},${lon},17z,1786559455614t,0b,0p,0m!1786512158844!1786563246912,${coordsBase64}!${lat}!${lon}`;
+    const x = lon * 20037508.34 / 180;
+    const y = Math.log(Math.tan((90 + lat) * Math.PI / 360)) / (Math.PI / 180);
+    const yMercator = y * 20037508.34 / 180;
+    const eclipseUrl = `https://visualizadores.ign.es/eclipses/2026?center=${x},${yMercator}&zoom=16&srs=EPSG:3857`;
+    
+    // Update the header
+    const header = document.querySelector('.detail-header');
+    if (header) {
+        header.innerHTML = `
+            <h2>${site.denominacion || site.code}</h2>
+            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <a href="${site.url}" target="_blank" class="link-button">🪨 View on IGME Website</a>
+                <a href="${mapsUrl}" target="_blank" class="link-button maps">📍 Open in Google Maps</a>
+                <a href="${shademapUrl}" target="_blank" class="link-button shademap">🌄 View on Shademap</a>
+                <a href="${eclipseUrl}" target="_blank" class="link-button eclipse">🌑 Eclipse 2026 View</a>
+                <div style="position: relative; display: inline-block;">
+                    <img src="data/eclipse_profiles/${site.code}_profile.png"
+                         alt="Eclipse visibility profile for ${site.code}"
+                         class="eclipse-profile-thumbnail"
+                         onclick="window.open('data/eclipse_profiles/${site.code}_profile.png', '_blank')"
+                         onerror="this.parentElement.style.display='none'"
+                         title="Hover to preview, click to open full-size">
+                    <div class="eclipse-profile-overlay">
+                        <img src="data/eclipse_profiles/${site.code}_profile.png"
+                             alt="Eclipse visibility profile for ${site.code}">
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Update the details content
+    detailsTab.innerHTML = `
+        <div class="detail-info">
+        <div class="info-item">
+            <div class="info-label">Code</div>
+            <div class="info-value">${site.code}</div>
+        </div>
+        <div class="info-item">
+            <div class="info-label">Tourist Value</div>
+            <div class="info-value">${site.valor_turistico}</div>
+        </div>
+        <div class="info-item">
+            <div class="info-label">Privacy</div>
+            <div class="info-value">${site.confidencialidad}</div>
+        </div>
+        ${site.route_difficulty && site.route_difficulty !== 'N/A' ? `
+        <div class="info-item">
+            <div class="info-label">Route Difficulty</div>
+            <div class="info-value">${site.route_difficulty}</div>
+        </div>
+        ` : ''}
+        <div class="info-item">
+            <div class="info-label">Coordinates</div>
+            <div class="info-value">${site.latitude}, ${site.longitude}</div>
+        </div>
+        ${site.eclipse_visibility ? `
+        <div class="info-item">
+            <div class="info-label">Eclipse 2026 Visibility</div>
+            <div class="info-value" style="color: ${
+                site.eclipse_visibility === 'visible' ? '#6f42c1' :
+                site.eclipse_visibility === 'not_visible' ? '#dc3545' : '#ffc107'
+            }">
+                ${site.eclipse_visibility === 'visible' ? '🌑 Visible' :
+                  site.eclipse_visibility === 'not_visible' ? '🌑 Not Visible' :
+                  '🌑 ' + site.eclipse_visibility}
+            </div>
+        </div>
+        ` : ''}
+        </div>
+
+        <div class="images-section">
+            <h3>📷 Images</h3>
+            <div id="imagesContainer" class="images-grid">
+                <div class="loading">Loading images from IGME...</div>
+            </div>
+        </div>
+    `;
+    
+    // Load images
+    loadSiteImages(site);
+}
+
 // Display site details
 async function displaySiteDetails(site) {
     const content = document.getElementById('content');
@@ -401,12 +494,10 @@ function updateMapWithMultipleSites() {
             .addTo(currentMap)
             .bindPopup(popupContent);
         
-        // Add click handler to update details in background (without switching tabs)
+        // Add click handler to update details in background (without affecting map or switching tabs)
         marker.on('click', () => {
             // Update current site
             currentSite = site;
-            selectedSites.clear();
-            selectedSites.add(site.code);
             
             // Update sidebar selection
             document.querySelectorAll('.site-item').forEach(item => {
@@ -417,22 +508,8 @@ function updateMapWithMultipleSites() {
                 siteItem.classList.add('active');
             }
             
-            // Update details content in background (stay on map tab)
-            const currentActiveTab = activeTab; // Remember current tab
-            displaySiteDetails(site);
-            
-            // Restore the map tab as active if we were on it
-            if (currentActiveTab === 'map') {
-                activeTab = 'map';
-                document.querySelectorAll('.tab').forEach(tab => {
-                    tab.classList.remove('active');
-                });
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
-                document.querySelector('.tab:nth-child(2)').classList.add('active');
-                document.getElementById('mapTab').classList.add('active');
-            }
+            // Update only the details tab content (doesn't affect map or current tab)
+            updateDetailsTabContent(site);
         });
     });
     
