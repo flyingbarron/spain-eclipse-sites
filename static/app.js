@@ -500,6 +500,18 @@ async function displaySiteDetails(site) {
                                      alt="Eclipse visibility profile for ${site.code}">
                             </div>
                         </div>
+                        <div style="position: relative; display: inline-block;">
+                            <img src="data/shademap/${site.code}_shademap.jpg"
+                                 alt="Shademap visualization for ${site.code}"
+                                 class="eclipse-profile-thumbnail"
+                                 onclick="window.open('data/shademap/${site.code}_shademap.jpg', '_blank')"
+                                 onerror="this.parentElement.style.display='none'"
+                                 title="Hover to preview, click to open full-size">
+                            <div class="eclipse-profile-overlay">
+                                <img src="data/shademap/${site.code}_shademap.jpg"
+                                     alt="Shademap visualization for ${site.code}">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
