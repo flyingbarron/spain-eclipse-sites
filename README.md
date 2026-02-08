@@ -100,6 +100,30 @@ Start the web viewer:
 python3 serve_viewer.py
 ```
 
+### Download Shademap Visualizations
+
+Download shadow map visualizations from Shademap.app using Playwright:
+```bash
+# Default Spain eclipse location at eclipse time
+python3 download_shademap_export_playwright.py
+
+# Custom location
+python3 download_shademap_export_playwright.py "https://shademap.app/@40.0,-3.0,20z" "my_shademap.jpg"
+```
+
+This script:
+- Opens Shademap.app with the specified location and eclipse time
+- Automatically dismisses popups
+- Zooms in 2x for better detail
+- Opens settings and selects "current time" and "sunset" options
+- Closes the settings modal
+- Exports and downloads the visualization as JPG
+- Saves to `data/shademap/{site_code}_shademap.jpg`
+
+**Requirements**: `pip install playwright` and `playwright install chromium`
+
+See `SHADEMAP_PLAYWRIGHT_README.md` for detailed usage and troubleshooting.
+
 ### Download EclipseFan Horizon Images
 
 Download horizon view images from EclipseFan.org for specific locations:
@@ -136,21 +160,28 @@ spain-eclipse-sites/
 │   └── favicon.svg
 ├── data/                             # Generated data (gitignored)
 │   ├── eclipse_profiles/             # Profile diagram images
+│   ├── shademap/                     # Shademap visualizations
 │   ├── eclipse_site_data.csv         # Main dataset
 │   └── sites.kml                     # All sites organized in 6 folders
 ├── src/                              # Modular source code
 │   ├── __init__.py
 │   ├── igme_scraper.py              # IGME site scraping
 │   ├── eclipse_checker.py           # Eclipse visibility checking
+│   ├── cloud_coverage_scraper.py    # Cloud coverage data scraping
 │   └── output_generator.py          # CSV/KML generation with azimuth lines
 ├── static/                           # Web viewer assets
 │   ├── app.js                       # Interactive viewer logic
 │   └── styles.css                   # Viewer styling
 ├── generate_eclipse_site_data.py     # Main data generation script
+├── download_shademap_export_playwright.py  # Shademap automation (Playwright)
+├── download_eclipsefan_horizon.py    # EclipseFan horizon image downloader
 ├── serve_viewer.py                   # Web viewer server
 ├── viewer.html                       # Interactive web interface
 ├── requirements.txt                  # Python dependencies
 ├── README.md                         # This file
+├── SHADEMAP_PLAYWRIGHT_README.md     # Shademap script documentation
+├── SCREENSHOT_README.md              # Screenshot tools documentation
+├── SERVER_SHUTDOWN.md                # Server shutdown guide
 └── .gitignore                        # Git ignore rules
 ```
 
@@ -251,13 +282,16 @@ The script uses Selenium to:
 - Site information (code, name, tourist value, privacy)
 - GPS coordinates
 - Eclipse visibility status
-- Eclipse profile diagram (hover to preview, click to enlarge)
+- **Eclipse profile diagram** (hover to preview, click to enlarge)
+- **Shademap thumbnail** (hover to preview, click to enlarge) - shows sun/shadow visualization
 - Image gallery from IGME website
 - Direct links to:
-  - IGME information page
-  - Google Maps location
-  - Shademap.app (sun/shadow visualization)
-  - IGN Eclipse 2026 viewer
+  - 🪨 IGME information page
+  - 📍 Google Maps location
+  - 🌄 Shademap.app (sun/shadow visualization)
+  - 🕐 timeanddate.com (cloud coverage data)
+  - 🌒 EclipseFan.org (horizon views)
+  - 🌑 IGN Eclipse 2026 viewer
 
 ### Interactive Maps
 - **Single-site view**: Map with route from Hotel Parras Arnedillo
@@ -278,15 +312,17 @@ The script uses Selenium to:
 
 ### Image Carousel
 
-### Additional Tools
-
-- **Server Shutdown**: See `SERVER_SHUTDOWN.md` for clean server shutdown options
-- **Screenshot Tools**: See `SCREENSHOT_README.md` for EclipseFan.org screenshot utilities
-- **Horizon Images**: Use `download_eclipsefan_horizon.py` to download horizon view images
+### Image Carousel
 - Full-screen image viewing
 - Keyboard navigation (← → arrows)
 - Image counter (e.g., "3 / 8")
 - ESC to close
+
+### Additional Tools
+- **Shademap Automation**: See `SHADEMAP_PLAYWRIGHT_README.md` for Shademap.app export automation
+- **Server Shutdown**: See `SERVER_SHUTDOWN.md` for clean server shutdown options
+- **Screenshot Tools**: See `SCREENSHOT_README.md` for EclipseFan.org screenshot utilities
+- **Horizon Images**: Use `download_eclipsefan_horizon.py` to download horizon view images
 
 ## Requirements
 
@@ -294,6 +330,7 @@ The script uses Selenium to:
 - requests >= 2.31.0
 - beautifulsoup4 >= 4.12.0
 - selenium >= 4.0.0
+- playwright >= 1.40.0 (for Shademap automation)
 - ChromeDriver (for eclipse visibility checking)
 
 ## License
