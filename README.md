@@ -298,15 +298,22 @@ The script uses Selenium to:
 
 ## License
 
-This project is provided as-is for educational and research purposes.
+This project's code is provided as-is for educational and research purposes. Data remains the property of respective sources (see [CREDITS.md](CREDITS.md)).
+
+**Code**: Educational use
+**Data**: Subject to original providers' terms of service
 
 ## Data Attribution
 
-Data sourced from:
+This project uses data from multiple sources. See **[CREDITS.md](CREDITS.md)** for complete attribution and terms of use.
+
+**Primary Sources**:
 - **IGME** (Instituto Geológico y Minero de España) - IELIG Database
 - **IGN** (Instituto Geográfico Nacional) - Eclipse 2026 Viewer
+- **EclipseFan.org** - Horizon visualizations
+- **AEMET** - Cloud coverage data
 
-Please respect IGME and IGN terms of service when using this data.
+**Important**: This project is for educational and non-commercial use only. Please respect all data providers' terms of service.
 
 ## Contributing
 
