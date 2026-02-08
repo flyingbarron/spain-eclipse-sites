@@ -397,9 +397,30 @@ function updateMapWithMultipleSites() {
             iconAnchor: [15, 15]
         });
         
-        L.marker([lat, lon], { icon: markerIcon })
+        const marker = L.marker([lat, lon], { icon: markerIcon })
             .addTo(currentMap)
             .bindPopup(popupContent);
+        
+        // Add click handler to switch to details tab and show this site
+        marker.on('click', () => {
+            // Update current site
+            currentSite = site;
+            selectedSites.clear();
+            selectedSites.add(site.code);
+            
+            // Update sidebar selection
+            document.querySelectorAll('.site-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            const siteItem = document.querySelector(`[data-code="${site.code}"]`);
+            if (siteItem) {
+                siteItem.classList.add('active');
+            }
+            
+            // Switch to details tab
+            activeTab = 'details';
+            displaySiteDetails(site);
+        });
     });
     
     // Create waypoints list
@@ -662,9 +683,22 @@ function initializeMap(site, mapsUrl, shademapUrl, eclipseUrl) {
                 </div>
             `;
 
-            L.marker([lat, lon])
+            const marker = L.marker([lat, lon])
                 .addTo(currentMap)
                 .bindPopup(popupContent);
+            
+            // Add click handler to switch to details tab
+            marker.on('click', () => {
+                activeTab = 'details';
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.querySelector('.tab:nth-child(1)').classList.add('active');
+                document.getElementById('detailsTab').classList.add('active');
+            });
 
             // Add routing
             currentRoutingControl = L.Routing.control({
