@@ -72,6 +72,10 @@ sudo apt-get install chromium-chromedriver
 
 # Or download from: https://chromedriver.chromium.org/
 ```
+5. Install Playwright browsers (for screenshot/horizon tools):
+```bash
+playwright install chromium
+```
 
 ## Usage
 
@@ -100,6 +104,26 @@ Start the web viewer:
 ```bash
 python3 serve_viewer.py
 ```
+
+### Download EclipseFan Horizon Images
+
+Download horizon view images from EclipseFan.org for specific locations:
+```bash
+# Default Spain eclipse location
+python3 download_eclipsefan_horizon.py
+
+# Custom location
+python3 download_eclipsefan_horizon.py "https://www.eclipsefan.org/?lat=40.0&lng=-3.0&zoom=8" "my_horizon.png"
+```
+
+This script:
+- Opens EclipseFan.org with the specified location
+- Automatically clicks the "Horizon" tab
+- Waits for the horizon image to load
+- Downloads the actual image (not a screenshot)
+- Closes the browser automatically
+
+See `SCREENSHOT_README.md` for more screenshot/image download tools.
 
 This will:
 - Start a local web server on port 8000
@@ -258,6 +282,12 @@ The script uses Selenium to:
 5. **Export**: Use buttons to open in Google Maps or download KML
 
 ### Image Carousel
+
+### Additional Tools
+
+- **Server Shutdown**: See `SERVER_SHUTDOWN.md` for clean server shutdown options
+- **Screenshot Tools**: See `SCREENSHOT_README.md` for EclipseFan.org screenshot utilities
+- **Horizon Images**: Use `download_eclipsefan_horizon.py` to download horizon view images
 - Full-screen image viewing
 - Keyboard navigation (← → arrows)
 - Image counter (e.g., "3 / 8")
