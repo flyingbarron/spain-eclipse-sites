@@ -413,16 +413,9 @@ async function displaySiteDetails(site) {
     initializeMap(site, mapsUrl, shademapUrl, eclipseUrl);
 }
 
-// Update map with multiple selected sites
-function updateMapWithMultipleSites() {
-    if (selectedSites.size === 0) return;
-    
-    // Get all selected site objects
-    const sites = Array.from(selectedSites).map(code =>
-        sitesData.find(s => s.code === code)
-    ).filter(s => s && s.latitude !== 'N/A' && s.longitude !== 'N/A');
-    
-    if (sites.length === 0) return;
+// Create map with sites (unified function for single or multiple sites)
+function createMapWithSites(sites, options = {}) {
+    const { showRouting = true, showRouteSummary = false } = options;
     
     // Remove existing map
     if (currentMap) {
@@ -482,17 +475,19 @@ function updateMapWithMultipleSites() {
             </div>
         `;
         
-        // Add site marker with numbered label
-        const markerIcon = L.divIcon({
-            html: `<div style="background: #007bff; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">${index + 1}</div>`,
-            className: 'numbered-marker',
-            iconSize: [30, 30],
-            iconAnchor: [15, 15]
-        });
+        // Add site marker (numbered for multiple sites, simple for single site)
+        const markerIcon = sites.length > 1
+            ? L.divIcon({
+                html: `<div style="background: #007bff; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">${index + 1}</div>`,
+                className: 'numbered-marker',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            })
+            : null; // Use default marker for single site
         
-        const marker = L.marker([lat, lon], { icon: markerIcon })
-            .addTo(currentMap)
-            .bindPopup(popupContent);
+        const marker = markerIcon
+            ? L.marker([lat, lon], { icon: markerIcon }).addTo(currentMap).bindPopup(popupContent)
+            : L.marker([lat, lon]).addTo(currentMap).bindPopup(popupContent);
         
         // Add click handler to update details in background (without affecting map or switching tabs)
         marker.on('click', () => {
@@ -512,6 +507,9 @@ function updateMapWithMultipleSites() {
             updateDetailsTabContent(site);
         });
     });
+    
+    // Only create routing if requested
+    if (!showRouting) return;
     
     // Create waypoints list
     const waypoints = [
@@ -589,7 +587,9 @@ function updateMapWithMultipleSites() {
             
             // When all segments are loaded, display summary and adjust bounds
             if (segmentsCompleted === totalSegments) {
-                displayRouteSummary(totalDistance, totalTime);
+                if (showRouteSummary) {
+                    displayRouteSummary(totalDistance, totalTime);
+                }
                 // Fit map to show all route coordinates
                 if (allRouteBounds.isValid()) {
                     currentMap.fitBounds(allRouteBounds, { padding: [80, 80] });
@@ -597,6 +597,20 @@ function updateMapWithMultipleSites() {
             }
         }).addTo(currentMap);
     }
+}
+
+// Update map with multiple selected sites
+function updateMapWithMultipleSites() {
+    if (selectedSites.size === 0) return;
+    
+    // Get all selected site objects
+    const sites = Array.from(selectedSites).map(code =>
+        sitesData.find(s => s.code === code)
+    ).filter(s => s && s.latitude !== 'N/A' && s.longitude !== 'N/A');
+    
+    if (sites.length === 0) return;
+    
+    createMapWithSites(sites, { showRouting: true, showRouteSummary: true });
 }
 
 // Display route summary
@@ -721,84 +735,13 @@ const HOTEL_LAT = 42.2106162276457;
 const HOTEL_LON = -2.24015444418023;
 
 function initializeMap(site, mapsUrl, shademapUrl, eclipseUrl) {
-    const lat = parseFloat(site.latitude);
-    const lon = parseFloat(site.longitude);
-
     // Reset map initialization flag when switching sites
     mapInitialized = false;
 
     // Function to create/update the map
     function createMap() {
-        // Remove existing map if any
-        if (currentMap) {
-            currentMap.remove();
-            currentMap = null;
-            currentRoutingControl = null;
-        }
-
         setTimeout(() => {
-            // Calculate bounds to fit both hotel and site
-            const bounds = L.latLngBounds(
-                [HOTEL_LAT, HOTEL_LON],
-                [lat, lon]
-            );
-            
-            currentMap = L.map('mapContainer').fitBounds(bounds, { padding: [50, 50] });
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors',
-                maxZoom: 19
-            }).addTo(currentMap);
-
-            // Add hotel marker
-            const hotelIcon = L.divIcon({
-                html: '<div style="font-size: 24px;">🏨</div>',
-                className: 'hotel-marker',
-                iconSize: [30, 30],
-                iconAnchor: [15, 15]
-            });
-            
-            L.marker([HOTEL_LAT, HOTEL_LON], { icon: hotelIcon })
-                .addTo(currentMap)
-                .bindPopup('<b>Hotel Parras Arnedillo</b><br>Starting point');
-
-            // Add site marker with popup
-            const popupContent = `
-                <div style="min-width: 200px;">
-                    <h4 style="margin: 0 0 8px 0; font-size: 0.95rem;">${site.denominacion || site.code}</h4>
-                    <a href="${site.url}" target="_blank">🪨 View on IGME Website</a>
-                    <a href="${mapsUrl}" target="_blank" class="maps">📍 Open in Google Maps</a>
-                    <a href="${shademapUrl}" target="_blank" class="shademap">🌄 View on Shademap</a>
-                    <a href="${eclipseUrl}" target="_blank" class="eclipse">🌑 Eclipse 2026 View</a>
-                </div>
-            `;
-
-            const marker = L.marker([lat, lon])
-                .addTo(currentMap)
-                .bindPopup(popupContent);
-            
-            // Marker click doesn't need handler for single-site view
-            // (already showing this site's details)
-
-            // Add routing
-            currentRoutingControl = L.Routing.control({
-                waypoints: [
-                    L.latLng(HOTEL_LAT, HOTEL_LON),
-                    L.latLng(lat, lon)
-                ],
-                routeWhileDragging: false,
-                addWaypoints: false,
-                draggableWaypoints: false,
-                fitSelectedRoutes: false,
-                showAlternatives: false,
-                lineOptions: {
-                    styles: [{ color: '#007bff', weight: 4, opacity: 0.7 }]
-                },
-                createMarker: function() { return null; }, // Don't create default markers
-                router: L.Routing.osrmv1({
-                    serviceUrl: 'https://router.project-osrm.org/route/v1'
-                })
-            }).addTo(currentMap);
+            createMapWithSites([site], { showRouting: true, showRouteSummary: false });
         }, 100);
     }
 
