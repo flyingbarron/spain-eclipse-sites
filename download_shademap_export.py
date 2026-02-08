@@ -19,7 +19,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 
-def download_shademap_export(url, output_dir="data", output_filename="shademap_export.jpg", headless=False):
+def download_shademap_export(url, output_dir="data", output_filename="shademap_export.jpg", headless=True):
     """
     Open Shademap, dismiss popup, zoom in, and export as JPG.
     
@@ -27,9 +27,9 @@ def download_shademap_export(url, output_dir="data", output_filename="shademap_e
         url: The Shademap URL with location and time parameters
         output_dir: Directory to save the exported file
         output_filename: Name for the output file
-        headless: Whether to run in headless mode
+        headless: Whether to run in headless mode (default: True)
     """
-    print(f"Opening Shademap: {url}")
+    print(f"Opening Shademap (headless={headless}): {url}")
     
     # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
@@ -250,8 +250,8 @@ def download_shademap_export(url, output_dir="data", output_filename="shademap_e
         driver.quit()
 
 def main():
-    # Default URL for the eclipse location (simplified)
-    default_url = "https://shademap.app/@42.13096,-2.15972,20z,1786559455614t,0b,0p,0m"
+    # Default URL for the eclipse location
+    default_url = "https://shademap.app/@42.13096,-2.15972,20z,1786559455614t,0b,0p,0m!1786511647543!1786562164762,qDMKLwoxMyo5NTgsIC0zCi8KMTU5NzIw=!42.13096!-2.15972"
     
     # Allow custom URL from command line
     url = sys.argv[1] if len(sys.argv) > 1 else default_url

@@ -18,7 +18,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-def download_shademap_export(url, output_dir="data", output_filename="shademap_export.jpg", headless=False):
+def download_shademap_export(url, output_dir="data", output_filename="shademap_export.jpg", headless=True):
     """
     Open Shademap with Firefox, dismiss popup, zoom in, and export as JPG.
     
@@ -26,9 +26,9 @@ def download_shademap_export(url, output_dir="data", output_filename="shademap_e
         url: The Shademap URL with location and time parameters
         output_dir: Directory to save the exported file
         output_filename: Name for the output file
-        headless: Whether to run in headless mode
+        headless: Whether to run in headless mode (default: True)
     """
-    print(f"Opening Shademap with Firefox: {url}")
+    print(f"Opening Shademap with Firefox (headless={headless}): {url}")
     
     # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
@@ -243,7 +243,12 @@ def download_shademap_export(url, output_dir="data", output_filename="shademap_e
 
 def main():
     # Default URL for the eclipse location
+    # Using URL-encoded version to handle special characters
     default_url = "https://shademap.app/@42.13096,-2.15972,20z,1786559455614t,0b,0p,0m"
+    default_url = "https://shademap.app/@42.13096,-2.15972,20z,1786559455614t"
+    default_url = "https://shademap.app/@42.13096,-2.15972,20z,1786559416824t,0b,0p,0m!1770534937652!1770571961845"
+    default_url = "https://shademap.app/@42.13096,-2.15972,20z,1786559455614t,0b,0p,0m!1786511647543!1786562164762,qDMKLwoxMyo5NTgsIC0zCi8KMTU5NzIw=!42.13096!-2.15972"
+    default_url = "https://shademap.app/@42.13096,-2.15972,20z,1786559455614t,0b,0p,0m!1786511647543!1786562164762,qDMKLwoxMyo5NTgsIC0zCi8KMTU5NzIw=!42.13096!-2.15972" 
     
     # Allow custom URL from command line
     url = sys.argv[1] if len(sys.argv) > 1 else default_url
