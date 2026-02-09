@@ -94,8 +94,8 @@ def download_shademap_export(url, output_dir="../data/shademap_snapshot", output
             if not popup_dismissed:
                 print("⚠️  No popup found (or already dismissed)")
             
-            # Step 2: Zoom in 2 times using the + button
-            print("\nZooming in 2 times...")
+            # Step 2: Zoom in 1 time using the + button
+            print("\nZooming in 1 time...")
             zoom_selectors = [
                 'button[aria-label*="Zoom in"]',
                 'button.zoom-in',
@@ -115,11 +115,10 @@ def download_shademap_export(url, output_dir="../data/shademap_snapshot", output
                     continue
             
             if zoom_button:
-                for i in range(2):
-                    zoom_button.click()
-                    print(f"  Zoom {i+1}/2")
-                    time.sleep(1)
-                print("✓ Zoomed in 2 times")
+                zoom_button.click()
+                print(f"  Zoomed in 1 time")
+                time.sleep(1)
+                print("✓ Zoomed in")
             else:
                 print("⚠️  Could not find zoom button")
             
