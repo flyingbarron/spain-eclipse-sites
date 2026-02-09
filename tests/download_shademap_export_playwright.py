@@ -367,8 +367,13 @@ def load_site_from_csv(site_code, csv_file="../data/eclipse_site_data.csv"):
     return None
 
 
-def process_all_sites(csv_file="../data/eclipse_site_data.csv"):
-    """Process all sites from eclipse_site_data.csv"""
+def process_all_sites(csv_file="../data/eclipse_site_data.csv", zoom_level=18):
+    """Process all sites from eclipse_site_data.csv
+    
+    Args:
+        csv_file: Path to CSV file with site data
+        zoom_level: Zoom level for Shademap (default: 18)
+    """
     
     # Check if CSV file exists
     if not os.path.exists(csv_file):
@@ -414,7 +419,7 @@ def process_all_sites(csv_file="../data/eclipse_site_data.csv"):
         lat = site['lat']
         lon = site['lon']
         coords_base64 = btoa(f"{lat}, {lon}")
-        url = f"https://shademap.app/@{lat},{lon},17z,{eclipse_time}t,0b,0p,0m!1786511647543!1786562164762,{coords_base64}!{lat}!{lon}"
+        url = f"https://shademap.app/@{lat},{lon},{zoom_level}z,{eclipse_time}t,0b,0p,0m!1786511647543!1786562164762,{coords_base64}!{lat}!{lon}"
         
         # Output filename
         output_filename = f"{site['code']}_shademap.jpg"
@@ -473,15 +478,23 @@ Examples:
                        help='Output filename (default: based on site code or shademap_export.jpg)')
     parser.add_argument('--headless', action='store_true',
                        help='Run browser in headless mode')
+    parser.add_argument('--zoom', '-z', type=int, default=18,
+                       help='Zoom level for Shademap (default: 18, range: 1-20)')
     
     args = parser.parse_args()
     
     # Eclipse time in milliseconds (August 12, 2026)
     eclipse_time = "1786559455614"
     
+    # Validate zoom level
+    if args.zoom < 1 or args.zoom > 20:
+        print(f"Error: Zoom level must be between 1 and 20 (got {args.zoom})")
+        sys.exit(1)
+    
     # Process all sites
     if args.all:
-        process_all_sites(csv_file=args.csv)
+        print(f"Using zoom level: {args.zoom}z")
+        process_all_sites(csv_file=args.csv, zoom_level=args.zoom)
         return
     
     # Process specific site by code
@@ -498,7 +511,7 @@ Examples:
         lat = site['lat']
         lon = site['lon']
         coords_base64 = btoa(f"{lat}, {lon}")
-        url = f"https://shademap.app/@{lat},{lon},17z,{eclipse_time}t"
+        url = f"https://shademap.app/@{lat},{lon},{args.zoom}z,{eclipse_time}t"
         
         # Output filename
         output_filename = args.output or f"{site['code']}_shademap.jpg"
