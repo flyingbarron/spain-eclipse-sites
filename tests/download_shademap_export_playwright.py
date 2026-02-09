@@ -414,7 +414,7 @@ def process_all_sites(csv_file="../data/eclipse_site_data.csv"):
         lat = site['lat']
         lon = site['lon']
         coords_base64 = btoa(f"{lat}, {lon}")
-        url = f"https://shademap.app/@{lat},{lon},20z,{eclipse_time}t,0b,0p,0m!1786511647543!1786562164762,{coords_base64}!{lat}!{lon}"
+        url = f"https://shademap.app/@{lat},{lon},15z,{eclipse_time}t,0b,0p,0m!1786511647543!1786562164762,{coords_base64}!{lat}!{lon}"
         
         # Output filename
         output_filename = f"{site['code']}_shademap.jpg"
@@ -498,7 +498,7 @@ Examples:
         lat = site['lat']
         lon = site['lon']
         coords_base64 = btoa(f"{lat}, {lon}")
-        url = f"https://shademap.app/@{lat},{lon},20z,{eclipse_time}t,0b,0p,0m!1786511647543!1786562164762,{coords_base64}!{lat}!{lon}"
+        url = f"https://shademap.app/@{lat},{lon},15z,{eclipse_time}t"
         
         # Output filename
         output_filename = args.output or f"{site['code']}_shademap.jpg"
