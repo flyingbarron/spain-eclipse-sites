@@ -6,6 +6,7 @@ Functions for checking eclipse visibility using IGN Eclipse 2026 viewer
 import math
 import time
 import os
+from typing import List, Dict, Any, Tuple, Optional
 
 # Data directory for outputs
 DATA_DIR = "data"
@@ -18,7 +19,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import TimeoutException
 
 
-def wgs84_to_web_mercator(lat, lon):
+def wgs84_to_web_mercator(lat: float, lon: float) -> Tuple[float, float]:
     """Convert WGS84 (lat/lon) to Web Mercator (EPSG:3857) coordinates
     
     Args:
@@ -34,7 +35,7 @@ def wgs84_to_web_mercator(lat, lon):
     return x, y_mercator
 
 
-def setup_webdriver():
+def setup_webdriver() -> Optional[webdriver.Chrome]:
     """Setup and return a Chrome WebDriver instance
     
     Returns:
@@ -57,7 +58,7 @@ def setup_webdriver():
         return None
 
 
-def check_eclipse_visibility(driver, lat, lon, code):
+def check_eclipse_visibility(driver: webdriver.Chrome, lat: float, lon: float, code: str) -> str:
     """Check if eclipse is visible from given coordinates
     
     Args:
@@ -139,7 +140,7 @@ def check_eclipse_visibility(driver, lat, lon, code):
         return "error"
 
 
-def check_sites_eclipse_visibility(sites):
+def check_sites_eclipse_visibility(sites: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Check eclipse visibility for multiple sites
     
     Args:
