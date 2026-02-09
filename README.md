@@ -150,6 +150,11 @@ spain-eclipse-sites/
 │   └── sites.kml                     # All sites organized in 6 folders
 ├── src/                              # Modular source code
 │   ├── __init__.py
+│   ├── cache.py                     # API response caching
+│   ├── config.py                    # Configuration loader
+│   ├── exceptions.py                # Custom exception classes
+│   ├── logger.py                    # Logging configuration
+│   ├── models.py                    # Data models (Site dataclass)
 │   ├── igme_scraper.py              # IGME site scraping
 │   ├── eclipse_checker.py           # Eclipse visibility checking
 │   ├── cloud_coverage_scraper.py    # Cloud coverage data scraping
@@ -159,6 +164,9 @@ spain-eclipse-sites/
 │   ├── app.js                       # Interactive viewer logic
 │   └── styles.css                   # Viewer styling
 ├── tests/                            # Test and utility scripts
+│   ├── __init__.py                  # Tests package
+│   ├── test_models.py               # Unit tests for models
+│   ├── test_config.py               # Unit tests for config
 │   ├── test_cloud_integration.py    # Cloud coverage integration test
 │   ├── test_server_shutdown.py      # Server shutdown test
 │   ├── add_cloud_data_to_csv.py     # Add cloud data to existing CSV
@@ -168,11 +176,19 @@ spain-eclipse-sites/
 │   ├── SHADEMAP_PLAYWRIGHT_README.md # Shademap automation docs
 │   ├── SCREENSHOT_README.md         # Screenshot tools docs
 │   └── SERVER_SHUTDOWN.md           # Server shutdown guide
+├── config.yaml                       # Application configuration
+├── .env.example                      # Environment variables template
+├── Dockerfile                        # Docker container definition
+├── docker-compose.yml                # Docker Compose configuration
+├── .dockerignore                     # Docker build exclusions
 ├── generate_eclipse_site_data.py     # Main data generation script
 ├── serve_viewer.py                   # Web viewer server
+├── run_tests.py                      # Test runner
 ├── viewer.html                       # Interactive web interface
 ├── requirements.txt                  # Python dependencies
 ├── README.md                         # This file
+├── DOCKER.md                         # Docker deployment guide
+├── REFACTORING_SUGGESTIONS.md        # Code improvement suggestions
 ├── CREDITS.md                        # Data attribution
 ├── LICENSE                           # MIT License
 └── .gitignore                        # Git ignore rules
@@ -324,14 +340,73 @@ The script uses Selenium to:
 - **Screenshot Tools**: See `tests/SCREENSHOT_README.md` for EclipseFan.org screenshot utilities
 - **Utility Scripts**: Various tools in `tests/` directory for data processing and downloads
 
+## New Features (2026-02-09 Refactoring)
+
+### 🎯 Type Safety
+- **Type hints** added to all Python modules
+- Improved code documentation and IDE support
+- Better error detection during development
+
+### ⚙️ Configuration System
+- **YAML-based configuration** (`config.yaml`)
+- Environment variable overrides for containers
+- Centralized settings management
+- See `.env.example` for available options
+
+### 📦 Data Models
+- **Site dataclass** with type-safe properties
+- Helper methods for data conversion
+- Convenient property accessors (e.g., `is_eclipse_visible`, `has_low_cloud_coverage`)
+
+### 📝 Logging
+- **Structured logging** with file rotation
+- Configurable log levels
+- EmojiLogger for better console output
+- Replaces print statements throughout
+
+### 🚨 Error Handling
+- **Custom exception classes** for different error types
+- Better error messages and debugging
+- Retry logic for network errors
+
+### 🧪 Testing
+- **Unit tests** for models and configuration
+- Test runner script (`run_tests.py`)
+- Foundation for comprehensive test coverage
+
+### 💾 Caching
+- **File-based API response caching**
+- Configurable TTL (time to live)
+- Reduces API calls and improves performance
+- `@cached` decorator for easy function caching
+
+### 🐳 Docker Support
+- **Dockerfile** for containerized deployment
+- **docker-compose.yml** for easy setup
+- Health checks and volume mounts
+- See `DOCKER.md` for deployment guide
+
 ## Requirements
 
-- Python 3.7+
+- Python 3.11+ (3.7+ for non-Docker)
 - requests >= 2.31.0
 - beautifulsoup4 >= 4.12.0
 - selenium >= 4.0.0
+- pyyaml >= 6.0.0
 - playwright >= 1.40.0 (for Shademap automation)
 - ChromeDriver (for eclipse visibility checking)
+
+## Docker Deployment
+
+See **[DOCKER.md](DOCKER.md)** for complete Docker deployment instructions.
+
+Quick start:
+```bash
+# Using Docker Compose
+docker-compose up -d
+
+# Access at http://localhost:8000
+```
 
 ## License
 
