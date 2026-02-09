@@ -1276,18 +1276,41 @@ function exportRouteAsKML() {
 }
 
 
-// Modal functions
-function openModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.style.display = 'block';
+// Side panel functions
+function openPanel(panelId) {
+    const panel = document.getElementById(panelId);
+    const overlay = document.getElementById('panelOverlay');
+    
+    if (panel && overlay) {
+        // Close any other open panels first
+        document.querySelectorAll('.info-modal').forEach(p => {
+            p.classList.remove('active');
+        });
+        
+        panel.classList.add('active');
+        overlay.classList.add('active');
     }
 }
 
-function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.style.display = 'none';
+function closePanel(panelId) {
+    const panel = document.getElementById(panelId);
+    const overlay = document.getElementById('panelOverlay');
+    
+    if (panel) {
+        panel.classList.remove('active');
+    }
+    if (overlay) {
+        overlay.classList.remove('active');
+    }
+}
+
+function closeAllPanels() {
+    document.querySelectorAll('.info-modal').forEach(panel => {
+        panel.classList.remove('active');
+    });
+    const overlay = document.getElementById('panelOverlay');
+    if (overlay) {
+        overlay.classList.remove('active');
     }
 }
 
@@ -1307,44 +1330,39 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeDragAndDrop();
     loadCSV();
     
-    // Setup modal buttons
+    // Setup panel buttons
     const resourcesBtn = document.getElementById('resourcesBtn');
     const aboutBtn = document.getElementById('aboutBtn');
     const helpBtn = document.getElementById('helpBtn');
     
     if (resourcesBtn) {
-        resourcesBtn.addEventListener('click', () => openModal('resourcesModal'));
+        resourcesBtn.addEventListener('click', () => openPanel('resourcesModal'));
     }
     if (aboutBtn) {
-        aboutBtn.addEventListener('click', () => openModal('aboutModal'));
+        aboutBtn.addEventListener('click', () => openPanel('aboutModal'));
     }
     if (helpBtn) {
-        helpBtn.addEventListener('click', () => openModal('helpModal'));
+        helpBtn.addEventListener('click', () => openPanel('helpModal'));
     }
     
-    // Setup modal close buttons
+    // Setup panel close buttons
     document.querySelectorAll('.info-modal-close').forEach(closeBtn => {
         closeBtn.addEventListener('click', function() {
-            const modalId = this.getAttribute('data-modal');
-            closeModal(modalId);
+            const panelId = this.getAttribute('data-modal');
+            closePanel(panelId);
         });
     });
     
-    // Close modals when clicking outside
-    document.querySelectorAll('.info-modal').forEach(modal => {
-        modal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.style.display = 'none';
-            }
-        });
-    });
+    // Close panels when clicking overlay
+    const overlay = document.getElementById('panelOverlay');
+    if (overlay) {
+        overlay.addEventListener('click', closeAllPanels);
+    }
     
-    // Close modals with Escape key
+    // Close panels with Escape key
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            document.querySelectorAll('.info-modal').forEach(modal => {
-                modal.style.display = 'none';
-            });
+            closeAllPanels();
         }
     });
     
