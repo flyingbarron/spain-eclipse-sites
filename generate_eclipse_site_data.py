@@ -17,8 +17,21 @@ from src.eclipsefan_scraper import download_horizon_images_for_sites
 from src.output_generator import save_to_csv, save_to_kml, print_summary
 
 
-def load_sites_from_csv(csv_path: str = 'eclipse_site_data.csv') -> List[Dict[str, Any]]:
-    """Load sites from existing CSV file"""
+def load_sites_from_csv(csv_filename: str = 'eclipse_site_data.csv') -> List[Dict[str, Any]]:
+    """Load sites from existing CSV file
+    
+    Args:
+        csv_filename: CSV filename (will be looked for in data/ directory)
+    
+    Returns:
+        List of site dictionaries
+    """
+    # Construct full path - check if filename already includes data/ prefix
+    if csv_filename.startswith('data/'):
+        csv_path = csv_filename
+    else:
+        csv_path = os.path.join('data', csv_filename)
+    
     sites = []
     try:
         with open(csv_path, 'r', encoding='utf-8') as f:
@@ -65,7 +78,7 @@ Examples:
     )
     parser.add_argument('--code', '-c',
                        help='Process only a specific site code (e.g., IB200a)')
-    parser.add_argument('--csv', default='data/eclipse_site_data.csv',
+    parser.add_argument('--csv', default='eclipse_site_data.csv',
                        help='CSV file to read from (default: data/eclipse_site_data.csv)')
     
     # Skip flags (for full pipeline)
