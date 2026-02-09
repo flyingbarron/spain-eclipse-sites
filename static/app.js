@@ -1396,6 +1396,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (footerToggle) {
         footerToggle.addEventListener('click', toggleFooter);
     }
+    
+    // Clear hash when clicking on main content (not in panels)
+    document.addEventListener('click', (e) => {
+        // Check if click is outside any panel and not on a panel button
+        const isInsidePanel = e.target.closest('.info-modal');
+        const isPanelButton = e.target.closest('.nav-item');
+        const isOverlay = e.target.id === 'panelOverlay';
+        
+        if (!isInsidePanel && !isPanelButton && !isOverlay && window.location.hash) {
+            // Only clear if a panel hash exists
+            const hash = window.location.hash.substring(1);
+            if (hash === 'resources' || hash === 'about' || hash === 'help') {
+                window.history.pushState(null, null, window.location.pathname);
+            }
+        }
+    });
 });
 
 // Made with Bob
