@@ -233,7 +233,7 @@ def download_shademap_export(url, output_dir="data", output_filename="shademap_e
 def main():
     # Default URL for the eclipse location (simplified)
     default_url = "https://shademap.app/@42.13096,-2.15972,20z,1786559455614t,0b,0p,0m"
-    
+    #default_url = "https://shademap.app/@42.13096%2C-2.15972%2C20z%2C1786559455614t%2C0b%2C0p%2C0m"
     # Allow custom URL from command line
     url = sys.argv[1] if len(sys.argv) > 1 else default_url
     output_filename = sys.argv[2] if len(sys.argv) > 2 else "shademap_export.jpg"

@@ -1280,6 +1280,20 @@ function exportRouteAsKML() {
 document.addEventListener('DOMContentLoaded', () => {
     initializeDragAndDrop();
     loadCSV();
+    
+    // Setup resources toggle
+    const resourcesToggle = document.getElementById('resourcesToggle');
+    if (resourcesToggle) {
+        resourcesToggle.addEventListener('click', toggleResources);
+    }
 });
 
 // Made with Bob
+
+// Toggle resources section
+function toggleResources() {
+    const section = document.querySelector('.resources-section');
+    if (section) {
+        section.classList.toggle('collapsed');
+    }
+}
