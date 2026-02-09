@@ -6,6 +6,7 @@ Functions for generating CSV and KML output files
 import csv
 import os
 import math
+from typing import List, Dict, Any, Tuple
 
 # Ensure data directory exists
 DATA_DIR = "data"
@@ -16,7 +17,7 @@ ECLIPSE_AZIMUTH = 283.7753
 AZIMUTH_LINE_DISTANCE_KM = 50
 
 
-def calculate_endpoint(lat, lon, azimuth, distance_km=50):
+def calculate_endpoint(lat: float, lon: float, azimuth: float, distance_km: float = 50) -> Tuple[float, float]:
     """Calculate endpoint coordinates given start point, azimuth, and distance
     
     Args:
@@ -57,7 +58,7 @@ def calculate_endpoint(lat, lon, azimuth, distance_km=50):
     return end_lat, end_lon
 
 
-def save_to_csv(results, filename='eclipse_site_data.csv'):
+def save_to_csv(results: List[Dict[str, Any]], filename: str = 'eclipse_site_data.csv') -> None:
     """Save results to CSV file, merging with existing data
     
     Args:
@@ -70,7 +71,7 @@ def save_to_csv(results, filename='eclipse_site_data.csv'):
                  'cloud_coverage', 'cloud_status', 'cloud_url', 'horizon_status']
     
     # Load existing data if file exists
-    existing_data = {}
+    existing_data: Dict[str, Dict[str, Any]] = {}
     if os.path.exists(filepath):
         try:
             with open(filepath, 'r', newline='', encoding='utf-8') as csvfile:
@@ -97,7 +98,7 @@ def save_to_csv(results, filename='eclipse_site_data.csv'):
     print(f"✓ CSV saved to {filepath} ({len(existing_data)} total entries, {len(results)} updated)")
 
 
-def get_tourist_value_category(tourist_value):
+def get_tourist_value_category(tourist_value: Any) -> Tuple[str, str]:
     """Determine tourist value category
     
     Args:
@@ -118,7 +119,7 @@ def get_tourist_value_category(tourist_value):
         return ('Unknown', 'redMarker')
 
 
-def save_to_kml(results, filename='sites.kml'):
+def save_to_kml(results: List[Dict[str, Any]], filename: str = 'sites.kml') -> None:
     """Save results to KML file, merging with existing data
     
     Args:
@@ -129,7 +130,7 @@ def save_to_kml(results, filename='sites.kml'):
     
     # Load existing data from CSV (which has all merged data)
     csv_filepath = os.path.join(DATA_DIR, 'eclipse_site_data.csv')
-    all_sites = []
+    all_sites: List[Dict[str, Any]] = []
     
     if os.path.exists(csv_filepath):
         try:
@@ -144,7 +145,7 @@ def save_to_kml(results, filename='sites.kml'):
         all_sites = results
     
     # Organize sites into categories
-    categories = {
+    categories: Dict[Tuple[str, str], List[Tuple[Dict[str, Any], str]]] = {
         ('High', 'visible'): [],
         ('High', 'not_visible'): [],
         ('Medium', 'visible'): [],
@@ -215,7 +216,7 @@ def save_to_kml(results, filename='sites.kml'):
         kmlfile.write(kml_header)
         
         # Define folder order and names with emojis
-        folder_order = [
+        folder_order: List[Tuple[Tuple[str, str], str]] = [
             (('High', 'visible'), '🟢 High Tourist Value (>5.0) - Eclipse Visible'),
             (('High', 'not_visible'), '🟢 High Tourist Value (>5.0) - Eclipse Not Visible'),
             (('Medium', 'visible'), '🟡 Medium Tourist Value (4.0-5.0) - Eclipse Visible'),
@@ -315,7 +316,7 @@ def save_to_kml(results, filename='sites.kml'):
             print(f"  • {folder_name}: {count} sites")
 
 
-def print_summary(results):
+def print_summary(results: List[Dict[str, Any]]) -> None:
     """Print summary statistics
     
     Args:
@@ -347,6 +348,7 @@ def print_summary(results):
         print(f"  ☀️  Low cloud (<30%): {low_cloud}")
         print(f"  ⛅ Medium cloud (30-60%): {medium_cloud}")
         print(f"  ☁️  High cloud (≥60%): {high_cloud}")
+    
     # Horizon image statistics
     with_horizon = sum(1 for r in results if r.get('horizon_status') == 'success')
     
