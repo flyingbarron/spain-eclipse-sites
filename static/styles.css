@@ -663,8 +663,8 @@ header h1 {
 }
 
 #routeSummary {
-    position: fixed;
-    top: 250px;
+    position: absolute;
+    top: 0;
     right: 10px;
     background: rgba(255, 255, 255, 0.95);
     padding: 1rem;
@@ -672,7 +672,7 @@ header h1 {
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     backdrop-filter: blur(10px);
     max-width: 320px;
-    max-height: calc(100vh - 210px);
+    max-height: calc(100% - 10px);
     overflow-y: auto;
     z-index: 1000;
     font-size: 0.85rem;
