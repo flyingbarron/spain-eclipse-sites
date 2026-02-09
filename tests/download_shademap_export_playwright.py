@@ -94,33 +94,8 @@ def download_shademap_export(url, output_dir="../data/shademap_snapshot", output
             if not popup_dismissed:
                 print("⚠️  No popup found (or already dismissed)")
             
-            # Step 2: Zoom in 1 time using the + button
-            print("\nZooming in 1 time...")
-            zoom_selectors = [
-                'button[aria-label*="Zoom in"]',
-                'button.zoom-in',
-                'button[title*="Zoom in"]',
-                'button:has-text("+")',
-            ]
-            
-            zoom_button = None
-            for selector in zoom_selectors:
-                try:
-                    button = page.locator(selector).first
-                    if button.is_visible(timeout=5000):
-                        zoom_button = button
-                        print(f"Found zoom button with selector: {selector}")
-                        break
-                except:
-                    continue
-            
-            if zoom_button:
-                zoom_button.click()
-                print(f"  Zoomed in 1 time")
-                time.sleep(1)
-                print("✓ Zoomed in")
-            else:
-                print("⚠️  Could not find zoom button")
+            # Step 2: Skip zooming - use default zoom level
+            print("\nSkipping zoom (using default zoom level)...")
             
             # Step 3: Click settings cog to configure shadow display
             print("\nLooking for settings button...")
