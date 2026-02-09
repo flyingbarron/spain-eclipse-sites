@@ -1276,24 +1276,66 @@ function exportRouteAsKML() {
 }
 
 
+// Modal functions
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'block';
+    }
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     initializeDragAndDrop();
     loadCSV();
     
-    // Setup resources toggle
-    const resourcesToggle = document.getElementById('resourcesToggle');
-    if (resourcesToggle) {
-        resourcesToggle.addEventListener('click', toggleResources);
+    // Setup modal buttons
+    const resourcesBtn = document.getElementById('resourcesBtn');
+    const aboutBtn = document.getElementById('aboutBtn');
+    const helpBtn = document.getElementById('helpBtn');
+    
+    if (resourcesBtn) {
+        resourcesBtn.addEventListener('click', () => openModal('resourcesModal'));
     }
+    if (aboutBtn) {
+        aboutBtn.addEventListener('click', () => openModal('aboutModal'));
+    }
+    if (helpBtn) {
+        helpBtn.addEventListener('click', () => openModal('helpModal'));
+    }
+    
+    // Setup modal close buttons
+    document.querySelectorAll('.info-modal-close').forEach(closeBtn => {
+        closeBtn.addEventListener('click', function() {
+            const modalId = this.getAttribute('data-modal');
+            closeModal(modalId);
+        });
+    });
+    
+    // Close modals when clicking outside
+    document.querySelectorAll('.info-modal').forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+    });
+    
+    // Close modals with Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.info-modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+        }
+    });
 });
 
 // Made with Bob
-
-// Toggle resources section
-function toggleResources() {
-    const section = document.querySelector('.resources-section');
-    if (section) {
-        section.classList.toggle('collapsed');
-    }
-}
