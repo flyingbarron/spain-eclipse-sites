@@ -584,7 +584,7 @@ async function displaySiteDetails(site) {
                 <div id="routeSummary" style="display: none;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <h4 style="margin: 0;">Route Summary</h4>
-                        <button onclick="toggleRouteSummary()" id="routeSummaryToggle" style="background: none; border: none; font-size: 0.9rem; cursor: pointer; color: #6c757d; padding: 0; line-height: 1; opacity: 0.6; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'" title="Collapse">▼</button>
+                        <button onclick="toggleRouteSummary()" id="routeSummaryToggle" style="background: none; border: none; font-size: 0.9rem; cursor: pointer; color: #6c757d; padding: 0; padding-left: 0.5rem; line-height: 1; opacity: 0.6; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'" title="Collapse">▼</button>
                     </div>
                     <div id="routeSummaryContent">
                     <div class="return-toggle">
