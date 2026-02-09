@@ -28,8 +28,9 @@ This project scrapes geological site information from IGME's IELIG database and 
 - 📊 **Sort** by code, name, or tourist value
 - 🖼️ **Image gallery** with full-screen carousel
 - 🗺️ **Interactive maps** with routing from Hotel Parras Arnedillo
-- 🚗 **Multi-site route planning** with drag-and-drop reordering
+- 🚗 **Multi-site route planning** with Ctrl/Cmd+Click selection
 - 🧭 **Turn-by-turn directions** for each route segment
+- 📦 **Collapsible route summary** to minimize map obstruction
 - 📍 **Export routes** to Google Maps or KML for GPS devices
 - 📈 **Eclipse profile diagrams** with hover preview
 - 🦕 **Dinosaur emoji** favicon (because dinosaur footprints!)
@@ -100,49 +101,19 @@ Start the web viewer:
 python3 serve_viewer.py
 ```
 
-### Download Shademap Visualizations
+### Utility Scripts
 
-Download shadow map visualizations from Shademap.app using Playwright:
-```bash
-# Default Spain eclipse location at eclipse time
-python3 download_shademap_export_playwright.py
+Additional utility scripts are available in the `tests/` directory:
 
-# Custom location
-python3 download_shademap_export_playwright.py "https://shademap.app/@40.0,-3.0,20z" "my_shademap.jpg"
-```
+- **Shademap automation**: `tests/download_shademap_export_playwright.py`
+- **EclipseFan horizon images**: `tests/download_eclipsefan_horizon.py`
+- **Cloud coverage data**: `tests/add_cloud_data_to_csv.py`
+- **Screenshot tools**: Various screenshot utilities
 
-This script:
-- Opens Shademap.app with the specified location and eclipse time
-- Automatically dismisses popups
-- Zooms in 2x for better detail
-- Opens settings and selects "current time" and "sunset" options
-- Closes the settings modal
-- Exports and downloads the visualization as JPG
-- Saves to `data/shademap/{site_code}_shademap.jpg`
-
-**Requirements**: `pip install playwright` and `playwright install chromium`
-
-See `SHADEMAP_PLAYWRIGHT_README.md` for detailed usage and troubleshooting.
-
-### Download EclipseFan Horizon Images
-
-Download horizon view images from EclipseFan.org for specific locations:
-```bash
-# Default Spain eclipse location
-python3 download_eclipsefan_horizon.py
-
-# Custom location
-python3 download_eclipsefan_horizon.py "https://www.eclipsefan.org/?lat=40.0&lng=-3.0&zoom=8" "my_horizon.png"
-```
-
-This script:
-- Opens EclipseFan.org with the specified location
-- Automatically clicks the "Horizon" tab
-- Waits for the horizon image to load
-- Downloads the actual image (not a screenshot)
-- Closes the browser automatically
-
-See `SCREENSHOT_README.md` for more screenshot/image download tools.
+See documentation in `tests/` directory for detailed usage:
+- `tests/SHADEMAP_PLAYWRIGHT_README.md` - Shademap automation guide
+- `tests/SCREENSHOT_README.md` - Screenshot tools documentation
+- `tests/SERVER_SHUTDOWN.md` - Server shutdown options
 
 This will:
 - Start a local web server on port 8000
@@ -172,16 +143,23 @@ spain-eclipse-sites/
 ├── static/                           # Web viewer assets
 │   ├── app.js                       # Interactive viewer logic
 │   └── styles.css                   # Viewer styling
+├── tests/                            # Test and utility scripts
+│   ├── test_cloud_integration.py    # Cloud coverage integration test
+│   ├── test_server_shutdown.py      # Server shutdown test
+│   ├── add_cloud_data_to_csv.py     # Add cloud data to existing CSV
+│   ├── download_*.py                # Various download utilities
+│   ├── scrape_*.py                  # Scraping utilities
+│   ├── take_*.py                    # Screenshot utilities
+│   ├── SHADEMAP_PLAYWRIGHT_README.md # Shademap automation docs
+│   ├── SCREENSHOT_README.md         # Screenshot tools docs
+│   └── SERVER_SHUTDOWN.md           # Server shutdown guide
 ├── generate_eclipse_site_data.py     # Main data generation script
-├── download_shademap_export_playwright.py  # Shademap automation (Playwright)
-├── download_eclipsefan_horizon.py    # EclipseFan horizon image downloader
 ├── serve_viewer.py                   # Web viewer server
 ├── viewer.html                       # Interactive web interface
 ├── requirements.txt                  # Python dependencies
 ├── README.md                         # This file
-├── SHADEMAP_PLAYWRIGHT_README.md     # Shademap script documentation
-├── SCREENSHOT_README.md              # Screenshot tools documentation
-├── SERVER_SHUTDOWN.md                # Server shutdown guide
+├── CREDITS.md                        # Data attribution
+├── LICENSE                           # MIT License
 └── .gitignore                        # Git ignore rules
 ```
 
@@ -297,7 +275,7 @@ The script uses Selenium to:
 - **Single-site view**: Map with route from Hotel Parras Arnedillo
 - **Multi-site planning**: Select multiple sites (Ctrl/Cmd+Click)
 - **Route visualization**: Color-coded segments with distance/time
-- **Drag-and-drop reordering**: Rearrange sites in route order widget
+- **Collapsible summary**: Minimize route summary to see more of the map
 - **Turn-by-turn directions**: Click route segments for detailed navigation
 - **Export options**:
   - 📍 Open complete route in Google Maps
@@ -306,7 +284,7 @@ The script uses Selenium to:
 ### Route Planning
 1. **Select sites**: Ctrl/Cmd+Click multiple sites in the sidebar
 2. **View route**: Switch to Map tab to see the route
-3. **Reorder sites**: Click "Route Order" to expand, drag sites to reorder
+3. **Collapse summary**: Click arrow to minimize route summary panel
 4. **Get directions**: Click route segments for turn-by-turn instructions
 5. **Export**: Use buttons to open in Google Maps or download KML
 
@@ -319,10 +297,10 @@ The script uses Selenium to:
 - ESC to close
 
 ### Additional Tools
-- **Shademap Automation**: See `SHADEMAP_PLAYWRIGHT_README.md` for Shademap.app export automation
-- **Server Shutdown**: See `SERVER_SHUTDOWN.md` for clean server shutdown options
-- **Screenshot Tools**: See `SCREENSHOT_README.md` for EclipseFan.org screenshot utilities
-- **Horizon Images**: Use `download_eclipsefan_horizon.py` to download horizon view images
+- **Shademap Automation**: See `tests/SHADEMAP_PLAYWRIGHT_README.md` for Shademap.app export automation
+- **Server Shutdown**: See `tests/SERVER_SHUTDOWN.md` for clean server shutdown options
+- **Screenshot Tools**: See `tests/SCREENSHOT_README.md` for EclipseFan.org screenshot utilities
+- **Utility Scripts**: Various tools in `tests/` directory for data processing and downloads
 
 ## Requirements
 
