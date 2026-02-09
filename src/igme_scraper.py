@@ -8,9 +8,10 @@ from bs4 import BeautifulSoup
 import re
 import math
 import time
+from typing import List, Tuple, Optional, Dict, Any
 
 
-def generate_urls(specific_code=None):
+def generate_urls(specific_code: Optional[str] = None) -> List[Tuple[str, str]]:
     """Generate URLs from IB200, IB200a to IB200z, IB034, and IB034a to IB034z
     
     Args:
@@ -19,7 +20,7 @@ def generate_urls(specific_code=None):
     Returns:
         List of tuples (code, url)
     """
-    urls = []
+    urls: List[Tuple[str, str]] = []
     
     if specific_code:
         code = specific_code.upper()
@@ -49,7 +50,7 @@ def generate_urls(specific_code=None):
     return urls
 
 
-def clean_site_name(name):
+def clean_site_name(name: str) -> str:
     """Remove repeated prefixes from site names
     
     Args:
@@ -80,7 +81,7 @@ def clean_site_name(name):
     return cleaned.strip().strip('.')
 
 
-def extract_site_name(html_content):
+def extract_site_name(html_content: str) -> Optional[str]:
     """Extract the site name (Denominación) from HTML content
     
     Args:
@@ -100,7 +101,7 @@ def extract_site_name(html_content):
     return None
 
 
-def extract_tourist_value(html_content):
+def extract_tourist_value(html_content: str) -> Optional[str]:
     """Extract the tourist value (VT) from HTML content
     
     Args:
@@ -122,7 +123,7 @@ def extract_tourist_value(html_content):
     return None
 
 
-def extract_confidencialidad(html_content):
+def extract_confidencialidad(html_content: str) -> Optional[str]:
     """Extract the Confidencialidad (privacy status) from HTML content
     
     Args:
@@ -147,7 +148,7 @@ def extract_confidencialidad(html_content):
     return None
 
 
-def extract_route_difficulty(html_content):
+def extract_route_difficulty(html_content: str) -> Optional[str]:
     """Extract the Dificultad itinerario (route difficulty) from HTML content
     
     Args:
@@ -174,7 +175,7 @@ def extract_route_difficulty(html_content):
     return None
 
 
-def web_mercator_to_lat_lon(x, y):
+def web_mercator_to_lat_lon(x: float, y: float) -> Tuple[float, float]:
     """Convert Web Mercator (EPSG:3857) to WGS84 lat/lon (EPSG:4326)
     
     Args:
@@ -190,7 +191,7 @@ def web_mercator_to_lat_lon(x, y):
     return lat, lon
 
 
-def calculate_polygon_centroid(rings):
+def calculate_polygon_centroid(rings: List[List[List[float]]]) -> Tuple[Optional[float], Optional[float]]:
     """Calculate the centroid of a polygon from its rings
     
     Args:
@@ -214,7 +215,7 @@ def calculate_polygon_centroid(rings):
     return lat, lon
 
 
-def get_coordinates_from_api(code):
+def get_coordinates_from_api(code: str) -> Tuple[Optional[float], Optional[float]]:
     """Get coordinates from IGME MapServer API
     
     Args:
@@ -245,7 +246,7 @@ def get_coordinates_from_api(code):
         return None, None
 
 
-def scrape_site(code, url):
+def scrape_site(code: str, url: str) -> Optional[Dict[str, Any]]:
     """Scrape a single IGME site
     
     Args:
@@ -290,7 +291,7 @@ def scrape_site(code, url):
         return None
 
 
-def scrape_all_sites(specific_code=None):
+def scrape_all_sites(specific_code: Optional[str] = None) -> List[Dict[str, Any]]:
     """Scrape all IGME sites
     
     Args:
@@ -300,7 +301,7 @@ def scrape_all_sites(specific_code=None):
         List of site dictionaries
     """
     urls = generate_urls(specific_code)
-    results = []
+    results: List[Dict[str, Any]] = []
     
     print(f"Scraping {len(urls)} IGME sites...")
     print("-" * 60)
