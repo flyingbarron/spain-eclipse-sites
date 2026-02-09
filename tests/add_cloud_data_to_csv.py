@@ -8,13 +8,17 @@ Saves progress after every 5 sites to allow resuming if interrupted
 import csv
 import sys
 import os
+
+# Add parent directory to path so we can import from src
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from src.cloud_coverage_scraper import get_cloud_coverage
 from src.output_generator import save_to_csv, print_summary
 
 def main():
-    input_file = 'data/eclipse_site_data.csv'
-    output_file = 'data/eclipse_site_data_with_cloud.csv'
-    progress_file = 'data/.cloud_progress.csv'
+    input_file = '../data/eclipse_site_data.csv'
+    output_file = '../data/eclipse_site_data_with_cloud.csv'
+    progress_file = '../data/.cloud_progress.csv'
     
     print("=" * 60)
     print("Add Cloud Coverage Data to Existing Sites")

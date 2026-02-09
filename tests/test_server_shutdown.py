@@ -11,12 +11,13 @@ import sys
 
 def test_shutdown():
     print("Starting server...")
-    # Start server in background
+    # Start server in background (from parent directory)
     process = subprocess.Popen(
-        [sys.executable, "serve_viewer.py"],
+        [sys.executable, "../serve_viewer.py"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        text=True
+        text=True,
+        cwd=".."
     )
     
     # Wait for server to start
