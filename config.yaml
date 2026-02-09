@@ -1,0 +1,89 @@
+# Spain Eclipse Sites Configuration
+# Configuration file for the eclipse site data generator
+
+# Application Information
+app:
+  name: "Spain Eclipse Sites"
+  version: "1.0.0"
+  environment: "production"  # development, staging, production
+
+# Directories (relative to project root)
+directories:
+  data: "data"
+  profiles: "data/ign_visibility_profiles"
+  horizon: "data/eclipsefan_visibility_profiles"
+  cache: ".cache"
+  logs: "logs"
+
+# Eclipse Configuration
+eclipse:
+  date: "2026-08-12"
+  date_iso: "20260812"
+  azimuth: 283.7753
+  azimuth_line_distance_km: 50
+
+# Scraping Settings
+scraping:
+  request_timeout: 10
+  rate_limit_delay: 1.0
+  cloud_scrape_delay: 2.0
+  horizon_scrape_delay: 2.0
+  max_retries: 3
+  retry_delay: 2.0
+  user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+
+# External URLs
+urls:
+  igme_base: "https://info.igme.es/ielig/LIGInfo.aspx?codigo="
+  igme_api: "https://mapas.igme.es/gis/rest/services/BasesDatos/IGME_IELIG/MapServer/0/query"
+  ign_eclipse: "https://visualizadores.ign.es/eclipses/2026"
+  timeanddate: "https://www.timeanddate.com/eclipse/in/@{lat},{lon}?iso={date}"
+  eclipsefan: "https://www.eclipsefan.org/?lat={lat}&lng={lon}&zoom=6&oz=5&lang=en"
+
+# Logging Configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/app.log"
+  max_bytes: 10485760  # 10MB
+  backup_count: 5
+
+# Web Server Settings (for viewer)
+server:
+  host: "0.0.0.0"  # Bind to all interfaces for containers
+  port: 8000
+  debug: false
+
+# Feature Flags
+features:
+  enable_caching: false
+  enable_eclipse_checking: true
+  enable_cloud_coverage: true
+  enable_horizon_download: true
+
+# CSV Output Configuration
+csv:
+  filename: "eclipse_site_data.csv"
+  fieldnames:
+    - code
+    - denominacion
+    - url
+    - valor_turistico
+    - confidencialidad
+    - route_difficulty
+    - latitude
+    - longitude
+    - eclipse_visibility
+    - status
+    - cloud_coverage
+    - cloud_status
+    - cloud_url
+    - horizon_status
+
+# KML Output Configuration
+kml:
+  filename: "sites.kml"
+  document_name: "Spain Eclipse Sites - Organized by Tourist Value and Eclipse Visibility"
+  document_description: "Geological sites from IGME IELIG database organized into six categories"
+
+# Made with Bob
