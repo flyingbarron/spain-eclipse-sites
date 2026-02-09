@@ -664,7 +664,7 @@ header h1 {
 
 #routeSummary {
     position: fixed;
-    top: 200px;
+    top: 250px;
     right: 10px;
     background: rgba(255, 255, 255, 0.95);
     padding: 1rem;
