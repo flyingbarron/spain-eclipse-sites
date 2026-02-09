@@ -154,7 +154,6 @@ function displaySites(sites) {
 function filterSites() {
     const searchTerm = document.getElementById('searchBox').value.toLowerCase();
     const eclipseFilter = document.getElementById('eclipseFilter').checked;
-    const cloudFilter = document.getElementById('cloudFilter').value;
     const sortBy = document.getElementById('sortBy').value;
     
     let filtered = sitesData.filter(site => {
@@ -163,22 +162,7 @@ function filterSites() {
         
         const matchesEclipse = !eclipseFilter || site.eclipse_visibility === 'visible';
         
-        // Cloud coverage filter
-        let matchesCloud = true;
-        if (cloudFilter !== 'all' && site.cloud_coverage && site.cloud_status === 'success') {
-            const cloudPct = parseInt(site.cloud_coverage);
-            if (cloudFilter === 'low') {
-                matchesCloud = cloudPct < 30;
-            } else if (cloudFilter === 'medium') {
-                matchesCloud = cloudPct >= 30 && cloudPct < 60;
-            } else if (cloudFilter === 'high') {
-                matchesCloud = cloudPct >= 60;
-            }
-        } else if (cloudFilter !== 'all') {
-            matchesCloud = false; // Exclude sites without cloud data when filter is active
-        }
-        
-        return matchesSearch && matchesEclipse && matchesCloud;
+        return matchesSearch && matchesEclipse;
     });
     
     // Sort
@@ -202,7 +186,6 @@ function filterSites() {
 // Event listeners
 document.getElementById('searchBox').addEventListener('input', filterSites);
 document.getElementById('eclipseFilter').addEventListener('change', filterSites);
-document.getElementById('cloudFilter').addEventListener('change', filterSites);
 document.getElementById('sortBy').addEventListener('change', filterSites);
 
 // Select a site
