@@ -133,7 +133,11 @@ def download_horizon_image(driver, lat, lon, code):
         print(f"  Waiting for horizon image to render...")
         time.sleep(5)
         
+        # Wait a bit more for canvas to render
+        time.sleep(2)
+        
         # Look for the skyline canvas
+        canvas_found = False
         try:
             canvas = driver.find_element(By.ID, 'skyline-canvas-v2')
             
@@ -147,34 +151,43 @@ def download_horizon_image(driver, lat, lon, code):
                 print(f"  ✓ Saved horizon image to {output_path}")
                 return 'success'
             else:
-                print(f"  ✗ Canvas found but not displayed")
-                return 'not_found'
+                print(f"  Canvas found but not displayed, trying fallback...")
                 
         except NoSuchElementException:
-            # Try fallback: look for any canvas in left sidebar
-            try:
-                canvases = driver.find_elements(By.TAG_NAME, 'canvas')
-                for canvas in canvases:
+            print(f"  skyline-canvas-v2 not found, trying fallback...")
+        
+        # Fallback: look for any canvas in left sidebar
+        try:
+            canvases = driver.find_elements(By.TAG_NAME, 'canvas')
+            print(f"  Found {len(canvases)} canvas elements total")
+            
+            for i, canvas in enumerate(canvases):
+                try:
+                    canvas_id = canvas.get_attribute('id') or 'no-id'
                     if canvas.is_displayed():
                         location = canvas.location
                         width = canvas.size.get('width', 0)
                         height = canvas.size.get('height', 0)
                         x_pos = location.get('x', 0)
                         
+                        print(f"    Canvas {i+1}: id='{canvas_id}', x={x_pos}, size={width}x{height}")
+                        
                         # Look for canvas in left sidebar with reasonable size
                         if x_pos < 500 and width > 200 and height > 200:
                             os.makedirs(HORIZON_DIR, exist_ok=True)
                             output_path = os.path.join(HORIZON_DIR, f"{code}_horizon.png")
                             canvas.screenshot(output_path)
-                            print(f"  ✓ Saved horizon image (fallback) to {output_path}")
+                            print(f"  ✓ Saved horizon image (fallback canvas {i+1}) to {output_path}")
                             return 'success'
-                
-                print(f"  ✗ No suitable canvas found")
-                return 'not_found'
-                
-            except Exception as e:
-                print(f"  ✗ Error in fallback: {e}")
-                return 'error'
+                except Exception as e:
+                    print(f"    Error processing canvas {i+1}: {e}")
+            
+            print(f"  ✗ No suitable canvas found")
+            return 'not_found'
+            
+        except Exception as e:
+            print(f"  ✗ Error in fallback: {e}")
+            return 'error'
         
     except TimeoutException:
         print(f"  ✗ Timeout loading page")
