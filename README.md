@@ -98,39 +98,42 @@ This will:
 
 #### Command-Line Options
 
-**Skip eclipse checking** (faster, IGME data only):
+**Skip specific operations** (faster):
 ```bash
+# Skip eclipse checking (IGME data only)
 python3 generate_eclipse_site_data.py --no-eclipse
-```
-Skips Selenium-based eclipse visibility checking. Sites will have `eclipse_visibility='not_checked'`.
 
-**Skip cloud coverage scraping** (faster):
-```bash
+# Skip cloud coverage scraping
 python3 generate_eclipse_site_data.py --no-cloud
-```
-Skips cloud coverage data collection. Sites will have `cloud_status='not_checked'`.
 
-**Skip horizon image downloading** (faster):
-```bash
+# Skip horizon image downloading
 python3 generate_eclipse_site_data.py --no-horizon
-```
-Skips EclipseFan horizon image downloads. Sites will have `horizon_status='not_checked'`.
 
-**Check specific site only**:
-```bash
-python3 generate_eclipse_site_data.py --code IB200a
-```
-Process only the specified site code. Useful for testing or updating individual sites.
-
-**Combine options**:
-```bash
-# IGME data only (fastest)
+# Combine multiple skips
 python3 generate_eclipse_site_data.py --no-eclipse --no-cloud --no-horizon
+```
 
-# IGME + eclipse only
-python3 generate_eclipse_site_data.py --no-cloud --no-horizon
+**Update existing CSV with specific data** (no IGME re-scraping):
+```bash
+# Add cloud coverage to existing sites
+python3 generate_eclipse_site_data.py --only-cloud
 
-# Specific site with all data
+# Add horizon images to existing sites
+python3 generate_eclipse_site_data.py --only-horizon
+
+# Re-check eclipse visibility for existing sites
+python3 generate_eclipse_site_data.py --only-eclipse
+
+# Update specific site only
+python3 generate_eclipse_site_data.py --only-cloud --code IB200a
+python3 generate_eclipse_site_data.py --only-horizon --code IB200b
+
+# Use custom CSV file
+python3 generate_eclipse_site_data.py --only-cloud --csv data/my_sites.csv
+```
+
+**Process specific site** (full pipeline):
+```bash
 python3 generate_eclipse_site_data.py --code IB200a
 ```
 
@@ -153,10 +156,30 @@ The script generates:
 
 #### Performance Tips
 
-- **First run**: Use all options to collect complete data (~30-60 minutes)
-- **Updates**: Use `--code` to update specific sites
-- **Testing**: Use `--no-eclipse --no-cloud --no-horizon` for quick IGME data only (~2-3 minutes)
-- **Incremental**: The script merges with existing data, so you can run multiple times
+- **First run**: Collect complete data (~30-60 minutes)
+  ```bash
+  python3 generate_eclipse_site_data.py
+  ```
+
+- **Add missing data**: Use `--only-*` flags to update existing CSV without re-scraping IGME
+  ```bash
+  python3 generate_eclipse_site_data.py --only-cloud
+  ```
+
+- **Update specific site**: Combine `--only-*` with `--code`
+  ```bash
+  python3 generate_eclipse_site_data.py --only-horizon --code IB200a
+  ```
+
+- **Testing**: Skip slow operations for quick IGME data only (~2-3 minutes)
+  ```bash
+  python3 generate_eclipse_site_data.py --no-eclipse --no-cloud --no-horizon
+  ```
+
+- **Workflow**:
+  1. First run with `--no-cloud --no-horizon` to get IGME + eclipse data quickly
+  2. Later add cloud data: `python3 generate_eclipse_site_data.py --only-cloud`
+  3. Later add horizon images: `python3 generate_eclipse_site_data.py --only-horizon`
 
 ### View Data
 
