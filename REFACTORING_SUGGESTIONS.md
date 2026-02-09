@@ -546,32 +546,110 @@ class FileCache:
             json.dump(value, f)
 ```
 
-#### B. Parallel Processing
-Use concurrent requests for scraping:
+#### B. Respectful Scraping Practices
+
+**IMPORTANT**: Always be respectful to the servers we're scraping. Avoid parallel processing for external sites.
 
 ```python
-from concurrent.futures import ThreadPoolExecutor, as_completed
+# src/scraper_utils.py
+import time
+from functools import wraps
 
-def scrape_all_sites_parallel(codes: List[str], max_workers: int = 5):
-    """Scrape multiple sites in parallel"""
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futures = {
-            executor.submit(scrape_site, code, url): code 
-            for code, url in generate_urls()
-        }
+class RateLimiter:
+    """Rate limiter to ensure respectful scraping"""
+    
+    def __init__(self, min_delay: float = 1.0, max_delay: float = 3.0):
+        self.min_delay = min_delay
+        self.max_delay = max_delay
+        self.last_request_time = {}
+    
+    def wait(self, domain: str):
+        """Wait appropriate time before next request to domain"""
+        now = time.time()
+        last_time = self.last_request_time.get(domain, 0)
+        elapsed = now - last_time
         
-        results = []
-        for future in as_completed(futures):
-            code = futures[future]
-            try:
-                result = future.result()
-                if result:
-                    results.append(result)
-            except Exception as e:
-                logger.error(f"Failed to scrape {code}: {e}")
+        if elapsed < self.min_delay:
+            sleep_time = self.min_delay - elapsed
+            time.sleep(sleep_time)
         
-        return results
+        self.last_request_time[domain] = time.time()
+
+# Global rate limiter
+rate_limiter = RateLimiter(min_delay=1.5, max_delay=3.0)
+
+def respectful_scrape(func):
+    """Decorator to ensure respectful scraping with rate limiting"""
+    @wraps(func)
+    def wrapper(url, *args, **kwargs):
+        from urllib.parse import urlparse
+        domain = urlparse(url).netloc
+        
+        # Wait before making request
+        rate_limiter.wait(domain)
+        
+        # Add random jitter to appear more human-like
+        import random
+        time.sleep(random.uniform(0.1, 0.5))
+        
+        return func(url, *args, **kwargs)
+    return wrapper
+
+@respectful_scrape
+def fetch_page(url):
+    """Fetch page with respectful rate limiting"""
+    response = requests.get(url, timeout=10)
+    return response
+
+# Usage in scraper:
+def scrape_all_sites(specific_code=None):
+    """Scrape sites sequentially with respectful delays"""
+    urls = generate_urls(specific_code)
+    results = []
+    
+    for code, url in urls:
+        logger.info(f"Scraping {code}...")
+        site_data = scrape_site(code, url)  # Uses @respectful_scrape
+        if site_data:
+            results.append(site_data)
+        
+        # Additional delay between sites (configurable)
+        time.sleep(config.get('scraping.rate_limit_delay', 1.5))
+    
+    return results
 ```
+
+**Best Practices for Respectful Scraping:**
+
+1. **Sequential Processing**: Scrape one site at a time, never in parallel
+2. **Rate Limiting**: Minimum 1-2 seconds between requests to same domain
+3. **Random Jitter**: Add 0.1-0.5s random delay to appear human-like
+4. **Respect robots.txt**: Check and honor robots.txt rules
+5. **User-Agent**: Use descriptive User-Agent identifying your project
+6. **Retry Logic**: Use exponential backoff, not aggressive retries
+7. **Off-Peak Hours**: Consider running during off-peak hours
+8. **Cache Results**: Cache responses to avoid re-scraping
+
+**Configuration for Respectful Scraping:**
+
+```yaml
+# config.yaml
+scraping:
+  # Conservative defaults - be respectful!
+  request_timeout: 10
+  rate_limit_delay: 1.5      # Minimum delay between requests
+  max_delay_jitter: 0.5      # Random jitter (0-0.5s)
+  max_retries: 2             # Limited retries
+  retry_delay: 5.0           # Long delay before retry
+  parallel_workers: 1        # ALWAYS 1 for external scraping
+  respect_robots_txt: true
+  user_agent: "Spain Eclipse Sites Scraper (Educational/Non-commercial; contact@example.com)"
+```
+
+**Note**: Parallel processing should ONLY be used for:
+- Internal data processing (not scraping)
+- APIs with explicit rate limit allowances
+- Your own infrastructure
 
 ---
 
