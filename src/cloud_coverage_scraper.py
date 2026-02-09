@@ -9,9 +9,10 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import re
+from typing import Dict, List, Any, Optional
 
 
-def get_cloud_coverage(latitude, longitude, date_iso="20260812"):
+def get_cloud_coverage(latitude: float, longitude: float, date_iso: str = "20260812") -> Dict[str, Any]:
     """
     Get historical cloud coverage percentage for a location on the eclipse date.
     
@@ -25,6 +26,7 @@ def get_cloud_coverage(latitude, longitude, date_iso="20260812"):
             - cloud_percentage: int (0-100) or None if not found
             - status: str ('success', 'not_found', 'error')
             - message: str with details
+            - url: str with the source URL
     """
     
     # Build URL for timeanddate.com eclipse page
@@ -93,7 +95,7 @@ def get_cloud_coverage(latitude, longitude, date_iso="20260812"):
         }
 
 
-def scrape_cloud_coverage_for_sites(sites, delay=2.0):
+def scrape_cloud_coverage_for_sites(sites: List[Dict[str, Any]], delay: float = 2.0) -> List[Dict[str, Any]]:
     """
     Scrape cloud coverage for multiple sites with rate limiting.
     
@@ -105,7 +107,7 @@ def scrape_cloud_coverage_for_sites(sites, delay=2.0):
         List of sites with added 'cloud_coverage' and 'cloud_status' fields
     """
     
-    results = []
+    results: List[Dict[str, Any]] = []
     total = len(sites)
     
     for i, site in enumerate(sites, 1):
