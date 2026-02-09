@@ -486,7 +486,21 @@ async function displaySiteDetails(site) {
                         </div>
                     </div>
                     ${cloudButton}
-                    <a href="${eclipseFanUrl}" target="_blank" class="link-button eclipsefan">🌒 EclipseFan.org</a>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
+                        <a href="${eclipseFanUrl}" target="_blank" class="link-button eclipsefan">🌒 EclipseFan.org</a>
+                        <div style="position: relative; display: inline-block;">
+                            <img src="data/eclipsefan_horizon/${site.code}_horizon.png"
+                                 alt="Horizon profile for ${site.code}"
+                                 class="eclipse-profile-thumbnail"
+                                 onclick="window.open('data/eclipsefan_horizon/${site.code}_horizon.png', '_blank')"
+                                 onerror="this.parentElement.style.display='none'"
+                                 title="Hover to preview, click to open full-size">
+                            <div class="eclipse-profile-overlay">
+                                <img src="data/eclipsefan_horizon/${site.code}_horizon.png"
+                                     alt="Horizon profile for ${site.code}">
+                            </div>
+                        </div>
+                    </div>
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
                         <a href="${eclipseUrl}" target="_blank" class="link-button eclipse">🌑 Eclipse 2026 View</a>
                         <div style="position: relative; display: inline-block;">
