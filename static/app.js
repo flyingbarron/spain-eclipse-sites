@@ -1141,7 +1141,7 @@ function switchTab(tabName) {
         if (!existingTip) {
             const tip = document.createElement('span');
             tip.className = 'map-tip';
-            tip.textContent = '💡 Hold Ctrl (Cmd on Mac) and click sites to select multiple';
+            tip.textContent = '💡 Hold Ctrl (Cmd on Mac) and click multiple sites in the list to plan a route';
             tabsContainer.appendChild(tip);
         }
     } else {
