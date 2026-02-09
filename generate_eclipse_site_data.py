@@ -46,6 +46,9 @@ Examples:
   # Skip specific operations (faster)
   python3 generate_eclipse_site_data.py --no-eclipse --no-cloud
   
+  # Check visibility without profile screenshots (faster)
+  python3 generate_eclipse_site_data.py --no-profile
+  
   # Check specific site only
   python3 generate_eclipse_site_data.py --code IB200a
   
@@ -53,6 +56,7 @@ Examples:
   python3 generate_eclipse_site_data.py --only-cloud
   python3 generate_eclipse_site_data.py --only-horizon
   python3 generate_eclipse_site_data.py --only-eclipse
+  python3 generate_eclipse_site_data.py --only-eclipse --no-profile
   
   # Only update specific site from existing CSV
   python3 generate_eclipse_site_data.py --only-cloud --code IB200a
@@ -71,6 +75,8 @@ Examples:
                        help='Skip cloud coverage scraping')
     parser.add_argument('--no-horizon', action='store_true',
                        help='Skip EclipseFan horizon image downloading')
+    parser.add_argument('--no-profile', action='store_true',
+                       help='Skip profile diagram screenshots (check visibility only)')
     
     # Only flags (for updating existing CSV)
     parser.add_argument('--only-eclipse', action='store_true',
@@ -119,7 +125,10 @@ Examples:
         if args.only_eclipse:
             print("\nChecking eclipse visibility...")
             print("=" * 60)
-            results = check_sites_eclipse_visibility(results)
+            save_profiles = not args.no_profile
+            if args.no_profile:
+                print("Profile screenshots will be skipped (--no-profile flag)")
+            results = check_sites_eclipse_visibility(results, save_profiles=save_profiles)
             print(f"\n✓ Eclipse visibility checked for {len(results)} site(s)")
         
         elif args.only_cloud:
@@ -176,7 +185,10 @@ Examples:
         print("\n" + "=" * 60)
         print("STEP 2: Checking eclipse visibility...")
         print("=" * 60)
-        results = check_sites_eclipse_visibility(results)
+        save_profiles = not args.no_profile
+        if args.no_profile:
+            print("Profile screenshots will be skipped (--no-profile flag)")
+        results = check_sites_eclipse_visibility(results, save_profiles=save_profiles)
         print(f"\n✓ Eclipse visibility checked for all sites")
     else:
         print("\n⚠️  Skipping eclipse visibility checking (--no-eclipse flag)")

@@ -58,7 +58,7 @@ def setup_webdriver() -> Optional[webdriver.Chrome]:
         return None
 
 
-def check_eclipse_visibility(driver: webdriver.Chrome, lat: float, lon: float, code: str) -> str:
+def check_eclipse_visibility(driver: webdriver.Chrome, lat: float, lon: float, code: str, save_profile: bool = True) -> str:
     """Check if eclipse is visible from given coordinates
     
     Args:
@@ -66,6 +66,7 @@ def check_eclipse_visibility(driver: webdriver.Chrome, lat: float, lon: float, c
         lat: Latitude in decimal degrees
         lon: Longitude in decimal degrees
         code: Site code for saving profile image
+        save_profile: Whether to save the profile diagram screenshot (default: True)
     
     Returns:
         String indicating visibility status: 'visible', 'not_visible', 'unknown', 'timeout', or 'error'
@@ -100,22 +101,25 @@ def check_eclipse_visibility(driver: webdriver.Chrome, lat: float, lon: float, c
             except TimeoutException:
                 time.sleep(2)
             
-            # Capture profile diagram screenshot
-            try:
+            # Capture profile diagram screenshot (if enabled)
+            if save_profile:
                 try:
-                    profile_element = driver.find_element(By.CSS_SELECTOR, ".profile-container svg")
-                except:
                     try:
-                        profile_element = driver.find_element(By.CSS_SELECTOR, ".profile-container canvas")
+                        profile_element = driver.find_element(By.CSS_SELECTOR, ".profile-container svg")
                     except:
-                        profile_element = driver.find_element(By.CLASS_NAME, "profile-container")
-                
-                os.makedirs(PROFILES_DIR, exist_ok=True)
-                profile_path = os.path.join(PROFILES_DIR, f"{code}_profile.png")
-                profile_element.screenshot(profile_path)
-                print(f"  📊 Saved profile to {profile_path}")
-            except Exception as e:
-                print(f"  ⚠️  Could not capture profile: {e}")
+                        try:
+                            profile_element = driver.find_element(By.CSS_SELECTOR, ".profile-container canvas")
+                        except:
+                            profile_element = driver.find_element(By.CLASS_NAME, "profile-container")
+                    
+                    os.makedirs(PROFILES_DIR, exist_ok=True)
+                    profile_path = os.path.join(PROFILES_DIR, f"{code}_profile.png")
+                    profile_element.screenshot(profile_path)
+                    print(f"  📊 Saved profile to {profile_path}")
+                except Exception as e:
+                    print(f"  ⚠️  Could not capture profile: {e}")
+            else:
+                print(f"  ⏭️  Skipping profile screenshot (--no-profile flag)")
             
             # Check visibility text
             page_source = driver.page_source
@@ -140,11 +144,12 @@ def check_eclipse_visibility(driver: webdriver.Chrome, lat: float, lon: float, c
         return "error"
 
 
-def check_sites_eclipse_visibility(sites: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def check_sites_eclipse_visibility(sites: List[Dict[str, Any]], save_profiles: bool = True) -> List[Dict[str, Any]]:
     """Check eclipse visibility for multiple sites
     
     Args:
         sites: List of site dictionaries with 'code', 'latitude', 'longitude'
+        save_profiles: Whether to save profile diagram screenshots (default: True)
     
     Returns:
         List of site dictionaries with added 'eclipse_visibility' field
@@ -173,7 +178,7 @@ def check_sites_eclipse_visibility(sites: List[Dict[str, Any]]) -> List[Dict[str
                 lon = float(lon_str)
                 
                 print(f"\n[{code}] Checking eclipse visibility...")
-                visibility = check_eclipse_visibility(driver, lat, lon, code)
+                visibility = check_eclipse_visibility(driver, lat, lon, code, save_profile=save_profiles)
                 site['eclipse_visibility'] = visibility
                 
                 time.sleep(1)  # Small delay between sites
