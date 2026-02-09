@@ -26,31 +26,38 @@
     <div class="container">
         <aside class="sidebar">
             <div class="sidebar-controls">
-                <input type="text" class="search-box" id="searchBox" placeholder="Search sites...">
+                <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search sites...">
+                
                 <div class="filter-controls">
-                    <label style="display: flex; align-items: center; cursor: pointer; font-size: 0.9rem; margin-bottom: 0.5rem;">
-                        <input type="checkbox" id="eclipseFilter" style="margin-right: 0.5rem; cursor: pointer;">
-                        <span>🌑 Show only eclipse-visible sites</span>
-                    </label>
-                    <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; margin-bottom: 0.5rem;">
-                        <label for="cloudFilter" style="font-weight: 500;">Cloud coverage:</label>
-                        <select id="cloudFilter" style="flex: 1; padding: 0.4rem; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.85rem; cursor: pointer;">
+                    <div class="filter-section">
+                        <label class="filter-label">Filters</label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="eclipseFilter" class="filter-checkbox">
+                            <span class="checkbox-text">🌑 Eclipse visible only</span>
+                        </label>
+                    </div>
+                    
+                    <div class="filter-section">
+                        <label class="filter-label" for="cloudFilter">Cloud Coverage</label>
+                        <select id="cloudFilter" class="filter-select">
                             <option value="all">All sites</option>
                             <option value="low">☀️ Low (<30%)</option>
                             <option value="medium">⛅ Medium (30-60%)</option>
                             <option value="high">☁️ High (≥60%)</option>
                         </select>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
-                        <label for="sortBy" style="font-weight: 500;">Sort by:</label>
-                        <select id="sortBy" style="flex: 1; padding: 0.4rem; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.85rem; cursor: pointer;">
+                    
+                    <div class="filter-section">
+                        <label class="filter-label" for="sortBy">Sort By</label>
+                        <select id="sortBy" class="filter-select">
                             <option value="code">Code</option>
                             <option value="name">Name</option>
                             <option value="tourist_value">Tourist Value</option>
                         </select>
                     </div>
-                    <div style="font-size: 0.75rem; color: #6c757d; margin-top: 0.5rem; padding: 0.5rem; background: #f8f9fa; border-radius: 4px;">
-                        💡 <b>Tip:</b> Hold Ctrl (Cmd on Mac) and click to select multiple sites for the map
+                    
+                    <div class="filter-tip">
+                        💡 <strong>Tip:</strong> Hold Ctrl (Cmd on Mac) and click to select multiple sites
                     </div>
                 </div>
             </div>
