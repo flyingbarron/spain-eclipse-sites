@@ -367,12 +367,12 @@ def load_site_from_csv(site_code, csv_file="../data/eclipse_site_data.csv"):
     return None
 
 
-def process_all_sites(csv_file="../data/eclipse_site_data.csv", zoom_level=18):
+def process_all_sites(csv_file="../data/eclipse_site_data.csv", zoom_level=19):
     """Process all sites from eclipse_site_data.csv
     
     Args:
         csv_file: Path to CSV file with site data
-        zoom_level: Zoom level for Shademap (default: 18)
+        zoom_level: Zoom level for Shademap (default: 19)
     """
     
     # Check if CSV file exists
@@ -478,8 +478,8 @@ Examples:
                        help='Output filename (default: based on site code or shademap_export.jpg)')
     parser.add_argument('--headless', action='store_true',
                        help='Run browser in headless mode')
-    parser.add_argument('--zoom', '-z', type=int, default=18,
-                       help='Zoom level for Shademap (default: 18, range: 1-20)')
+    parser.add_argument('--zoom', '-z', type=int, default=19,
+                       help='Zoom level for Shademap (default: 19, range: 1-20)')
     
     args = parser.parse_args()
     
