@@ -10,6 +10,7 @@ import sys
 from src.igme_scraper import scrape_all_sites
 from src.eclipse_checker import check_sites_eclipse_visibility
 from src.cloud_coverage_scraper import scrape_cloud_coverage_for_sites
+from src.eclipsefan_scraper import download_horizon_images_for_sites
 from src.output_generator import save_to_csv, save_to_kml, print_summary
 
 
@@ -29,6 +30,9 @@ Examples:
   # Skip cloud coverage scraping (faster)
   python3 generate_eclipse_site_data.py --no-cloud
   
+  # Skip horizon image downloading (faster)
+  python3 generate_eclipse_site_data.py --no-horizon
+  
   # Check specific site only
   python3 generate_eclipse_site_data.py --code IB200a
         """
@@ -39,6 +43,8 @@ Examples:
                        help='Skip eclipse visibility checking')
     parser.add_argument('--no-cloud', action='store_true',
                        help='Skip cloud coverage scraping')
+    parser.add_argument('--no-horizon', action='store_true',
+                       help='Skip EclipseFan horizon image downloading')
     args = parser.parse_args()
     
     print("=" * 60)
@@ -83,6 +89,19 @@ Examples:
             site['cloud_coverage'] = None
             site['cloud_status'] = 'not_checked'
             site['cloud_url'] = None
+    
+    # Step 2.7: Download EclipseFan horizon images (if enabled)
+    if not args.no_horizon:
+        print("\n" + "=" * 60)
+        print("STEP 2.7: Downloading EclipseFan horizon images...")
+        print("=" * 60)
+        print("This will take a while (2 second delay between requests)...")
+        results = download_horizon_images_for_sites(results, delay=2.0)
+        print(f"\n✓ Horizon images downloaded for all sites")
+    else:
+        print("\n⚠️  Skipping horizon image downloading (--no-horizon flag)")
+        for site in results:
+            site['horizon_status'] = 'not_checked'
     
     # Step 3: Generate outputs
     print("\n" + "=" * 60)

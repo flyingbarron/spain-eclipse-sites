@@ -21,6 +21,7 @@ This project scrapes geological site information from IGME's IELIG database and 
 - ✅ Precise GPS coordinates from MapServer API
 - ✅ Eclipse visibility checking via IGN Eclipse 2026 viewer
 - ✅ Automated profile diagram capture
+- ✅ EclipseFan horizon image downloading
 
 ### Web Viewer
 - 🔍 **Search** by site code or name (sticky controls)
@@ -89,6 +90,16 @@ Skip eclipse checking (faster, IGME data only):
 python3 generate_eclipse_site_data.py --no-eclipse
 ```
 
+Skip cloud coverage scraping (faster):
+```bash
+python3 generate_eclipse_site_data.py --no-cloud
+```
+
+Skip horizon image downloading (faster):
+```bash
+python3 generate_eclipse_site_data.py --no-horizon
+```
+
 Check specific site only:
 ```bash
 python3 generate_eclipse_site_data.py --code IB200a
@@ -133,6 +144,7 @@ spain-eclipse-sites/
 │   └── favicon.svg
 ├── data/                             # Generated data (gitignored)
 │   ├── eclipse_profiles/             # Profile diagram images
+│   ├── eclipsefan_horizon/           # EclipseFan horizon images
 │   ├── shademap/                     # Shademap visualizations
 │   ├── eclipse_site_data.csv         # Main dataset
 │   └── sites.kml                     # All sites organized in 6 folders
@@ -141,6 +153,7 @@ spain-eclipse-sites/
 │   ├── igme_scraper.py              # IGME site scraping
 │   ├── eclipse_checker.py           # Eclipse visibility checking
 │   ├── cloud_coverage_scraper.py    # Cloud coverage data scraping
+│   ├── eclipsefan_scraper.py        # EclipseFan horizon image downloading
 │   └── output_generator.py          # CSV/KML generation with azimuth lines
 ├── static/                           # Web viewer assets
 │   ├── app.js                       # Interactive viewer logic
@@ -221,6 +234,10 @@ Each folder contains:
 ### Profile Diagrams
 
 **`data/eclipse_profiles/{code}_profile.png`** - Eclipse visibility profile for each site showing the eclipse path and visibility details
+
+### Horizon Images
+
+**`data/eclipsefan_horizon/{code}_horizon.png`** - Horizon profile images from EclipseFan.org showing local topography and eclipse direction
 
 ## Technical Details
 

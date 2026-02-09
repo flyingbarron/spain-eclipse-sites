@@ -68,7 +68,7 @@ def save_to_csv(results, filename='eclipse_site_data.csv'):
     with open(filepath, 'w', newline='', encoding='utf-8') as csvfile:
         fieldnames = ['code', 'denominacion', 'url', 'valor_turistico', 'confidencialidad',
                      'route_difficulty', 'latitude', 'longitude', 'eclipse_visibility', 'status',
-                     'cloud_coverage', 'cloud_status', 'cloud_url']
+                     'cloud_coverage', 'cloud_status', 'cloud_url', 'horizon_status']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         
         writer.writeheader()
@@ -312,9 +312,14 @@ def print_summary(results):
         print(f"  ☀️  Low cloud (<30%): {low_cloud}")
         print(f"  ⛅ Medium cloud (30-60%): {medium_cloud}")
         print(f"  ☁️  High cloud (≥60%): {high_cloud}")
+    # Horizon image statistics
+    with_horizon = sum(1 for r in results if r.get('horizon_status') == 'success')
+    
     print("\nOutput files:")
     print("  • data/eclipse_site_data.csv - Complete dataset")
     print("  • data/sites.kml - All sites organized in 6 folders")
     print("  • data/eclipse_profiles/*.png - Visibility profile diagrams")
+    if with_horizon > 0:
+        print(f"  • data/eclipsefan_horizon/*.png - Horizon profile images ({with_horizon} sites)")
 
 # Made with Bob
