@@ -13,9 +13,11 @@ Playwright is more reliable than Selenium for modern web apps.
 import sys
 import time
 import os
+import csv
+import argparse
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
 
-def download_shademap_export(url, output_dir="data", output_filename="shademap_export.jpg", headless=False):
+def download_shademap_export(url, output_dir="../data/shademap", output_filename="shademap_export.jpg", headless=False):
     """
     Open Shademap, dismiss popup, zoom in, and export as JPG.
     
@@ -350,11 +352,49 @@ def download_shademap_export(url, output_dir="data", output_filename="shademap_e
         finally:
             browser.close()
 
-def process_all_sites():
-    """Process all sites from eclipse_site_data_with_cloud.csv"""
-    import csv
+def load_site_from_csv(site_code, csv_file="../data/eclipse_site_data.csv"):
+    """Load a specific site from CSV by code
     
-    csv_file = "data/eclipse_site_data_with_cloud.csv"
+    Args:
+        site_code: Site code to look for (e.g., 'IB200a')
+        csv_file: Path to CSV file
+    
+    Returns:
+        Dictionary with site data or None if not found
+    """
+    if not os.path.exists(csv_file):
+        print(f"Error: {csv_file} not found")
+        print("Please run generate_eclipse_site_data.py first")
+        sys.exit(1)
+    
+    with open(csv_file, 'r', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if row['code'] == site_code:
+                lat = row.get('latitude', '').strip()
+                lon = row.get('longitude', '').strip()
+                
+                if not lat or not lon or lat == 'N/A' or lon == 'N/A':
+                    print(f"Error: Site {site_code} has no valid coordinates")
+                    return None
+                
+                try:
+                    return {
+                        'code': row['code'],
+                        'name': row.get('denominacion', row['code']),
+                        'lat': float(lat),
+                        'lon': float(lon)
+                    }
+                except ValueError:
+                    print(f"Error: Site {site_code} has invalid coordinates: {lat}, {lon}")
+                    return None
+    
+    print(f"Error: Site {site_code} not found in CSV")
+    return None
+
+
+def process_all_sites(csv_file="../data/eclipse_site_data.csv"):
+    """Process all sites from eclipse_site_data.csv"""
     
     # Check if CSV file exists
     if not os.path.exists(csv_file):
@@ -406,7 +446,7 @@ def process_all_sites():
         output_filename = f"{site['code']}_shademap.jpg"
         
         try:
-            download_shademap_export(url, output_dir="data/shademap", output_filename=output_filename, headless=False)
+            download_shademap_export(url, output_dir="../data/shademap", output_filename=output_filename, headless=False)
             print(f"✓ Successfully exported {output_filename}")
         except Exception as e:
             print(f"✗ Failed to export {site['code']}: {e}")
@@ -420,7 +460,7 @@ def process_all_sites():
     
     print("\n" + "=" * 60)
     print(f"Completed processing {len(sites)} sites")
-    print(f"Shademap exports saved to: data/shademap/")
+    print(f"Shademap exports saved to: ../data/shademap/")
 
 def btoa(s):
     """Base64 encode a string (like JavaScript's btoa)"""
@@ -428,19 +468,79 @@ def btoa(s):
     return base64.b64encode(s.encode()).decode()
 
 def main():
-    # Check if --all flag is provided
-    if len(sys.argv) > 1 and sys.argv[1] == '--all':
-        process_all_sites()
+    parser = argparse.ArgumentParser(
+        description='Download Shademap export for eclipse sites',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Download shademap for specific site (reads from CSV)
+  python3 download_shademap_export_playwright.py --code IB200a
+  
+  # Download shademap for all sites
+  python3 download_shademap_export_playwright.py --all
+  
+  # Use custom CSV file
+  python3 download_shademap_export_playwright.py --code IB200a --csv ../data/my_sites.csv
+  
+  # Download from custom URL
+  python3 download_shademap_export_playwright.py --url "https://shademap.app/@42.13,-2.16,20z,..."
+        """
+    )
+    
+    parser.add_argument('--code', '-c',
+                       help='Site code to download shademap for (e.g., IB200a)')
+    parser.add_argument('--all', action='store_true',
+                       help='Download shademaps for all sites in CSV')
+    parser.add_argument('--csv', default='../data/eclipse_site_data.csv',
+                       help='CSV file to read site data from (default: ../data/eclipse_site_data.csv)')
+    parser.add_argument('--url',
+                       help='Custom Shademap URL to download')
+    parser.add_argument('--output', '-o',
+                       help='Output filename (default: based on site code or shademap_export.jpg)')
+    parser.add_argument('--headless', action='store_true',
+                       help='Run browser in headless mode')
+    
+    args = parser.parse_args()
+    
+    # Eclipse time in milliseconds (August 12, 2026)
+    eclipse_time = "1786559455614"
+    
+    # Process all sites
+    if args.all:
+        process_all_sites(csv_file=args.csv)
         return
     
-    # Default URL for the eclipse location
-    default_url = "https://shademap.app/@42.13096,-2.15972,20z,1786559455614t,0b,0p,0m!1786511647543!1786562164762,qDMKLwoxMyo5NTgsIC0zCi8KMTU5NzIw=!42.13096!-2.15972"
+    # Process specific site by code
+    if args.code:
+        site = load_site_from_csv(args.code, csv_file=args.csv)
+        if not site:
+            sys.exit(1)
+        
+        print(f"Processing {site['code']} - {site['name']}")
+        print(f"Coordinates: {site['lat']}, {site['lon']}")
+        print("=" * 60)
+        
+        # Build Shademap URL
+        lat = site['lat']
+        lon = site['lon']
+        coords_base64 = btoa(f"{lat}, {lon}")
+        url = f"https://shademap.app/@{lat},{lon},20z,{eclipse_time}t,0b,0p,0m!1786511647543!1786562164762,{coords_base64}!{lat}!{lon}"
+        
+        # Output filename
+        output_filename = args.output or f"{site['code']}_shademap.jpg"
+        
+        download_shademap_export(url, output_dir="../data/shademap", output_filename=output_filename, headless=args.headless)
+        print(f"\n✓ Successfully exported to: ../data/shademap/{output_filename}")
+        return
     
-    # Allow custom URL from command line
-    url = sys.argv[1] if len(sys.argv) > 1 else default_url
-    output_filename = sys.argv[2] if len(sys.argv) > 2 else "shademap_export.jpg"
+    # Process custom URL
+    if args.url:
+        output_filename = args.output or "shademap_export.jpg"
+        download_shademap_export(args.url, output_filename=output_filename, headless=args.headless)
+        return
     
-    download_shademap_export(url, output_filename=output_filename)
+    # No arguments provided - show help
+    parser.print_help()
 
 if __name__ == "__main__":
     main()
