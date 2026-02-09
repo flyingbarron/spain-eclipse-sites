@@ -83,22 +83,51 @@ def download_horizon_image(driver, lat, lon, code):
         print(f"  Looking for Horizon tab...")
         horizon_clicked = False
         
-        # Try to find Horizon tab by text
+        # Strategy 1: Find by exact text
         try:
-            elements = driver.find_elements(By.XPATH, "//*[contains(translate(text(), 'HORIZON', 'horizon'), 'horizon')]")
-            for elem in elements:
-                if 'horizon' in elem.text.lower():
-                    elem.click()
-                    horizon_clicked = True
-                    print(f"  ✓ Clicked Horizon tab")
-                    break
-        except Exception as e:
-            print(f"  ⚠️  Could not find Horizon tab: {e}")
-            return 'not_found'
+            elements = driver.find_elements(By.XPATH, "//*[text()='Horizon']")
+            if elements:
+                print(f"  Found Horizon tab by exact text match")
+                elements[0].click()
+                horizon_clicked = True
+        except:
+            pass
+        
+        # Strategy 2: Find by partial text (case-insensitive)
+        if not horizon_clicked:
+            try:
+                elements = driver.find_elements(By.XPATH, "//*[contains(translate(text(), 'HORIZON', 'horizon'), 'horizon')]")
+                for elem in elements:
+                    if 'horizon' in elem.text.lower():
+                        print(f"  Found Horizon tab by partial text: {elem.text}")
+                        elem.click()
+                        horizon_clicked = True
+                        break
+            except:
+                pass
+        
+        # Strategy 3: Find clickable elements and check their text
+        if not horizon_clicked:
+            try:
+                clickable_elements = driver.find_elements(By.XPATH, "//button | //a | //div[@role='button'] | //span[@role='button']")
+                for elem in clickable_elements:
+                    try:
+                        text = elem.text.strip().lower()
+                        if 'horizon' in text:
+                            print(f"  Found Horizon tab in clickable element: {elem.text}")
+                            elem.click()
+                            horizon_clicked = True
+                            break
+                    except:
+                        continue
+            except:
+                pass
         
         if not horizon_clicked:
             print(f"  ✗ Horizon tab not found")
             return 'not_found'
+        
+        print(f"  ✓ Clicked Horizon tab")
         
         # Wait for horizon image to generate
         print(f"  Waiting for horizon image to render...")
