@@ -253,12 +253,16 @@ def save_to_kml(results: List[Dict[str, Any]], filename: str = 'sites.kml') -> N
                 
                 # Add cloud coverage info if available
                 cloud_info = ''
-                if result.get('cloud_coverage') is not None:
-                    cloud_pct = result['cloud_coverage']
-                    cloud_emoji = '☀️' if cloud_pct < 30 else '⛅' if cloud_pct < 60 else '☁️'
-                    cloud_info = f'<b>Cloud Coverage:</b> {cloud_emoji} {cloud_pct}%<br/>'
-                    if result.get('cloud_url'):
-                        cloud_info += f'<b>Cloud Data:</b> <a href="{result["cloud_url"]}">View Details</a><br/>'
+                if result.get('cloud_coverage') is not None and result.get('cloud_coverage') != '':
+                    try:
+                        cloud_pct = int(result['cloud_coverage'])
+                        cloud_emoji = '☀️' if cloud_pct < 30 else '⛅' if cloud_pct < 60 else '☁️'
+                        cloud_info = f'<b>Cloud Coverage:</b> {cloud_emoji} {cloud_pct}%<br/>'
+                        if result.get('cloud_url'):
+                            cloud_info += f'<b>Cloud Data:</b> <a href="{result["cloud_url"]}">View Details</a><br/>'
+                    except (ValueError, TypeError):
+                        # Skip cloud info if conversion fails
+                        pass
                 
                 placemark = f'''
       <Placemark>
