@@ -103,6 +103,9 @@ This will:
 # Skip eclipse checking (IGME data only)
 python3 generate_eclipse_site_data.py --no-eclipse
 
+# Check visibility without profile screenshots (faster)
+python3 generate_eclipse_site_data.py --no-profile
+
 # Skip cloud coverage scraping
 python3 generate_eclipse_site_data.py --no-cloud
 
@@ -123,6 +126,9 @@ python3 generate_eclipse_site_data.py --only-horizon
 
 # Re-check eclipse visibility for existing sites
 python3 generate_eclipse_site_data.py --only-eclipse
+
+# Re-check visibility without downloading profile screenshots (faster)
+python3 generate_eclipse_site_data.py --only-eclipse --no-profile
 
 # Update specific site only
 python3 generate_eclipse_site_data.py --only-cloud --code IB200a
@@ -161,9 +167,15 @@ The script generates:
   python3 generate_eclipse_site_data.py
   ```
 
+- **Fast visibility check**: Check eclipse visibility without profile screenshots (~10-15 minutes)
+  ```bash
+  python3 generate_eclipse_site_data.py --no-profile --no-cloud --no-horizon
+  ```
+
 - **Add missing data**: Use `--only-*` flags to update existing CSV without re-scraping IGME
   ```bash
   python3 generate_eclipse_site_data.py --only-cloud
+  python3 generate_eclipse_site_data.py --only-eclipse --no-profile
   ```
 
 - **Update specific site**: Combine `--only-*` with `--code`
@@ -176,10 +188,11 @@ The script generates:
   python3 generate_eclipse_site_data.py --no-eclipse --no-cloud --no-horizon
   ```
 
-- **Workflow**:
-  1. First run with `--no-cloud --no-horizon` to get IGME + eclipse data quickly
-  2. Later add cloud data: `python3 generate_eclipse_site_data.py --only-cloud`
-  3. Later add horizon images: `python3 generate_eclipse_site_data.py --only-horizon`
+- **Recommended workflow**:
+  1. Quick visibility check: `python3 generate_eclipse_site_data.py --no-profile --no-cloud --no-horizon`
+  2. Add cloud data: `python3 generate_eclipse_site_data.py --only-cloud`
+  3. Add horizon images: `python3 generate_eclipse_site_data.py --only-horizon`
+  4. Add profile screenshots: `python3 generate_eclipse_site_data.py --only-eclipse`
 
 ### View Data
 
