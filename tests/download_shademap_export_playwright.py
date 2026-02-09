@@ -17,7 +17,7 @@ import csv
 import argparse
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
 
-def download_shademap_export(url, output_dir="../data/shademap", output_filename="shademap_export.jpg", headless=False):
+def download_shademap_export(url, output_dir="../data/shademap_snapshot", output_filename="shademap_export.jpg", headless=False):
     """
     Open Shademap, dismiss popup, zoom in, and export as JPG.
     
@@ -446,7 +446,7 @@ def process_all_sites(csv_file="../data/eclipse_site_data.csv"):
         output_filename = f"{site['code']}_shademap.jpg"
         
         try:
-            download_shademap_export(url, output_dir="../data/shademap", output_filename=output_filename, headless=False)
+            download_shademap_export(url, output_dir="../data/shademap_snapshot", output_filename=output_filename, headless=False)
             print(f"✓ Successfully exported {output_filename}")
         except Exception as e:
             print(f"✗ Failed to export {site['code']}: {e}")
@@ -460,7 +460,7 @@ def process_all_sites(csv_file="../data/eclipse_site_data.csv"):
     
     print("\n" + "=" * 60)
     print(f"Completed processing {len(sites)} sites")
-    print(f"Shademap exports saved to: ../data/shademap/")
+    print(f"Shademap exports saved to: ../data/shademap_snapshot/")
 
 def btoa(s):
     """Base64 encode a string (like JavaScript's btoa)"""
@@ -529,8 +529,8 @@ Examples:
         # Output filename
         output_filename = args.output or f"{site['code']}_shademap.jpg"
         
-        download_shademap_export(url, output_dir="../data/shademap", output_filename=output_filename, headless=args.headless)
-        print(f"\n✓ Successfully exported to: ../data/shademap/{output_filename}")
+        download_shademap_export(url, output_dir="../data/shademap_snapshot", output_filename=output_filename, headless=args.headless)
+        print(f"\n✓ Successfully exported to: ../data/shademap_snapshot/{output_filename}")
         return
     
     # Process custom URL
