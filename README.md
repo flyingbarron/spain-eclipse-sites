@@ -26,7 +26,9 @@ This project scrapes geological site information from IGME's IELIG database and 
 - 🔍 **Search** by site code or name (sticky controls)
 - 🌑 **Filter** eclipse-visible sites
 - 📊 **Sort** by code, name, or tourist value
-- 🖼️ **Image gallery** with full-screen carousel
+- 📚 **Navigation panels** - Resources, About, and Help sections accessible from header
+- 🔗 **Resources panel** - Quick links to eclipse websites and planning tools
+- �️ **Image gallery** with full-screen carousel
 - 🗺️ **Interactive maps** with routing from Hotel Parras Arnedillo
 - 🚗 **Multi-site route planning** with Ctrl/Cmd+Click selection
 - 🧭 **Turn-by-turn directions** for each route segment
