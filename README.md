@@ -80,32 +80,83 @@ sudo apt-get install chromium-chromedriver
 
 ### Generate Data
 
-Collect all data (IGME sites + eclipse visibility):
+The main script `generate_eclipse_site_data.py` collects all site data with multiple options:
+
+#### Basic Usage
+
+Collect all data (IGME sites + eclipse visibility + cloud coverage + horizon images):
 ```bash
 python3 generate_eclipse_site_data.py
 ```
 
-Skip eclipse checking (faster, IGME data only):
+This will:
+1. Scrape IGME site data (tourist values, coordinates, etc.)
+2. Check eclipse visibility using IGN Eclipse 2026 viewer
+3. Scrape cloud coverage data from timeanddate.com
+4. Download horizon images from EclipseFan.org
+5. Generate CSV and KML output files
+
+#### Command-Line Options
+
+**Skip eclipse checking** (faster, IGME data only):
 ```bash
 python3 generate_eclipse_site_data.py --no-eclipse
 ```
+Skips Selenium-based eclipse visibility checking. Sites will have `eclipse_visibility='not_checked'`.
 
-Skip cloud coverage scraping (faster):
+**Skip cloud coverage scraping** (faster):
 ```bash
 python3 generate_eclipse_site_data.py --no-cloud
 ```
+Skips cloud coverage data collection. Sites will have `cloud_status='not_checked'`.
 
-Skip horizon image downloading (faster):
+**Skip horizon image downloading** (faster):
 ```bash
 python3 generate_eclipse_site_data.py --no-horizon
 ```
+Skips EclipseFan horizon image downloads. Sites will have `horizon_status='not_checked'`.
 
-Check specific site only:
+**Check specific site only**:
 ```bash
 python3 generate_eclipse_site_data.py --code IB200a
 ```
+Process only the specified site code. Useful for testing or updating individual sites.
+
+**Combine options**:
+```bash
+# IGME data only (fastest)
+python3 generate_eclipse_site_data.py --no-eclipse --no-cloud --no-horizon
+
+# IGME + eclipse only
+python3 generate_eclipse_site_data.py --no-cloud --no-horizon
+
+# Specific site with all data
+python3 generate_eclipse_site_data.py --code IB200a
+```
+
+#### Help
+
+View all options:
+```bash
+python3 generate_eclipse_site_data.py --help
+```
+
+#### Output
+
+The script generates:
+- `data/eclipse_site_data.csv` - Complete dataset
+- `data/sites.kml` - KML file with 6 organized folders
+- `data/ign_visibility_profiles/*.png` - Eclipse profile diagrams (if --no-eclipse not used)
+- `data/eclipsefan_visibility_profiles/*.png` - Horizon images (if --no-horizon not used)
 
 **Note**: Eclipse azimuth lines (283.7753°, 50km length) are automatically included in the generated KML file, showing the direction toward the eclipse for each site.
+
+#### Performance Tips
+
+- **First run**: Use all options to collect complete data (~30-60 minutes)
+- **Updates**: Use `--code` to update specific sites
+- **Testing**: Use `--no-eclipse --no-cloud --no-horizon` for quick IGME data only (~2-3 minutes)
+- **Incremental**: The script merges with existing data, so you can run multiple times
 
 ### View Data
 
@@ -339,6 +390,41 @@ The script uses Selenium to:
 - **Server Shutdown**: See `tests/SERVER_SHUTDOWN.md` for clean server shutdown options
 - **Screenshot Tools**: See `tests/SCREENSHOT_README.md` for EclipseFan.org screenshot utilities
 - **Utility Scripts**: Various tools in `tests/` directory for data processing and downloads
+
+## Configuration
+
+The application uses a YAML-based configuration system. See **[CONFIGURATION.md](CONFIGURATION.md)** for complete documentation.
+
+Quick configuration:
+- Edit `config.yaml` for application settings
+- Use environment variables for container deployment (see `.env.example`)
+- Override settings with `ECLIPSE_SITES_*` environment variables
+
+Example:
+```bash
+export ECLIPSE_SITES_LOGGING_LEVEL=DEBUG
+export ECLIPSE_SITES_SCRAPING_RATE_LIMIT_DELAY=2.0
+python3 generate_eclipse_site_data.py
+```
+
+## Testing
+
+Run the test suite:
+```bash
+# Install dependencies first
+pip install -r requirements.txt
+
+# Run all tests
+python3 run_tests.py
+
+# Run specific test file
+python3 -m unittest tests.test_models
+```
+
+Current test coverage:
+- ✅ Site dataclass (15 tests)
+- ✅ Configuration system (when PyYAML installed)
+- ⚠️ Integration tests (legacy, needs update)
 
 ## New Features (2026-02-09 Refactoring)
 
