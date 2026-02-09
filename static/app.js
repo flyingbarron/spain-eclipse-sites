@@ -508,6 +508,7 @@ async function displaySiteDetails(site) {
             <div class="tabs">
                 <button class="tab ${activeTab === 'details' ? 'active' : ''}" onclick="switchTab('details')">📋 Details</button>
                 <button class="tab ${activeTab === 'map' ? 'active' : ''}" onclick="switchTab('map')">🗺️ Map</button>
+                ${activeTab === 'map' ? '<span class="map-tip">💡 Hold Ctrl (Cmd on Mac) and click sites to select multiple</span>' : ''}
             </div>
 
             <div id="detailsTab" class="tab-content ${activeTab === 'details' ? 'active' : ''}">
