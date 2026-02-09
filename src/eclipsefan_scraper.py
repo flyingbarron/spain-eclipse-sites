@@ -5,6 +5,7 @@ Functions for downloading horizon profile images from EclipseFan.org
 
 import os
 import time
+from typing import List, Dict, Any, Optional
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -15,7 +16,7 @@ DATA_DIR = "data"
 HORIZON_DIR = os.path.join(DATA_DIR, "eclipsefan_visibility_profiles")
 
 
-def setup_webdriver(headless=True):
+def setup_webdriver(headless: bool = True) -> Optional[webdriver.Chrome]:
     """Setup and return a Chrome WebDriver instance for EclipseFan
     
     Args:
@@ -57,7 +58,7 @@ def setup_webdriver(headless=True):
         return None
 
 
-def download_horizon_image(driver, lat, lon, code):
+def download_horizon_image(driver: webdriver.Chrome, lat: float, lon: float, code: str) -> str:
     """Download horizon profile image from EclipseFan.org
     
     Args:
@@ -197,7 +198,7 @@ def download_horizon_image(driver, lat, lon, code):
         return 'error'
 
 
-def download_horizon_images_for_sites(sites, delay=2.0):
+def download_horizon_images_for_sites(sites: List[Dict[str, Any]], delay: float = 2.0) -> List[Dict[str, Any]]:
     """Download horizon images for multiple sites
     
     Args:
