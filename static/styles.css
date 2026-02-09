@@ -593,7 +593,7 @@ header h1 {
 .map-tip {
     font-size: 0.8rem;
     color: #6c757d;
-    margin-left: auto;
+    margin: 0 auto;
     padding: 0.5rem 0.75rem;
     background: #f8f9fa;
     border-radius: 4px;
