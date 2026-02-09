@@ -1131,6 +1131,25 @@ function switchTab(tabName) {
     } else if (tabName === 'map') {
         document.getElementById('mapTab').classList.add('active');
     }
+    
+    // Show/hide map tip
+    const tabsContainer = document.querySelector('.tabs');
+    let existingTip = tabsContainer.querySelector('.map-tip');
+    
+    if (tabName === 'map') {
+        // Add tip if it doesn't exist
+        if (!existingTip) {
+            const tip = document.createElement('span');
+            tip.className = 'map-tip';
+            tip.textContent = '💡 Hold Ctrl (Cmd on Mac) and click sites to select multiple';
+            tabsContainer.appendChild(tip);
+        }
+    } else {
+        // Remove tip if it exists
+        if (existingTip) {
+            existingTip.remove();
+        }
+    }
 }
 // Export route as KML file
 function exportRouteAsKML() {
