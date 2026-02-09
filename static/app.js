@@ -29,7 +29,7 @@ function decimalToDMS(decimal, isLat) {
 // Load CSV file
 async function loadCSV() {
     try {
-        const response = await fetch('data/eclipse_site_data_with_cloud.csv');
+        const response = await fetch('data/eclipse_site_data.csv');
         const text = await response.text();
         
         parseCSV(text);
