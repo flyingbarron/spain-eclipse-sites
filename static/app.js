@@ -1289,6 +1289,16 @@ function openPanel(panelId) {
         
         panel.classList.add('active');
         overlay.classList.add('active');
+        
+        // Update URL hash for direct linking
+        const hashMap = {
+            'resourcesModal': 'resources',
+            'aboutModal': 'about',
+            'helpModal': 'help'
+        };
+        if (hashMap[panelId]) {
+            window.history.pushState(null, null, '#' + hashMap[panelId]);
+        }
     }
 }
 
@@ -1312,6 +1322,11 @@ function closeAllPanels() {
     if (overlay) {
         overlay.classList.remove('active');
     }
+    
+    // Clear URL hash
+    if (window.location.hash) {
+        window.history.pushState(null, null, window.location.pathname);
+    }
 }
 
 // Footer toggle function
@@ -1329,6 +1344,16 @@ function toggleFooter() {
 document.addEventListener('DOMContentLoaded', () => {
     initializeDragAndDrop();
     loadCSV();
+    
+    // Check for hash in URL and open corresponding panel
+    const hash = window.location.hash.substring(1); // Remove the #
+    if (hash === 'resources') {
+        openPanel('resourcesModal');
+    } else if (hash === 'about') {
+        openPanel('aboutModal');
+    } else if (hash === 'help') {
+        openPanel('helpModal');
+    }
     
     // Setup panel buttons
     const resourcesBtn = document.getElementById('resourcesBtn');
