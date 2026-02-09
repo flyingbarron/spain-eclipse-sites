@@ -58,24 +58,43 @@ def calculate_endpoint(lat, lon, azimuth, distance_km=50):
 
 
 def save_to_csv(results, filename='eclipse_site_data.csv'):
-    """Save results to CSV file
+    """Save results to CSV file, merging with existing data
     
     Args:
-        results: List of site dictionaries
+        results: List of site dictionaries (new/updated data)
         filename: Output CSV filename
     """
     filepath = os.path.join(DATA_DIR, filename)
-    with open(filepath, 'w', newline='', encoding='utf-8') as csvfile:
-        fieldnames = ['code', 'denominacion', 'url', 'valor_turistico', 'confidencialidad',
-                     'route_difficulty', 'latitude', 'longitude', 'eclipse_visibility', 'status',
-                     'cloud_coverage', 'cloud_status', 'cloud_url', 'horizon_status']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        
-        writer.writeheader()
-        for result in results:
-            writer.writerow(result)
+    fieldnames = ['code', 'denominacion', 'url', 'valor_turistico', 'confidencialidad',
+                 'route_difficulty', 'latitude', 'longitude', 'eclipse_visibility', 'status',
+                 'cloud_coverage', 'cloud_status', 'cloud_url', 'horizon_status']
     
-    print(f"✓ CSV saved to {filepath}")
+    # Load existing data if file exists
+    existing_data = {}
+    if os.path.exists(filepath):
+        try:
+            with open(filepath, 'r', newline='', encoding='utf-8') as csvfile:
+                reader = csv.DictReader(csvfile)
+                for row in reader:
+                    existing_data[row['code']] = row
+            print(f"  Loaded {len(existing_data)} existing entries from CSV")
+        except Exception as e:
+            print(f"  Warning: Could not load existing CSV: {e}")
+    
+    # Merge new results with existing data (new data takes precedence)
+    for result in results:
+        existing_data[result['code']] = result
+    
+    # Write merged data
+    with open(filepath, 'w', newline='', encoding='utf-8') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        
+        # Sort by code for consistent output
+        for code in sorted(existing_data.keys()):
+            writer.writerow(existing_data[code])
+    
+    print(f"✓ CSV saved to {filepath} ({len(existing_data)} total entries, {len(results)} updated)")
 
 
 def get_tourist_value_category(tourist_value):
@@ -100,13 +119,29 @@ def get_tourist_value_category(tourist_value):
 
 
 def save_to_kml(results, filename='sites.kml'):
-    """Save results to KML file with six folders organized by tourist value and eclipse visibility
+    """Save results to KML file, merging with existing data
     
     Args:
-        results: List of site dictionaries
+        results: List of site dictionaries (new/updated data)
         filename: Output KML filename
     """
     filepath = os.path.join(DATA_DIR, filename)
+    
+    # Load existing data from CSV (which has all merged data)
+    csv_filepath = os.path.join(DATA_DIR, 'eclipse_site_data.csv')
+    all_sites = []
+    
+    if os.path.exists(csv_filepath):
+        try:
+            with open(csv_filepath, 'r', newline='', encoding='utf-8') as csvfile:
+                reader = csv.DictReader(csvfile)
+                all_sites = list(reader)
+            print(f"  Loaded {len(all_sites)} entries from CSV for KML generation")
+        except Exception as e:
+            print(f"  Warning: Could not load CSV for KML: {e}")
+            all_sites = results
+    else:
+        all_sites = results
     
     # Organize sites into categories
     categories = {
@@ -118,7 +153,7 @@ def save_to_kml(results, filename='sites.kml'):
         ('Lower', 'not_visible'): [],
     }
     
-    for result in results:
+    for result in all_sites:
         if result['latitude'] == 'N/A' or result['longitude'] == 'N/A':
             continue
         
