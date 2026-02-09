@@ -104,7 +104,7 @@ function displaySites(sites) {
     const list = document.getElementById('siteList');
     
     // Update counter
-    updateSiteCounter(sites.length, allSites.length);
+    updateSiteCounter(sites.length, sitesData.length);
     
     if (sites.length === 0) {
         list.innerHTML = '<li class="loading">No sites found</li>';
