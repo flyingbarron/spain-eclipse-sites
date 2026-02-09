@@ -72,36 +72,230 @@ export class AppState {
 
 ### Priority: MEDIUM
 
-#### A. Create Configuration Module
-**File**: `src/config.py`
+#### A. Create Configuration System with YAML (Container-Ready)
+**File**: `config.yaml` (for Kubernetes/OpenShift deployment)
+
+```yaml
+# Application Configuration
+app:
+  name: "Spain Eclipse Sites"
+  version: "1.0.0"
+  environment: "production"  # development, staging, production
+
+# Directories (relative to project root)
+directories:
+  data: "data"
+  profiles: "data/eclipse_profiles"
+  shademap: "data/shademap"
+  cache: ".cache"
+  logs: "logs"
+
+# Eclipse Configuration
+eclipse:
+  date: "2026-08-12"
+  date_iso: "20260812"
+  azimuth: 283.7753
+  azimuth_line_distance_km: 50
+
+# Scraping Settings
+scraping:
+  request_timeout: 10
+  rate_limit_delay: 1.0
+  cloud_scrape_delay: 2.0
+  max_retries: 3
+  retry_delay: 2.0
+  parallel_workers: 5
+  user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+
+# External URLs
+urls:
+  igme_base: "https://info.igme.es/ielig/LIGInfo.aspx?codigo="
+  igme_api: "https://mapas.igme.es/gis/rest/services/BasesDatos/IGME_IELIG/MapServer/0/query"
+  ign_eclipse: "https://visualizadores.ign.es/eclipses/2026"
+  timeanddate: "https://www.timeanddate.com/eclipse/in/@{lat},{lon}?iso={date}"
+
+# Logging Configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/app.log"
+  max_bytes: 10485760  # 10MB
+  backup_count: 5
+
+# Web Server Settings
+server:
+  host: "0.0.0.0"  # Bind to all interfaces for containers
+  port: 8000
+  debug: false
+
+# Feature Flags
+features:
+  enable_caching: true
+  enable_parallel_scraping: false
+  enable_cloud_coverage: true
+  enable_eclipse_checking: true
+```
+
+**File**: `src/config.py` (Configuration loader with env var support)
 
 ```python
 """
-Configuration constants for the project
+Configuration loader with environment variable override support for containers
 """
 import os
+import yaml
+from pathlib import Path
+from typing import Any, Dict
 
-# Directories
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-DATA_DIR = os.path.join(BASE_DIR, "data")
-PROFILES_DIR = os.path.join(DATA_DIR, "eclipse_profiles")
-SHADEMAP_DIR = os.path.join(DATA_DIR, "shademap")
+class Config:
+    """Configuration manager with YAML file and environment variable support"""
+    
+    def __init__(self, config_path: str = "config.yaml"):
+        self.config_path = config_path
+        self._config = self._load_config()
+        self._apply_env_overrides()
+    
+    def _load_config(self) -> Dict[str, Any]:
+        """Load configuration from YAML file"""
+        config_file = Path(self.config_path)
+        
+        if not config_file.exists():
+            raise FileNotFoundError(f"Config file not found: {self.config_path}")
+        
+        with open(config_file, 'r') as f:
+            return yaml.safe_load(f)
+    
+    def _apply_env_overrides(self):
+        """Override config with environment variables (for K8s/OpenShift)"""
+        # Example: ECLIPSE_SITES_SERVER_PORT=9000 overrides server.port
+        prefix = "ECLIPSE_SITES_"
+        
+        for key, value in os.environ.items():
+            if key.startswith(prefix):
+                # Convert ECLIPSE_SITES_SERVER_PORT to ['server', 'port']
+                config_path = key[len(prefix):].lower().split('_')
+                self._set_nested(config_path, value)
+    
+    def _set_nested(self, path: list, value: str):
+        """Set nested configuration value"""
+        current = self._config
+        for key in path[:-1]:
+            current = current.setdefault(key, {})
+        
+        # Try to convert to appropriate type
+        try:
+            if value.lower() in ('true', 'false'):
+                value = value.lower() == 'true'
+            elif value.isdigit():
+                value = int(value)
+            elif value.replace('.', '').isdigit():
+                value = float(value)
+        except:
+            pass
+        
+        current[path[-1]] = value
+    
+    def get(self, path: str, default: Any = None) -> Any:
+        """Get configuration value using dot notation
+        
+        Example:
+            config.get('server.port')  # Returns 8000
+            config.get('scraping.request_timeout')  # Returns 10
+        """
+        keys = path.split('.')
+        value = self._config
+        
+        for key in keys:
+            if isinstance(value, dict):
+                value = value.get(key)
+                if value is None:
+                    return default
+            else:
+                return default
+        
+        return value
+    
+    @property
+    def base_dir(self) -> Path:
+        """Get base directory path"""
+        return Path(__file__).parent.parent
+    
+    def get_path(self, path_key: str) -> Path:
+        """Get absolute path for a directory configuration
+        
+        Example:
+            config.get_path('directories.data')  # Returns /app/data
+        """
+        relative_path = self.get(path_key)
+        if relative_path:
+            return self.base_dir / relative_path
+        return self.base_dir
 
-# Eclipse constants
-ECLIPSE_DATE = "2026-08-12"
-ECLIPSE_DATE_ISO = "20260812"
-ECLIPSE_AZIMUTH = 283.7753
-AZIMUTH_LINE_DISTANCE_KM = 50
+# Global config instance
+config = Config()
 
-# Scraping settings
-REQUEST_TIMEOUT = 10
-RATE_LIMIT_DELAY = 1.0
-CLOUD_SCRAPE_DELAY = 2.0
+# Convenience accessors for backward compatibility
+ECLIPSE_DATE = config.get('eclipse.date')
+ECLIPSE_AZIMUTH = config.get('eclipse.azimuth')
+REQUEST_TIMEOUT = config.get('scraping.request_timeout')
+DATA_DIR = str(config.get_path('directories.data'))
+PROFILES_DIR = str(config.get_path('directories.profiles'))
+```
 
-# URLs
-IGME_BASE_URL = "https://info.igme.es/ielig/LIGInfo.aspx?codigo="
-IGME_API_URL = "https://mapas.igme.es/gis/rest/services/BasesDatos/IGME_IELIG/MapServer/0/query"
-IGN_ECLIPSE_URL = "https://visualizadores.ign.es/eclipses/2026"
+**File**: `config.dev.yaml` (Development overrides)
+
+```yaml
+# Development Configuration Overrides
+app:
+  environment: "development"
+
+server:
+  debug: true
+
+logging:
+  level: "DEBUG"
+
+scraping:
+  rate_limit_delay: 0.5  # Faster for development
+  parallel_workers: 2
+
+features:
+  enable_caching: false  # Disable cache in dev
+```
+
+**File**: `.env.example` (Environment variables for containers)
+
+```bash
+# Environment Variables for Container Deployment
+# Copy to .env and customize for your environment
+
+# Server Configuration
+ECLIPSE_SITES_SERVER_HOST=0.0.0.0
+ECLIPSE_SITES_SERVER_PORT=8000
+
+# Logging
+ECLIPSE_SITES_LOGGING_LEVEL=INFO
+
+# Scraping Settings
+ECLIPSE_SITES_SCRAPING_REQUEST_TIMEOUT=10
+ECLIPSE_SITES_SCRAPING_RATE_LIMIT_DELAY=1.0
+
+# Feature Flags
+ECLIPSE_SITES_FEATURES_ENABLE_CACHING=true
+ECLIPSE_SITES_FEATURES_ENABLE_PARALLEL_SCRAPING=false
+```
+
+**Usage in code:**
+
+```python
+from src.config import config
+
+# Access configuration
+timeout = config.get('scraping.request_timeout')
+data_dir = config.get_path('directories.data')
+
+# Or use convenience constants
+from src.config import ECLIPSE_DATE, DATA_DIR
 ```
 
 #### B. Add Type Hints Throughout
@@ -439,6 +633,300 @@ Create `CONTRIBUTING.md` with:
 6. **Documentation**: Better onboarding for new contributors
 
 ---
+## 8. Containerization & Deployment
+
+### Priority: MEDIUM (for production deployment)
+
+#### A. Docker Configuration
+**File**: `Dockerfile`
+
+```dockerfile
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    chromium \
+    chromium-driver \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements and install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY . .
+
+# Create necessary directories
+RUN mkdir -p data/eclipse_profiles data/shademap logs
+
+# Expose port
+EXPOSE 8000
+
+# Set environment variables
+ENV ECLIPSE_SITES_SERVER_HOST=0.0.0.0
+ENV ECLIPSE_SITES_SERVER_PORT=8000
+
+# Run the application
+CMD ["python", "serve_viewer.py"]
+```
+
+**File**: `docker-compose.yml`
+
+```yaml
+version: '3.8'
+
+services:
+  eclipse-sites:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./config.yaml:/app/config.yaml
+      - ./logs:/app/logs
+    environment:
+      - ECLIPSE_SITES_LOGGING_LEVEL=INFO
+      - ECLIPSE_SITES_SERVER_HOST=0.0.0.0
+    restart: unless-stopped
+```
+
+#### B. Kubernetes Deployment
+**File**: `k8s/deployment.yaml`
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eclipse-sites
+  labels:
+    app: eclipse-sites
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: eclipse-sites
+  template:
+    metadata:
+      labels:
+        app: eclipse-sites
+    spec:
+      containers:
+      - name: eclipse-sites
+        image: your-registry/eclipse-sites:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: ECLIPSE_SITES_SERVER_HOST
+          value: "0.0.0.0"
+        - name: ECLIPSE_SITES_SERVER_PORT
+          value: "8000"
+        - name: ECLIPSE_SITES_LOGGING_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: eclipse-sites-config
+              key: log-level
+        volumeMounts:
+        - name: data
+          mountPath: /app/data
+        - name: config
+          mountPath: /app/config.yaml
+          subPath: config.yaml
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: eclipse-sites-data
+      - name: config
+        configMap:
+          name: eclipse-sites-config
+```
+
+**File**: `k8s/service.yaml`
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: eclipse-sites
+spec:
+  selector:
+    app: eclipse-sites
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
+  type: LoadBalancer
+```
+
+**File**: `k8s/configmap.yaml`
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eclipse-sites-config
+data:
+  log-level: "INFO"
+  config.yaml: |
+    app:
+      name: "Spain Eclipse Sites"
+      version: "1.0.0"
+      environment: "production"
+    
+    directories:
+      data: "data"
+      profiles: "data/eclipse_profiles"
+      shademap: "data/shademap"
+      logs: "logs"
+    
+    eclipse:
+      date: "2026-08-12"
+      date_iso: "20260812"
+      azimuth: 283.7753
+      azimuth_line_distance_km: 50
+    
+    scraping:
+      request_timeout: 10
+      rate_limit_delay: 1.0
+      cloud_scrape_delay: 2.0
+    
+    server:
+      host: "0.0.0.0"
+      port: 8000
+      debug: false
+    
+    logging:
+      level: "INFO"
+      format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+```
+
+**File**: `k8s/pvc.yaml`
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: eclipse-sites-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+```
+
+#### C. OpenShift Configuration
+**File**: `openshift/deployment.yaml`
+
+```yaml
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: eclipse-sites
+spec:
+  replicas: 2
+  selector:
+    app: eclipse-sites
+  template:
+    metadata:
+      labels:
+        app: eclipse-sites
+    spec:
+      containers:
+      - name: eclipse-sites
+        image: eclipse-sites:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: ECLIPSE_SITES_SERVER_HOST
+          value: "0.0.0.0"
+        - name: ECLIPSE_SITES_SERVER_PORT
+          value: "8000"
+        volumeMounts:
+        - name: data
+          mountPath: /app/data
+        - name: config
+          mountPath: /app/config.yaml
+          subPath: config.yaml
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: eclipse-sites-data
+      - name: config
+        configMap:
+          name: eclipse-sites-config
+  triggers:
+  - type: ConfigChange
+  - type: ImageChange
+    imageChangeParams:
+      automatic: true
+      containerNames:
+      - eclipse-sites
+      from:
+        kind: ImageStreamTag
+        name: eclipse-sites:latest
+```
+
+**File**: `openshift/route.yaml`
+
+```yaml
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: eclipse-sites
+spec:
+  to:
+    kind: Service
+    name: eclipse-sites
+  port:
+    targetPort: 8000
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+```
+
+#### D. Deployment Commands
+
+```bash
+# Docker
+docker build -t eclipse-sites:latest .
+docker run -p 8000:8000 -v $(pwd)/data:/app/data eclipse-sites:latest
+
+# Docker Compose
+docker-compose up -d
+
+# Kubernetes
+kubectl apply -f k8s/
+
+# OpenShift
+oc apply -f openshift/
+oc new-app . --name=eclipse-sites
+oc expose svc/eclipse-sites
+```
+
+---
+
 
 *Generated: 2026-02-09*
 *Made with Bob 🤖*
