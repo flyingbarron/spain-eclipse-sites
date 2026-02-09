@@ -582,7 +582,11 @@ async function displaySiteDetails(site) {
             <div id="mapTab" class="tab-content ${activeTab === 'map' ? 'active' : ''}">
                 <div id="mapContainer"></div>
                 <div id="routeSummary" style="display: none;">
-                    <h4>Route Summary</h4>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <h4 style="margin: 0;">Route Summary</h4>
+                        <button onclick="toggleRouteSummary()" id="routeSummaryToggle" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #007bff; padding: 0; line-height: 1;" title="Collapse">▼</button>
+                    </div>
+                    <div id="routeSummaryContent">
                     <div class="return-toggle">
                         <label>
                             <input type="checkbox" id="returnToHotel" onchange="toggleReturnToHotel()">
@@ -597,6 +601,7 @@ async function displaySiteDetails(site) {
                             <button onclick="closeDirections()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #6c757d; padding: 0; line-height: 1;">&times;</button>
                         </div>
                         <div id="directionsContent"></div>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -986,6 +991,22 @@ function closeDirections() {
     const directionsPanel = document.getElementById('routeDirections');
     if (directionsPanel) {
         directionsPanel.style.display = 'none';
+    }
+}
+
+// Toggle route summary collapse/expand
+function toggleRouteSummary() {
+    const content = document.getElementById('routeSummaryContent');
+    const toggle = document.getElementById('routeSummaryToggle');
+    
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        toggle.textContent = '▼';
+        toggle.title = 'Collapse';
+    } else {
+        content.style.display = 'none';
+        toggle.textContent = '▶';
+        toggle.title = 'Expand';
     }
 }
 
