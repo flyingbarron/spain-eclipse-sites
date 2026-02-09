@@ -773,10 +773,53 @@ header h1 {
 footer {
     background: #f8f9fa;
     border-top: 1px solid #dee2e6;
-    padding: 1rem 2rem;
+    padding: 0.75rem 2rem;
     text-align: center;
     font-size: 0.85rem;
     color: #6c757d;
+}
+
+.footer-main {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.footer-toggle {
+    background: transparent;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: color 0.2s;
+}
+
+.footer-toggle:hover {
+    color: #2c3e50;
+}
+
+.footer-toggle-icon {
+    font-size: 0.6rem;
+    transition: transform 0.3s;
+    display: inline-block;
+}
+
+.footer-toggle.expanded .footer-toggle-icon {
+    transform: rotate(90deg);
+}
+
+.footer-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    margin-top: 0.5rem;
+}
+
+.footer-details.expanded {
+    max-height: 200px;
 }
 
 footer a {

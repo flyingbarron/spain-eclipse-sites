@@ -1291,6 +1291,17 @@ function closeModal(modalId) {
     }
 }
 
+// Footer toggle function
+function toggleFooter() {
+    const toggle = document.getElementById('footerToggle');
+    const details = document.getElementById('footerDetails');
+    
+    if (toggle && details) {
+        toggle.classList.toggle('expanded');
+        details.classList.toggle('expanded');
+    }
+}
+
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     initializeDragAndDrop();
@@ -1336,6 +1347,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     });
+    
+    // Setup footer toggle
+    const footerToggle = document.getElementById('footerToggle');
+    if (footerToggle) {
+        footerToggle.addEventListener('click', toggleFooter);
+    }
 });
 
 // Made with Bob
