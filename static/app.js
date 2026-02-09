@@ -90,8 +90,21 @@ function parseCSVLine(line) {
 }
 
 // Display sites in sidebar
+function updateSiteCounter(visibleCount, totalCount) {
+    const visibleCountEl = document.getElementById('visibleCount');
+    const totalCountEl = document.getElementById('totalCount');
+    
+    if (visibleCountEl && totalCountEl) {
+        visibleCountEl.textContent = visibleCount;
+        totalCountEl.textContent = totalCount;
+    }
+}
+
 function displaySites(sites) {
     const list = document.getElementById('siteList');
+    
+    // Update counter
+    updateSiteCounter(sites.length, allSites.length);
     
     if (sites.length === 0) {
         list.innerHTML = '<li class="loading">No sites found</li>';
