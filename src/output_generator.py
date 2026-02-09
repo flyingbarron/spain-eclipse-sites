@@ -318,8 +318,8 @@ def print_summary(results):
     print("\nOutput files:")
     print("  • data/eclipse_site_data.csv - Complete dataset")
     print("  • data/sites.kml - All sites organized in 6 folders")
-    print("  • data/eclipse_profiles/*.png - Visibility profile diagrams")
+    print("  • data/ign_visibility_profiles/*.png - IGN visibility profile diagrams")
     if with_horizon > 0:
-        print(f"  • data/eclipsefan_horizon/*.png - Horizon profile images ({with_horizon} sites)")
+        print(f"  • data/eclipsefan_visibility_profiles/*.png - EclipseFan horizon profiles ({with_horizon} sites)")
 
 # Made with Bob

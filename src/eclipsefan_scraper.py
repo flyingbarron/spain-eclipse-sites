@@ -12,7 +12,7 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 # Data directory for outputs
 DATA_DIR = "data"
-HORIZON_DIR = os.path.join(DATA_DIR, "eclipsefan_horizon")
+HORIZON_DIR = os.path.join(DATA_DIR, "eclipsefan_visibility_profiles")
 
 
 def setup_webdriver(headless=True):

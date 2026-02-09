@@ -9,7 +9,7 @@ import os
 
 # Data directory for outputs
 DATA_DIR = "data"
-PROFILES_DIR = os.path.join(DATA_DIR, "eclipse_profiles")
+PROFILES_DIR = os.path.join(DATA_DIR, "ign_visibility_profiles")
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait

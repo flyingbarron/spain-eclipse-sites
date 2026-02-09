@@ -473,14 +473,14 @@ async function displaySiteDetails(site) {
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
                         <a href="${shademapUrl}" target="_blank" class="link-button shademap">🌄 View on Shademap</a>
                         <div style="position: relative; display: inline-block;">
-                            <img src="data/shademap/${site.code}_shademap.jpg"
+                            <img src="data/shademap_snapshot/${site.code}_shademap.jpg"
                                  alt="Shademap visualization for ${site.code}"
                                  class="eclipse-profile-thumbnail shademap-thumbnail"
-                                 onclick="window.open('data/shademap/${site.code}_shademap.jpg', '_blank')"
+                                 onclick="window.open('data/shademap_snapshot/${site.code}_shademap.jpg', '_blank')"
                                  onerror="this.parentElement.style.display='none'"
                                  title="Hover to preview, click to open full-size">
                             <div class="eclipse-profile-overlay">
-                                <img src="data/shademap/${site.code}_shademap.jpg"
+                                <img src="data/shademap_snapshot/${site.code}_shademap.jpg"
                                      alt="Shademap visualization for ${site.code}">
                             </div>
                         </div>
@@ -489,14 +489,14 @@ async function displaySiteDetails(site) {
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
                         <a href="${eclipseFanUrl}" target="_blank" class="link-button eclipsefan">🌒 EclipseFan.org</a>
                         <div style="position: relative; display: inline-block;">
-                            <img src="data/eclipsefan_horizon/${site.code}_horizon.png"
+                            <img src="data/eclipsefan_visibility_profiles/${site.code}_horizon.png"
                                  alt="Horizon profile for ${site.code}"
                                  class="eclipse-profile-thumbnail"
-                                 onclick="window.open('data/eclipsefan_horizon/${site.code}_horizon.png', '_blank')"
+                                 onclick="window.open('data/eclipsefan_visibility_profiles/${site.code}_horizon.png', '_blank')"
                                  onerror="this.parentElement.style.display='none'"
                                  title="Hover to preview, click to open full-size">
                             <div class="eclipse-profile-overlay">
-                                <img src="data/eclipsefan_horizon/${site.code}_horizon.png"
+                                <img src="data/eclipsefan_visibility_profiles/${site.code}_horizon.png"
                                      alt="Horizon profile for ${site.code}">
                             </div>
                         </div>
@@ -504,14 +504,14 @@ async function displaySiteDetails(site) {
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
                         <a href="${eclipseUrl}" target="_blank" class="link-button eclipse">🌑 Eclipse 2026 View</a>
                         <div style="position: relative; display: inline-block;">
-                            <img src="data/eclipse_profiles/${site.code}_profile.png"
+                            <img src="data/ign_visibility_profiles/${site.code}_profile.png"
                                  alt="Eclipse visibility profile for ${site.code}"
                                  class="eclipse-profile-thumbnail"
-                                 onclick="window.open('data/eclipse_profiles/${site.code}_profile.png', '_blank')"
+                                 onclick="window.open('data/ign_visibility_profiles/${site.code}_profile.png', '_blank')"
                                  onerror="this.parentElement.style.display='none'"
                                  title="Hover to preview, click to open full-size">
                             <div class="eclipse-profile-overlay">
-                                <img src="data/eclipse_profiles/${site.code}_profile.png"
+                                <img src="data/ign_visibility_profiles/${site.code}_profile.png"
                                      alt="Eclipse visibility profile for ${site.code}">
                             </div>
                         </div>

@@ -143,9 +143,9 @@ spain-eclipse-sites/
 │   ├── add_eclipse_azimuth.py       # Standalone azimuth tool (deprecated)
 │   └── favicon.svg
 ├── data/                             # Generated data (gitignored)
-│   ├── eclipse_profiles/             # Profile diagram images
-│   ├── eclipsefan_horizon/           # EclipseFan horizon images
-│   ├── shademap/                     # Shademap visualizations
+│   ├── ign_visibility_profiles/      # IGN eclipse visibility diagrams
+│   ├── eclipsefan_visibility_profiles/ # EclipseFan horizon profiles
+│   ├── shademap_snapshot/            # Shademap visualizations
 │   ├── eclipse_site_data.csv         # Main dataset
 │   └── sites.kml                     # All sites organized in 6 folders
 ├── src/                              # Modular source code
@@ -231,13 +231,17 @@ Each folder contains:
 - Site markers with detailed information
 - 🧭 **Eclipse azimuth lines** (yellow, 50km) pointing toward the eclipse direction (283.7753°)
 
-### Profile Diagrams
+### IGN Visibility Profiles
 
-**`data/eclipse_profiles/{code}_profile.png`** - Eclipse visibility profile for each site showing the eclipse path and visibility details
+**`data/ign_visibility_profiles/{code}_profile.png`** - Eclipse visibility profile diagrams from IGN showing the eclipse path and visibility details
 
-### Horizon Images
+### EclipseFan Visibility Profiles
 
-**`data/eclipsefan_horizon/{code}_horizon.png`** - Horizon profile images from EclipseFan.org showing local topography and eclipse direction
+**`data/eclipsefan_visibility_profiles/{code}_horizon.png`** - Horizon profile images from EclipseFan.org showing local topography and eclipse direction
+
+### Shademap Snapshots
+
+**`data/shademap_snapshot/{code}_shademap.jpg`** - Sun/shadow visualization snapshots from Shademap.app at eclipse time
 
 ## Technical Details
 
