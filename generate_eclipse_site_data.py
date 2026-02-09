@@ -65,8 +65,8 @@ Examples:
     )
     parser.add_argument('--code', '-c',
                        help='Process only a specific site code (e.g., IB200a)')
-    parser.add_argument('--csv', default='eclipse_site_data.csv',
-                       help='CSV file to read from (default: eclipse_site_data.csv)')
+    parser.add_argument('--csv', default='data/eclipse_site_data.csv',
+                       help='CSV file to read from (default: data/eclipse_site_data.csv)')
     
     # Skip flags (for full pipeline)
     parser.add_argument('--no-eclipse', action='store_true',
