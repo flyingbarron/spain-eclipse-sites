@@ -28,7 +28,7 @@ This project scrapes geological site information from IGME's IELIG database and 
 - 📊 **Sort** by code, name, or tourist value
 - 📚 **Navigation panels** - Resources, About, and Help sections accessible from header
 - 🔗 **Resources panel** - Quick links to eclipse websites and planning tools
-- �️ **Image gallery** with full-screen carousel
+- 🖼️ **Image gallery** with full-screen carousel
 - 🗺️ **Interactive maps** with routing from Hotel Parras Arnedillo
 - 🚗 **Multi-site route planning** with Ctrl/Cmd+Click selection
 - 🧭 **Turn-by-turn directions** for each route segment
@@ -263,7 +263,8 @@ The script uses Selenium to:
 - GPS coordinates
 - Eclipse visibility status
 - **Eclipse profile diagram** (hover to preview, click to enlarge)
-- **Shademap thumbnail** (hover to preview, click to enlarge) - shows sun/shadow visualization
+- **Shademap thumbnail** (hover to preview, click to enlarge) - shows sun/shadow visualization at eclipse time
+- **EclipseFan horizon view** - shows local horizon profile
 - Image gallery from IGME website
 - Direct links to:
   - 🪨 IGME information page
@@ -289,8 +290,6 @@ The script uses Selenium to:
 3. **Collapse summary**: Click arrow to minimize route summary panel
 4. **Get directions**: Click route segments for turn-by-turn instructions
 5. **Export**: Use buttons to open in Google Maps or download KML
-
-### Image Carousel
 
 ### Image Carousel
 - Full-screen image viewing
