@@ -255,9 +255,6 @@ function displayRouteSummary(totalDistance, totalTime, routeSegments) {
     
     if (!routeSummary || !routeSegmentsEl || !routeTotal) return;
     
-    // Make route summary draggable and collapsible
-    makeRouteSummaryDraggable(routeSummary);
-    
     // Build header with collapse button and drag handle
     const headerHTML = `
         <div class="route-summary-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; cursor: move; padding: 0.5rem; background: #f8f9fa; border-radius: 4px; user-select: none;">
@@ -340,8 +337,11 @@ function displayRouteSummary(totalDistance, totalTime, routeSegments) {
     // Setup event listeners
     setupRouteListeners();
     
-    // Setup collapse button
+    // Setup collapse button (must be after HTML is inserted)
     setupCollapseButton();
+    
+    // Make route summary draggable (must be after HTML is inserted)
+    makeRouteSummaryDraggable(routeSummary);
 }
 
 /**
