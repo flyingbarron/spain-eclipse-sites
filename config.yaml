@@ -41,9 +41,9 @@ urls:
   timeanddate: "https://www.timeanddate.com/eclipse/in/@{lat},{lon}?iso={date}"
   eclipsefan: "https://www.eclipsefan.org/?lat={lat}&lng={lon}&zoom=6&oz=5&lang=en"
 
-# API Keys
+# API Keys (load from environment variables for security)
 api_keys:
-  google_maps: "AIzaSyCwM8id7jkwdnhTU9OT1LCeJBwVT7nBdRs"
+  google_maps: ""  # Set via ECLIPSE_SITES_API_KEYS_GOOGLE_MAPS environment variable
 
 # Logging Configuration
 logging:
