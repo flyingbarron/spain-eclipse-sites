@@ -297,12 +297,15 @@ export function displaySiteDetails(site) {
     
     // Initialize map if on map tab
     if (activeTab === 'map') {
-        // Check if we have multiple selected sites for routing
-        if (appState.selectedSites.length > 1) {
-            updateMapWithMultipleSites();
-        } else {
-            initializeSingleSiteMap(site);
-        }
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+            // Check if we have multiple selected sites for routing
+            if (appState.selectedSites.length > 1) {
+                updateMapWithMultipleSites();
+            } else {
+                initializeSingleSiteMap(site);
+            }
+        }, 100);
     }
 }
 
@@ -353,13 +356,15 @@ export function switchTab(tabName) {
         const mapTab = document.getElementById('mapTab');
         if (mapTab) {
             mapTab.classList.add('active');
-            // Initialize map
+            // Initialize map with delay to ensure DOM is ready
             if (appState.currentSite) {
-                if (appState.selectedSites.length > 1) {
-                    updateMapWithMultipleSites();
-                } else {
-                    initializeSingleSiteMap(appState.currentSite);
-                }
+                setTimeout(() => {
+                    if (appState.selectedSites.length > 1) {
+                        updateMapWithMultipleSites();
+                    } else {
+                        initializeSingleSiteMap(appState.currentSite);
+                    }
+                }, 100);
             }
         }
     }
