@@ -70,8 +70,14 @@ function renderSiteHeader(site, urls) {
         <div class="detail-header">
             <h2>${site.denominacion || site.code}</h2>
             <div style="display: flex; align-items: flex-start; gap: 0.5rem; flex-wrap: wrap;">
-                <a href="${site.url}" target="_blank" class="link-button">🪨 View on IGME Website</a>
+                <!-- Left column: IGME, timeanddate, Xavier Jubier stacked vertically -->
+                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                    <a href="${site.url}" target="_blank" class="link-button">🪨 View on IGME Website</a>
+                    ${cloudButton}
+                    <a href="${urls.xavierJubier}" target="_blank" class="link-button xavier">🗺️ Xavier Jubier Eclipse Map</a>
+                </div>
                 
+                <!-- Right side: Buttons with previews -->
                 <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
                     <a href="${urls.maps}" target="_blank" class="link-button maps">📍 Open in Google Maps</a>
                     ${urls.googleStatic ? `
@@ -101,10 +107,6 @@ function renderSiteHeader(site, urls) {
                         </div>
                     </div>
                 </div>
-                
-                ${cloudButton}
-                
-                <a href="${urls.xavierJubier}" target="_blank" class="link-button xavier">🗺️ Xavier Jubier Eclipse Map</a>
                 
                 <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
                     <a href="${urls.eclipseFan}" target="_blank" class="link-button eclipsefan">🌒 EclipseFan.org</a>

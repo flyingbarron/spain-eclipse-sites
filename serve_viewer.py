@@ -16,8 +16,12 @@ import signal
 import sys
 import threading
 import yaml
+from dotenv import load_dotenv
 
 PORT = 8000
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Load configuration
 def load_config():
@@ -62,8 +66,13 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def handle_config(self):
         """Serve configuration data (API keys, etc.)"""
         try:
+            # Load API key from environment variable (preferred) or config.yaml (fallback)
+            google_maps_key = os.environ.get('ECLIPSE_SITES_API_KEYS_GOOGLE_MAPS', '')
+            if not google_maps_key:
+                google_maps_key = CONFIG.get('api_keys', {}).get('google_maps', '')
+            
             config_data = {
-                'google_maps_api_key': CONFIG.get('api_keys', {}).get('google_maps', '')
+                'google_maps_api_key': google_maps_key
             }
             
             self.send_response(200)
