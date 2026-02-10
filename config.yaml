@@ -10,9 +10,10 @@ app:
 # Directories (relative to project root)
 directories:
   data: "data"
-  profiles: "data/ign_visibility_profiles"
-  horizon: "data/eclipsefan_visibility_profiles"
-  cache: ".cache"
+  profiles: "data/scrape/ign_profiles"
+  horizon: "data/scrape/eclipsefan_horizons"
+  shademap: "data/scrape/shademap_snapshots"
+  cache: "data/cache"
   logs: "logs"
 
 # Eclipse Configuration
