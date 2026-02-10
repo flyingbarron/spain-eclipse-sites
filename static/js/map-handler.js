@@ -372,12 +372,7 @@ function makeRouteSummaryDraggable(element) {
     element.style.left = '10px';
     
     const header = element.querySelector('.route-summary-header');
-    if (!header) {
-        console.error('Route summary header not found for dragging');
-        return;
-    }
-    
-    console.log('Setting up draggable for route summary');
+    if (!header) return;
     
     header.addEventListener('mousedown', dragStart);
     document.addEventListener('mousemove', drag);
@@ -395,7 +390,6 @@ function makeRouteSummaryDraggable(element) {
         if (e.target === header || header.contains(e.target)) {
             isDragging = true;
             header.style.cursor = 'grabbing';
-            console.log('Drag started');
         }
     }
     
@@ -419,7 +413,6 @@ function makeRouteSummaryDraggable(element) {
             initialY = currentY;
             isDragging = false;
             header.style.cursor = 'move';
-            console.log('Drag ended at:', currentX, currentY);
         }
     }
     
@@ -435,12 +428,8 @@ function setupCollapseButton() {
     const collapseBtn = document.getElementById('routeCollapseBtn');
     const routeSummaryContent = document.getElementById('routeSummaryContent');
     
-    if (!collapseBtn || !routeSummaryContent) {
-        console.error('Collapse button or content not found');
-        return;
-    }
+    if (!collapseBtn || !routeSummaryContent) return;
     
-    console.log('Setting up collapse button');
     let isCollapsed = false;
     
     collapseBtn.addEventListener('click', (e) => {
@@ -451,11 +440,9 @@ function setupCollapseButton() {
         if (isCollapsed) {
             routeSummaryContent.style.display = 'none';
             collapseBtn.textContent = '▶';
-            console.log('Collapsed');
         } else {
             routeSummaryContent.style.display = 'block';
             collapseBtn.textContent = '▼';
-            console.log('Expanded');
         }
     });
 }
