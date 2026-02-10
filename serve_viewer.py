@@ -108,7 +108,7 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 return
             
             # Create cache directory if it doesn't exist
-            cache_dir = 'data/igme_html_cache'
+            cache_dir = 'data/cache/igme_html'
             os.makedirs(cache_dir, exist_ok=True)
             
             # Generate cache filename from URL hash
@@ -202,7 +202,7 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 return
             
             # Create cache directory if it doesn't exist
-            cache_dir = 'data/igme_image_cache'
+            cache_dir = 'data/cache/igme_images'
             os.makedirs(cache_dir, exist_ok=True)
             
             # Generate cache filename from URL hash
