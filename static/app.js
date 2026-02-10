@@ -468,7 +468,7 @@ function updateDetailsTabContent(site) {
         <div class="images-section">
             <h3>📷 Images</h3>
             <div id="imagesContainer" class="images-grid">
-                <div class="loading">Loading images from IGME...</div>
+                <div class="loading">Loading IGME images...</div>
             </div>
         </div>
     `;
@@ -637,7 +637,7 @@ async function displaySiteDetails(site) {
                 <div class="images-section">
                     <h3>📷 Images</h3>
                     <div id="imagesContainer" class="images-grid">
-                        <div class="loading">Loading images from IGME...</div>
+                        <div class="loading">Loading IGME images...</div>
                     </div>
                 </div>
             </div>
