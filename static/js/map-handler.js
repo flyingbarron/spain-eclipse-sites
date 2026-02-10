@@ -360,14 +360,18 @@ function makeRouteSummaryDraggable(element) {
     // Make it positioned absolutely when dragging starts
     element.style.position = 'absolute';
     element.style.zIndex = '1001';
-    element.style.cursor = 'move';
     
     // Set initial position (top-left of map container)
     element.style.top = '10px';
     element.style.left = '10px';
     
     const header = element.querySelector('.route-summary-header');
-    if (!header) return;
+    if (!header) {
+        console.error('Route summary header not found for dragging');
+        return;
+    }
+    
+    console.log('Setting up draggable for route summary');
     
     header.addEventListener('mousedown', dragStart);
     document.addEventListener('mousemove', drag);
@@ -375,7 +379,9 @@ function makeRouteSummaryDraggable(element) {
     
     function dragStart(e) {
         // Only drag if clicking on the header (not the collapse button)
-        if (e.target.id === 'routeCollapseBtn') return;
+        if (e.target.id === 'routeCollapseBtn' || e.target.closest('#routeCollapseBtn')) {
+            return;
+        }
         
         initialX = e.clientX - xOffset;
         initialY = e.clientY - yOffset;
@@ -383,6 +389,7 @@ function makeRouteSummaryDraggable(element) {
         if (e.target === header || header.contains(e.target)) {
             isDragging = true;
             header.style.cursor = 'grabbing';
+            console.log('Drag started');
         }
     }
     
@@ -405,7 +412,8 @@ function makeRouteSummaryDraggable(element) {
             initialX = currentX;
             initialY = currentY;
             isDragging = false;
-            header.style.cursor = 'grab';
+            header.style.cursor = 'move';
+            console.log('Drag ended at:', currentX, currentY);
         }
     }
     
