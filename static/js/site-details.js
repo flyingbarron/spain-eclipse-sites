@@ -248,9 +248,9 @@ function renderMapTab(site) {
             </div>
             <div id="mapContainer" style="height: 600px; width: 100%; display: block;"></div>
             <div id="map3DContainer" style="height: 600px; width: 100%; display: none;"></div>
-        </div>
-        <div id="routeSummary" style="display: none; margin-top: 1rem;">
-            <div style="background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            
+            <!-- Floating draggable route summary -->
+            <div id="routeSummary" class="route-summary-floating" style="display: none;">
                 <div id="routeTotal" style="margin-bottom: 1rem;"></div>
                 <div id="routeSegments"></div>
             </div>

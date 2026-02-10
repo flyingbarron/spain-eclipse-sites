@@ -1,0 +1,2 @@
+code,denominacion,url,valor_turistico,confidencialidad,latitude,longitude,eclipse_visibility,status
+IB200B,La Magdalena,https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200B,3.5,Public,42.124479,-2.187944,not_visible,success

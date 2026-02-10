@@ -692,6 +692,55 @@ header h1 {
     background: #5a32a3;
 }
 
+/* Route summary panel - Floating and draggable */
+.route-summary-floating {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(255, 255, 255, 0.98);
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    backdrop-filter: blur(10px);
+    max-width: 350px;
+    max-height: calc(100% - 20px);
+    overflow-y: auto;
+    z-index: 1001;
+    font-size: 0.85rem;
+    pointer-events: auto;
+    border: 2px solid rgba(0, 123, 255, 0.3);
+}
+
+.route-summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    cursor: move;
+    padding: 0.5rem;
+    background: #f8f9fa;
+    border-radius: 4px;
+    user-select: none;
+}
+
+.route-summary-header:active {
+    cursor: grabbing;
+}
+
+#routeCollapseBtn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    transition: transform 0.2s;
+}
+
+#routeCollapseBtn:hover {
+    transform: scale(1.2);
+}
+
+/* Legacy route summary styling */
 #routeSummary {
     position: absolute;
     top: 10px;

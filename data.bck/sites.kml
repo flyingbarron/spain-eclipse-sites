@@ -1,0 +1,861 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Spain Eclipse Sites - Organized by Tourist Value and Eclipse Visibility</name>
+    <description>Geological sites from IGME IELIG database organized into six categories</description>
+    
+    <!-- Style definitions -->
+    <Style id="greenMarker">
+      <IconStyle>
+        <color>ff00ff00</color>
+        <scale>1.2</scale>
+        <Icon>
+          <href>http://maps.google.com/mapfiles/kml/paddle/grn-circle.png</href>
+        </Icon>
+      </IconStyle>
+    </Style>
+    <Style id="yellowMarker">
+      <IconStyle>
+        <color>ff00ffff</color>
+        <scale>1.2</scale>
+        <Icon>
+          <href>http://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href>
+        </Icon>
+      </IconStyle>
+    </Style>
+    <Style id="redMarker">
+      <IconStyle>
+        <color>ff0000ff</color>
+        <scale>1.2</scale>
+        <Icon>
+          <href>http://maps.google.com/mapfiles/kml/paddle/red-circle.png</href>
+        </Icon>
+      </IconStyle>
+    </Style>
+    <Style id="azimuthLine">
+      <LineStyle>
+        <color>ff00ffff</color>
+        <width>3</width>
+      </LineStyle>
+    </Style>
+
+    <Folder>
+      <name>🟢 High Tourist Value (>5.0) - Eclipse Visible</name>
+      <description>4 sites</description>
+      <open>0</open>
+
+      <Placemark>
+        <name>Peñaportillo</name>
+        <description><![CDATA[
+          <b>Code:</b> IB200l<br/>
+          <b>Tourist Value:</b> 5.4<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Low<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse VISIBLE<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200l">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200l</a>
+        ]]></description>
+        <styleUrl>#greenMarker</styleUrl>
+        <Point>
+          <coordinates>-2.285160,42.194942,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>Peñaportillo - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.28516,42.194942,0 -2.875635359231459,42.300500355495664,0</coordinates>
+        </LineString>
+      </Placemark>
+
+      <Placemark>
+        <name>La Senoba</name>
+        <description><![CDATA[
+          <b>Code:</b> IB200t<br/>
+          <b>Tourist Value:</b> 5.8<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Low<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse VISIBLE<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200t">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200t</a>
+        ]]></description>
+        <styleUrl>#greenMarker</styleUrl>
+        <Point>
+          <coordinates>-2.267609,42.130706,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>La Senoba - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.267609,42.130706,0 -2.8574829704646647,42.236267763187485,0</coordinates>
+        </LineString>
+      </Placemark>
+
+      <Placemark>
+        <name>Navalsaz</name>
+        <description><![CDATA[
+          <b>Code:</b> IB200u<br/>
+          <b>Tourist Value:</b> 6<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Low<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse VISIBLE<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200u">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200u</a>
+        ]]></description>
+        <styleUrl>#greenMarker</styleUrl>
+        <Point>
+          <coordinates>-2.208504,42.120794,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>Navalsaz - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.208504,42.120794,0 -2.7982853476337564,42.22635628839684,0</coordinates>
+        </LineString>
+      </Placemark>
+
+      <Placemark>
+        <name>La Pellejera</name>
+        <description><![CDATA[
+          <b>Code:</b> IB200v<br/>
+          <b>Tourist Value:</b> 5.1<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Low<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse VISIBLE<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200v">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200v</a>
+        ]]></description>
+        <styleUrl>#greenMarker</styleUrl>
+        <Point>
+          <coordinates>-2.453835,42.218676,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>La Pellejera - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.453835,42.218676,0 -3.0445330594160014,42.324233094658105,0</coordinates>
+        </LineString>
+      </Placemark>
+    </Folder>
+
+    <Folder>
+      <name>🟢 High Tourist Value (>5.0) - Eclipse Not Visible</name>
+      <description>6 sites</description>
+      <open>0</open>
+
+      <Placemark>
+        <name>Los Cayos A</name>
+        <description><![CDATA[
+          <b>Code:</b> IB200c<br/>
+          <b>Tourist Value:</b> 6<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Low<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse not visible<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200c">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200c</a>
+        ]]></description>
+        <styleUrl>#greenMarker</styleUrl>
+        <Point>
+          <coordinates>-2.088449,42.084398,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>Los Cayos A - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.088449,42.084398,0 -2.677890645251897,42.1899622155063,0</coordinates>
+        </LineString>
+      </Placemark>
+
+      <Placemark>
+        <name>Los Cayos C</name>
+        <description><![CDATA[
+          <b>Code:</b> IB200e<br/>
+          <b>Tourist Value:</b> 5.1<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Low<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse not visible<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200e">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200e</a>
+        ]]></description>
+        <styleUrl>#greenMarker</styleUrl>
+        <Point>
+          <coordinates>-2.084852,42.083306,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>Los Cayos C - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.084852,42.083306,0 -2.6742834627808625,42.188870273291656,0</coordinates>
+        </LineString>
+      </Placemark>
+
+      <Placemark>
+        <name>Valdecevillo</name>
+        <description><![CDATA[
+          <b>Code:</b> IB200i<br/>
+          <b>Tourist Value:</b> 6.3<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Low<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse not visible<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200i">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200i</a>
+        ]]></description>
+        <styleUrl>#greenMarker</styleUrl>
+        <Point>
+          <coordinates>-2.256116,42.135837,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>Valdecevillo - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.256116,42.135837,0 -2.846037935533838,42.24139849124522,0</coordinates>
+        </LineString>
+      </Placemark>
+
+      <Placemark>
+        <name>Virgen del Campo</name>
+        <description><![CDATA[
+          <b>Code:</b> IB200j<br/>
+          <b>Tourist Value:</b> 6.3<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Low<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse not visible<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200j">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200j</a>
+        ]]></description>
+        <styleUrl>#greenMarker</styleUrl>
+        <Point>
+          <coordinates>-2.271836,42.143737,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>Virgen del Campo - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.271836,42.143737,0 -2.8618318099779723,42.24929807245989,0</coordinates>
+        </LineString>
+      </Placemark>
+
+      <Placemark>
+        <name>El Villar-Poyales</name>
+        <description><![CDATA[
+          <b>Code:</b> IB200k<br/>
+          <b>Tourist Value:</b> 5.3<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Low<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse not visible<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200k">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200k</a>
+        ]]></description>
+        <styleUrl>#greenMarker</styleUrl>
+        <Point>
+          <coordinates>-2.230414,42.125790,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>El Villar-Poyales - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.230414,42.12579,0 -2.8202420269876933,42.23135202369329,0</coordinates>
+        </LineString>
+      </Placemark>
+
+      <Placemark>
+        <name>la Era del Peladillo</name>
+        <description><![CDATA[
+          <b>Code:</b> IB200o<br/>
+          <b>Tourist Value:</b> 5.9<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Low<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse not visible<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200o">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200o</a>
+        ]]></description>
+        <styleUrl>#greenMarker</styleUrl>
+        <Point>
+          <coordinates>-2.043049,42.083328,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>la Era del Peladillo - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.043049,42.083328,0 -2.632480667916634,42.18889227212749,0</coordinates>
+        </LineString>
+      </Placemark>
+    </Folder>
+
+    <Folder>
+      <name>🟡 Medium Tourist Value (4.0-5.0) - Eclipse Visible</name>
+      <description>1 sites</description>
+      <open>0</open>
+
+      <Placemark>
+        <name>Virgen del Prado</name>
+        <description><![CDATA[
+          <b>Code:</b> IB200h<br/>
+          <b>Tourist Value:</b> 5<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Low<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse VISIBLE<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200h">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200h</a>
+        ]]></description>
+        <styleUrl>#yellowMarker</styleUrl>
+        <Point>
+          <coordinates>-1.966703,41.963535,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>Virgen del Prado - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-1.966703,41.963535,0 -2.555021071864424,42.06910559912547,0</coordinates>
+        </LineString>
+      </Placemark>
+    </Folder>
+
+    <Folder>
+      <name>🟡 Medium Tourist Value (4.0-5.0) - Eclipse Not Visible</name>
+      <description>3 sites</description>
+      <open>0</open>
+
+      <Placemark>
+        <name>Los Cayos S</name>
+        <description><![CDATA[
+          <b>Code:</b> IB200f<br/>
+          <b>Tourist Value:</b> 4<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Medium<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse not visible<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200f">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200f</a>
+        ]]></description>
+        <styleUrl>#yellowMarker</styleUrl>
+        <Point>
+          <coordinates>-2.091261,42.081150,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>Los Cayos S - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.091261,42.08115,0 -2.680672360589272,42.18671438737479,0</coordinates>
+        </LineString>
+      </Placemark>
+
+      <Placemark>
+        <name>Soto en Cameros 1, 2 y 3</name>
+        <description><![CDATA[
+          <b>Code:</b> IB200n<br/>
+          <b>Tourist Value:</b> 4.9<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Medium<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse not visible<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200n">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200n</a>
+        ]]></description>
+        <styleUrl>#yellowMarker</styleUrl>
+        <Point>
+          <coordinates>-2.414614,42.297744,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>Soto en Cameros 1, 2 y 3 - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.414614,42.297744,0 -3.006055914337874,42.40329688740009,0</coordinates>
+        </LineString>
+      </Placemark>
+
+      <Placemark>
+        <name>Las Losas</name>
+        <description><![CDATA[
+          <b>Code:</b> IB200s<br/>
+          <b>Tourist Value:</b> 5<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Low<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse not visible<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200s">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200s</a>
+        ]]></description>
+        <styleUrl>#yellowMarker</styleUrl>
+        <Point>
+          <coordinates>-2.279108,42.153846,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>Las Losas - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.279108,42.153846,0 -2.8691983845656384,42.25940653642067,0</coordinates>
+        </LineString>
+      </Placemark>
+    </Folder>
+
+    <Folder>
+      <name>🔴 Lower Tourist Value (<4.0) - Eclipse Visible</name>
+      <description>5 sites</description>
+      <open>0</open>
+
+      <Placemark>
+        <name>Las Navillas</name>
+        <description><![CDATA[
+          <b>Code:</b> IB200p<br/>
+          <b>Tourist Value:</b> 3.1<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Low<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse VISIBLE<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200p">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200p</a>
+        ]]></description>
+        <styleUrl>#redMarker</styleUrl>
+        <Point>
+          <coordinates>-1.941051,42.067068,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>Las Navillas - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-1.941051,42.067068,0 -2.530331116557817,42.17263313232207,0</coordinates>
+        </LineString>
+      </Placemark>
+
+      <Placemark>
+        <name>San Roque</name>
+        <description><![CDATA[
+          <b>Code:</b> IB034d<br/>
+          <b>Tourist Value:</b> 3.8<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Low<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse VISIBLE<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB034d">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB034d</a>
+        ]]></description>
+        <styleUrl>#redMarker</styleUrl>
+        <Point>
+          <coordinates>-2.264032,42.012898,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>San Roque - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.264032,42.012898,0 -2.8528081286490847,42.11846599486274,0</coordinates>
+        </LineString>
+      </Placemark>
+
+      <Placemark>
+        <name>El Salgar de Silas</name>
+        <description><![CDATA[
+          <b>Code:</b> IB034e<br/>
+          <b>Tourist Value:</b> 3.8<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Low<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse VISIBLE<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB034e">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB034e</a>
+        ]]></description>
+        <styleUrl>#redMarker</styleUrl>
+        <Point>
+          <coordinates>-2.353893,41.984620,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>El Salgar de Silas - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.353893,41.98462,0 -2.942406586394745,42.090189487231946,0</coordinates>
+        </LineString>
+      </Placemark>
+
+      <Placemark>
+        <name>Fuentesalvo</name>
+        <description><![CDATA[
+          <b>Code:</b> IB034f<br/>
+          <b>Tourist Value:</b> 3.8<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Low<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse VISIBLE<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB034f">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB034f</a>
+        ]]></description>
+        <styleUrl>#redMarker</styleUrl>
+        <Point>
+          <coordinates>-2.340318,42.052380,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>Fuentesalvo - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.340318,42.05238,0 -2.9294613247806742,42.157945908973794,0</coordinates>
+        </LineString>
+      </Placemark>
+
+      <Placemark>
+        <name>Miraflores I</name>
+        <description><![CDATA[
+          <b>Code:</b> IB034g<br/>
+          <b>Tourist Value:</b> 2.8<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Low<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse VISIBLE<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB034g">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB034g</a>
+        ]]></description>
+        <styleUrl>#redMarker</styleUrl>
+        <Point>
+          <coordinates>-2.179579,41.929020,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>Miraflores I - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.179579,41.92902,0 -2.767577477176949,42.03459241764165,0</coordinates>
+        </LineString>
+      </Placemark>
+    </Folder>
+
+    <Folder>
+      <name>🔴 Lower Tourist Value (<4.0) - Eclipse Not Visible</name>
+      <description>10 sites</description>
+      <open>0</open>
+
+      <Placemark>
+        <name>Valdeté, Perosancio y Tajugueras</name>
+        <description><![CDATA[
+          <b>Code:</b> IB200<br/>
+          <b>Tourist Value:</b> 3<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Low<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse not visible<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200</a>
+        ]]></description>
+        <styleUrl>#redMarker</styleUrl>
+        <Point>
+          <coordinates>-2.159723,42.130958,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>Valdeté, Perosancio y Tajugueras - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.159723,42.130958,0 -2.749599325891719,42.236519749832546,0</coordinates>
+        </LineString>
+      </Placemark>
+
+      <Placemark>
+        <name>La Magdalena</name>
+        <description><![CDATA[
+          <b>Code:</b> IB200b<br/>
+          <b>Tourist Value:</b> 3.5<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Medium<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse not visible<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200b">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200b</a>
+        ]]></description>
+        <styleUrl>#redMarker</styleUrl>
+        <Point>
+          <coordinates>-2.187944,42.124479,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>La Magdalena - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.187944,42.124479,0 -2.7777597767127844,42.23004109315818,0</coordinates>
+        </LineString>
+      </Placemark>
+
+      <Placemark>
+        <name>Los Cayos B</name>
+        <description><![CDATA[
+          <b>Code:</b> IB200d<br/>
+          <b>Tourist Value:</b> 3.1<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Medium<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse not visible<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200d">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200d</a>
+        ]]></description>
+        <styleUrl>#redMarker</styleUrl>
+        <Point>
+          <coordinates>-2.085237,42.083378,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>Los Cayos B - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.085237,42.083378,0 -2.6746691341351534,42.18894226948168,0</coordinates>
+        </LineString>
+      </Placemark>
+
+      <Placemark>
+        <name>Valdemayor</name>
+        <description><![CDATA[
+          <b>Code:</b> IB200g<br/>
+          <b>Tourist Value:</b> 3.4<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Medium<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse not visible<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200g">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200g</a>
+        ]]></description>
+        <styleUrl>#redMarker</styleUrl>
+        <Point>
+          <coordinates>-2.528254,42.199732,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>Valdemayor - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.528254,42.199732,0 -3.1187742829354486,42.3052901011098,0</coordinates>
+        </LineString>
+      </Placemark>
+
+      <Placemark>
+        <name>La Torre</name>
+        <description><![CDATA[
+          <b>Code:</b> IB200q<br/>
+          <b>Tourist Value:</b> 3.5<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Medium<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse not visible<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200q">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200q</a>
+        ]]></description>
+        <styleUrl>#redMarker</styleUrl>
+        <Point>
+          <coordinates>-2.040422,42.075845,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>La Torre - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.040422,42.075845,0 -2.6297839070258244,42.18140966805182,0</coordinates>
+        </LineString>
+      </Placemark>
+
+      <Placemark>
+        <name>Valdebrajes</name>
+        <description><![CDATA[
+          <b>Code:</b> IB200r<br/>
+          <b>Tourist Value:</b> 3.5<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Low<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse not visible<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200r">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200r</a>
+        ]]></description>
+        <styleUrl>#redMarker</styleUrl>
+        <Point>
+          <coordinates>-1.973726,42.073576,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>Valdebrajes - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-1.973726,42.073576,0 -2.563066759332635,42.17914078808572,0</coordinates>
+        </LineString>
+      </Placemark>
+
+      <Placemark>
+        <name>Fuente Lacorte-El Frontal</name>
+        <description><![CDATA[
+          <b>Code:</b> IB034<br/>
+          <b>Tourist Value:</b> 3.6<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Low<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse not visible<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB034">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB034</a>
+        ]]></description>
+        <styleUrl>#redMarker</styleUrl>
+        <Point>
+          <coordinates>-2.390883,42.062050,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>Fuente Lacorte-El Frontal - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.390883,42.06205,0 -2.9801163715949426,42.16761539769748,0</coordinates>
+        </LineString>
+      </Placemark>
+
+      <Placemark>
+        <name>Los Tormos</name>
+        <description><![CDATA[
+          <b>Code:</b> IB034c<br/>
+          <b>Tourist Value:</b> 3.4<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Low<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse not visible<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB034c">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB034c</a>
+        ]]></description>
+        <styleUrl>#redMarker</styleUrl>
+        <Point>
+          <coordinates>-2.454492,42.061857,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>Los Tormos - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.454492,42.061857,0 -3.0437235739501034,42.167422407903395,0</coordinates>
+        </LineString>
+      </Placemark>
+
+      <Placemark>
+        <name>Serrantes</name>
+        <description><![CDATA[
+          <b>Code:</b> IB034h<br/>
+          <b>Tourist Value:</b> 3.1<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Low<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse not visible<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB034h">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB034h</a>
+        ]]></description>
+        <styleUrl>#redMarker</styleUrl>
+        <Point>
+          <coordinates>-2.367544,42.067290,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>Serrantes - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.367544,42.06729,0 -2.956826184864972,42.17285512058069,0</coordinates>
+        </LineString>
+      </Placemark>
+
+      <Placemark>
+        <name>Valles de Valdelalosa</name>
+        <description><![CDATA[
+          <b>Code:</b> IB034j<br/>
+          <b>Tourist Value:</b> 3.8<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Route Difficulty:</b> Low<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse not visible<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB034j">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB034j</a>
+        ]]></description>
+        <styleUrl>#redMarker</styleUrl>
+        <Point>
+          <coordinates>-2.214522,41.969953,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Placemark>
+        <name>Valles de Valdelalosa - Eclipse Azimuth</name>
+        <description><![CDATA[
+          Eclipse azimuth: 283.7753° (pointing toward eclipse direction)
+        ]]></description>
+        <styleUrl>#azimuthLine</styleUrl>
+        <LineString>
+          <coordinates>-2.214522,41.969953,0 -2.802899561758141,42.075523260757734,0</coordinates>
+        </LineString>
+      </Placemark>
+    </Folder>
+  </Document>
+</kml>

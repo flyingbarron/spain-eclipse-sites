@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Spain Eclipse Sites - Organized by Tourist Value and Eclipse Visibility</name>
+    <description>Geological sites from IGME IELIG database organized into six categories</description>
+    
+    <!-- Style definitions -->
+    <Style id="greenMarker">
+      <IconStyle>
+        <color>ff00ff00</color>
+        <scale>1.2</scale>
+        <Icon>
+          <href>http://maps.google.com/mapfiles/kml/paddle/grn-circle.png</href>
+        </Icon>
+      </IconStyle>
+    </Style>
+    <Style id="yellowMarker">
+      <IconStyle>
+        <color>ff00ffff</color>
+        <scale>1.2</scale>
+        <Icon>
+          <href>http://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href>
+        </Icon>
+      </IconStyle>
+    </Style>
+    <Style id="redMarker">
+      <IconStyle>
+        <color>ff0000ff</color>
+        <scale>1.2</scale>
+        <Icon>
+          <href>http://maps.google.com/mapfiles/kml/paddle/red-circle.png</href>
+        </Icon>
+      </IconStyle>
+    </Style>
+
+    <Folder>
+      <name>🟢 High Tourist Value (>5.0) - Eclipse Visible</name>
+      <description>0 sites</description>
+      <open>0</open>
+    </Folder>
+
+    <Folder>
+      <name>🟢 High Tourist Value (>5.0) - Eclipse Not Visible</name>
+      <description>0 sites</description>
+      <open>0</open>
+    </Folder>
+
+    <Folder>
+      <name>🟡 Medium Tourist Value (4.0-5.0) - Eclipse Visible</name>
+      <description>0 sites</description>
+      <open>0</open>
+    </Folder>
+
+    <Folder>
+      <name>🟡 Medium Tourist Value (4.0-5.0) - Eclipse Not Visible</name>
+      <description>0 sites</description>
+      <open>0</open>
+    </Folder>
+
+    <Folder>
+      <name>🔴 Lower Tourist Value (<4.0) - Eclipse Visible</name>
+      <description>0 sites</description>
+      <open>0</open>
+    </Folder>
+
+    <Folder>
+      <name>🔴 Lower Tourist Value (<4.0) - Eclipse Not Visible</name>
+      <description>1 sites</description>
+      <open>0</open>
+
+      <Placemark>
+        <name>La Magdalena</name>
+        <description><![CDATA[
+          <b>Code:</b> IB200B<br/>
+          <b>Tourist Value:</b> 3.5<br/>
+          <b>Privacy:</b> Public<br/>
+          <b>Eclipse 2026:</b> 🌑 Eclipse not visible<br/>
+          <b>URL:</b> <a href="https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200B">https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200B</a>
+        ]]></description>
+        <styleUrl>#redMarker</styleUrl>
+        <Point>
+          <coordinates>-2.187944,42.124479,0</coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+  </Document>
+</kml>

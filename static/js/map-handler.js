@@ -255,6 +255,20 @@ function displayRouteSummary(totalDistance, totalTime, routeSegments) {
     
     if (!routeSummary || !routeSegmentsEl || !routeTotal) return;
     
+    // Make route summary draggable and collapsible
+    makeRouteSummaryDraggable(routeSummary);
+    
+    // Build header with collapse button and drag handle
+    const headerHTML = `
+        <div class="route-summary-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; cursor: move; padding: 0.5rem; background: #f8f9fa; border-radius: 4px; user-select: none;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="cursor: grab; font-size: 1.2rem;">⋮⋮</span>
+                <strong>Route Summary</strong>
+            </div>
+            <button id="routeCollapseBtn" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 0.25rem 0.5rem;">▼</button>
+        </div>
+    `;
+    
     // Build reorderable site list (only for multi-site routes)
     let siteListHTML = '';
     if (appState.selectedSites.length > 1) {
@@ -293,7 +307,7 @@ function displayRouteSummary(totalDistance, totalTime, routeSegments) {
         `;
     });
     
-    routeSegmentsEl.innerHTML = siteListHTML + segmentHTML;
+    routeSegmentsEl.innerHTML = headerHTML + '<div id="routeContent">' + siteListHTML + segmentHTML + '</div>';
     
     // Build Google Maps URL for the entire route
     let googleMapsUrl = 'https://www.google.com/maps/dir/';
@@ -325,6 +339,108 @@ function displayRouteSummary(totalDistance, totalTime, routeSegments) {
     
     // Setup event listeners
     setupRouteListeners();
+    
+    // Setup collapse button
+    setupCollapseButton();
+}
+
+/**
+ * Make route summary panel draggable
+ * @param {HTMLElement} element - Route summary element
+ */
+function makeRouteSummaryDraggable(element) {
+    let isDragging = false;
+    let currentX;
+    let currentY;
+    let initialX;
+    let initialY;
+    let xOffset = 0;
+    let yOffset = 0;
+    
+    // Make it positioned absolutely when dragging starts
+    element.style.position = 'absolute';
+    element.style.zIndex = '1001';
+    element.style.cursor = 'move';
+    
+    // Set initial position (top-left of map container)
+    element.style.top = '10px';
+    element.style.left = '10px';
+    
+    const header = element.querySelector('.route-summary-header');
+    if (!header) return;
+    
+    header.addEventListener('mousedown', dragStart);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', dragEnd);
+    
+    function dragStart(e) {
+        // Only drag if clicking on the header (not the collapse button)
+        if (e.target.id === 'routeCollapseBtn') return;
+        
+        initialX = e.clientX - xOffset;
+        initialY = e.clientY - yOffset;
+        
+        if (e.target === header || header.contains(e.target)) {
+            isDragging = true;
+            header.style.cursor = 'grabbing';
+        }
+    }
+    
+    function drag(e) {
+        if (isDragging) {
+            e.preventDefault();
+            
+            currentX = e.clientX - initialX;
+            currentY = e.clientY - initialY;
+            
+            xOffset = currentX;
+            yOffset = currentY;
+            
+            setTranslate(currentX, currentY, element);
+        }
+    }
+    
+    function dragEnd() {
+        if (isDragging) {
+            initialX = currentX;
+            initialY = currentY;
+            isDragging = false;
+            header.style.cursor = 'grab';
+        }
+    }
+    
+    function setTranslate(xPos, yPos, el) {
+        el.style.transform = `translate(${xPos}px, ${yPos}px)`;
+    }
+}
+
+/**
+ * Setup collapse/expand button for route summary
+ */
+function setupCollapseButton() {
+    const collapseBtn = document.getElementById('routeCollapseBtn');
+    const routeContent = document.getElementById('routeContent');
+    const routeTotal = document.getElementById('routeTotal');
+    
+    if (!collapseBtn || !routeContent) return;
+    
+    let isCollapsed = false;
+    
+    collapseBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent dragging when clicking collapse button
+        
+        isCollapsed = !isCollapsed;
+        
+        if (isCollapsed) {
+            routeContent.style.display = 'none';
+            if (routeTotal) routeTotal.style.display = 'none';
+            collapseBtn.textContent = '▶';
+        } else {
+            routeContent.style.display = 'block';
+            if (routeTotal) routeTotal.style.display = 'block';
+            collapseBtn.textContent = '▼';
+        }
+    });
 }
 
 /**

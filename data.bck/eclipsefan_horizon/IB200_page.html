@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Éclipse totale 2026 - Carte interactive</title>
+
+    <!-- Préconnexion aux services externes pour accélérer les premières requêtes -->
+    <link rel="preconnect" href="https://photon.komoot.io" crossorigin>
+    <link rel="preconnect" href="https://a.tile.openstreetmap.org" crossorigin>
+    <link rel="preconnect" href="https://b.tile.openstreetmap.org" crossorigin>
+    <link rel="preconnect" href="https://c.tile.openstreetmap.org" crossorigin>
+    <link rel="preconnect" href="https://a.basemaps.cartocdn.com" crossorigin>
+    <link rel="preconnect" href="https://b.basemaps.cartocdn.com" crossorigin>
+    <link rel="preconnect" href="https://c.basemaps.cartocdn.com" crossorigin>
+    <link rel="dns-prefetch" href="https://photon.komoot.io">
+    <link rel="dns-prefetch" href="https://tiles.eclipsefan.org">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="manifest" id="manifest-link" href="manifest-fr.json">
+    <meta name="theme-color" content="#87CEEB">
+    <script>
+        // Charger le manifest selon la langue (avant le chargement complet)
+        (function() {
+            const params = new URLSearchParams(window.location.search);
+            const lang = params.get('lang');
+            const validLangs = ['fr', 'en', 'es'];
+            const manifestLang = validLangs.includes(lang) ? lang : 'fr';
+            document.getElementById('manifest-link').href = 'manifest-' + manifestLang + '.json';
+        })();
+    </script>
+    <!-- Apply theme immediately to prevent white flash on dark mode -->
+    <script>
+        (function() {
+            try {
+                var theme = localStorage.getItem('eclipsefan-theme');
+                if (theme && ['light', 'dark', 'astro'].includes(theme)) {
+                    document.documentElement.setAttribute('data-theme', theme);
+                    // Update PWA theme-color immediately
+                    var colors = { light: '#87CEEB', dark: '#121212', astro: '#661a1a' };
+                    var meta = document.querySelector('meta[name="theme-color"]');
+                    if (meta) meta.setAttribute('content', colors[theme]);
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <!-- Design System: tokens must be loaded first -->
+    <link rel="stylesheet" href="design-tokens.css">
+    <link rel="stylesheet" href="base-styles.css">
+    <script src="theme-manager.js"></script>
+    <link rel="stylesheet" href="mobile-portrait-bs.css">
+    <link rel="stylesheet" href="mobile-portrait-ui.css">
+    <link rel="stylesheet" href="mobile-landscape.css">
+    <link rel="stylesheet" href="mobile-left-panel.css">
+    <link rel="stylesheet" href="help-system.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Leaflet Control Geocoder CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.css" />
+
+    <link rel="stylesheet" href="app.css">
+    <link rel="stylesheet" href="skyline.css">
+    <link rel="stylesheet" href="unified-timeline.css">
+    <!-- Theme overrides (dark/astro) -->
+    <link rel="stylesheet" href="theme-map.css">
+    <link rel="stylesheet" href="theme-panels.css">
+    <link rel="stylesheet" href="theme-fan-slider.css">
+    <link rel="stylesheet" href="theme-components.css">
+    <link rel="stylesheet" href="theme-controls.css">
+</head>
+<body>
+    <div id="map"></div>
+
+    <!-- Bottom Sheet Mobile -->
+    <div id="bottom-sheet" class="bottom-sheet" data-state="peek">
+        <div class="bottom-sheet-handle">
+            <div class="handle-bar"></div>
+        </div>
+        <div class="bottom-sheet-header" id="bs-header">
+            <div class="bs-header-content">
+                <div class="bs-header-row1">
+                    <span class="bs-location-name" id="bs-location-name">Sélectionnez un lieu</span>
+                    <span class="bs-type-badge" id="bs-type-badge"></span>
+                    <span class="bs-duration" id="bs-duration"></span>
+                    <span class="bs-max-time" id="bs-max-time"></span>
+                </div>
+            </div>
+        </div>
+        <div class="bottom-sheet-content" id="bs-content">
+            <!-- Contenu dynamique : horaires et panneaux -->
+        </div>
+    </div>
+
+    <!-- Left Panel Desktop (replaces old desktop panels) -->
+    <div id="left-panel" class="left-panel">
+        <div class="left-panel-header" id="lp-header">
+            <div class="lp-header-content">
+                <div class="lp-header-row1">
+                    <span class="lp-location-name" id="lp-location-name">Sélectionnez un lieu</span>
+                </div>
+                <div class="lp-header-row2">
+                    <span class="lp-type-badge" id="lp-type-badge"></span>
+                    <span class="lp-duration" id="lp-duration"></span>
+                    <span class="lp-max-time" id="lp-max-time"></span>
+                </div>
+            </div>
+        </div>
+        <div class="left-panel-content" id="lp-content">
+            <!-- Contenu dynamique : onglets Info, Fan, Horizon -->
+        </div>
+    </div>
+
+    <!-- Bouton géolocalisation mobile -->
+    <button id="geolocate-btn" class="geolocate-btn" aria-label="Ma position">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+            <path fill="currentColor" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
+        </svg>
+    </button>
+
+    <!-- Modal dialog pour générer une venelle -->
+    <div class="modal-overlay" id="eclipsefan-modal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 data-i18n="generateVenelle">Générer une venelle</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-field">
+                    <label for="modal-location-name" data-i18n="locationName">Nom du lieu</label>
+                    <input type="text" id="modal-location-name" data-i18n-placeholder="locationNamePlaceholder" placeholder="Ex: Madrid, Burgos...">
+                </div>
+                <div class="modal-field">
+                    <label for="modal-latitude" data-i18n="latitude">Latitude</label>
+                    <input type="number" id="modal-latitude" step="0.00001" min="-90" max="90" placeholder="Ex: 42.35">
+                    <div class="field-hint" data-i18n="decimalDegrees">Degrés décimaux (-90 à +90)</div>
+                </div>
+                <div class="modal-field">
+                    <label for="modal-longitude" data-i18n="longitude">Longitude</label>
+                    <input type="number" id="modal-longitude" step="0.00001" min="-180" max="180" placeholder="Ex: -3.70">
+                    <div class="field-hint" data-i18n="decimalDegrees">Degrés décimaux (-180 à +180)</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="modal-loading" id="modal-loading">
+                    <div class="spinner"></div>
+                    <span data-i18n="generating">Génération en cours...</span>
+                </div>
+                <button class="modal-btn modal-btn-cancel" id="modal-cancel" data-i18n="cancel">Annuler</button>
+                <button class="modal-btn modal-btn-ok" id="modal-ok" data-i18n="generate">Ok</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Leaflet Control Geocoder JS -->
+    <script src="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.js"></script>
+    
+    <!-- Leaflet Omnivore pour charger KML -->
+    <script src="https://unpkg.com/leaflet-omnivore@0.3.4/leaflet-omnivore.min.js"></script>
+
+    <!-- Leaflet Shadow Simulator -->
+    <script src="https://unpkg.com/leaflet-shadow-simulator/dist/leaflet-shadow-simulator.umd.min.js"></script>
+
+    <!-- OSM to GeoJSON (pour les bâtiments) -->
+    <script src="https://unpkg.com/osmtogeojson@3.0.0-beta.5/osmtogeojson.js"></script>
+
+    <!-- Marked.js for Markdown parsing (help system) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Configuration locale (clés API) -->
+    <script src="config.js"></script>
+
+    <!-- Application -->
+    <script src="translations.js"></script>
+    <script src="app-core.js"></script>
+    <script src="map-init.js"></script>
+    <script src="map-controls.js"></script>
+    <script src="layers-panel.js"></script>
+    <script src="panels-events.js"></script>
+    <script src="eclipse-ui.js"></script>
+    <script src="url-params.js"></script>
+    <script src="shadow-simulator.js"></script>
+
+    <!-- Panel system (mobile bottom sheet + desktop left panel) -->
+    <script src="panel-base.js"></script>
+    <script src="panel-tabs.js"></script>
+    <script src="panel-fan.js"></script>
+    <script src="panel-skyline.js"></script>
+    <script src="bottom-sheet.js"></script>
+    <script src="left-panel.js"></script>
+    <script src="mobile.js"></script>
+
+    <!-- External modules -->
+    <script src="weather-history.js"></script>
+    <script src="skyline-config.js"></script>
+    <script src="skyline-geo.js"></script>
+    <script src="skyline-astro.js"></script>
+    <script src="skyline-horizon.js"></script>
+    <script src="skyline-renderer.js"></script>
+    <script src="skyline-control.js"></script>
+    <script src="help-system.js"></script>
+    <script src="unified-timeline.js"></script>
+    <script src="weather-layers.js"></script>
+
+    <!-- Initialization -->
+    <script src="app-init.js"></script>
+</body>
+</html>

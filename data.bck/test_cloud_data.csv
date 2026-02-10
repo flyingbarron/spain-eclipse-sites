@@ -1,0 +1,4 @@
+code,denominacion,url,valor_turistico,confidencialidad,route_difficulty,latitude,longitude,eclipse_visibility,status,cloud_coverage,cloud_status,cloud_url
+IB200,"Valdeté, Perosancio y Tajugueras",https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200,3,Public,Low,42.130958,-2.159723,not_visible,success,32,success,"https://www.timeanddate.com/eclipse/in/@42.130958,-2.159723?iso=20260812"
+IB200b,La Magdalena,https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200b,3.5,Public,Medium,42.124479,-2.187944,not_visible,success,32,success,"https://www.timeanddate.com/eclipse/in/@42.124479,-2.187944?iso=20260812"
+IB200c,Los Cayos A,https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200c,6,Public,Low,42.084398,-2.088449,not_visible,success,32,success,"https://www.timeanddate.com/eclipse/in/@42.084398,-2.088449?iso=20260812"
