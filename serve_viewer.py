@@ -15,8 +15,21 @@ import json
 import signal
 import sys
 import threading
+import yaml
 
 PORT = 8000
+
+# Load configuration
+def load_config():
+    """Load configuration from config.yaml"""
+    try:
+        with open('config.yaml', 'r') as f:
+            return yaml.safe_load(f)
+    except Exception as e:
+        print(f"Warning: Could not load config.yaml: {e}")
+        return {}
+
+CONFIG = load_config()
 
 # Global server reference for clean shutdown
 server_instance = None
@@ -33,6 +46,9 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         # Handle shutdown endpoint
         if self.path == '/api/shutdown':
             self.handle_shutdown()
+        # Handle config endpoint
+        elif self.path == '/api/config':
+            self.handle_config()
         # Handle image scraping API endpoint
         elif self.path.startswith('/api/images?'):
             self.handle_images_api()
@@ -42,6 +58,21 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         else:
             # Default file serving
             super().do_GET()
+    
+    def handle_config(self):
+        """Serve configuration data (API keys, etc.)"""
+        try:
+            config_data = {
+                'google_maps_api_key': CONFIG.get('api_keys', {}).get('google_maps', '')
+            }
+            
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(config_data).encode())
+            
+        except Exception as e:
+            self.send_error(500, f"Error loading config: {str(e)}")
     
     def handle_shutdown(self):
         """Handle graceful server shutdown"""

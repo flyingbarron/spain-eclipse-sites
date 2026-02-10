@@ -7,6 +7,18 @@ let selectedSites = []; // Track selected sites for multi-select (array to maint
 let returnToHotel = false; // Track if return to hotel is enabled
 let currentRouteControl = null; // Track current route control
 let routeSegments = []; // Store route segment data
+let googleMapsApiKey = ''; // Google Maps API key loaded from server
+
+// Load configuration from server
+async function loadConfig() {
+    try {
+        const response = await fetch('/api/config');
+        const config = await response.json();
+        googleMapsApiKey = config.google_maps_api_key || '';
+    } catch (error) {
+        console.error('Error loading config:', error);
+    }
+}
 
 // Convert decimal degrees to DMS (Degrees, Minutes, Seconds)
 function decimalToDMS(decimal, isLat) {
@@ -361,7 +373,7 @@ function updateDetailsTabContent(site) {
     const header = document.querySelector('.detail-header');
     if (header) {
         // Google Maps Static API thumbnail (400x200, zoom 15, satellite view)
-        const googleMapsThumbUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lon}&zoom=15&size=400x200&maptype=satellite&markers=color:red%7C${lat},${lon}&key=YOUR_API_KEY`;
+        const googleMapsThumbUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lon}&zoom=15&size=400x200&maptype=satellite&markers=color:red%7C${lat},${lon}&key=${googleMapsApiKey}`;
         
         header.innerHTML = `
             <h2>${site.denominacion || site.code}</h2>
@@ -1405,7 +1417,8 @@ function toggleFooter() {
 }
 
 // Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadConfig(); // Load API keys first
     initializeDragAndDrop();
     loadCSV();
     
