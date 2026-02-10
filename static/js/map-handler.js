@@ -637,7 +637,7 @@ export function initializeSingleSiteMap(site) {
         return;
     }
     
-    createMapWithSites([site], { showRouting: true, showRouteSummary: false });
+    createMapWithSites([site], { showRouting: true, showRouteSummary: true });
 }
 
 // Made with Bob
