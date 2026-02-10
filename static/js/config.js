@@ -40,8 +40,9 @@ export const CONFIG = {
     }
 };
 
-// Google Maps API key (loaded from server)
+// API keys (loaded from server)
 export let googleMapsApiKey = '';
+export let mapboxApiKey = '';
 
 /**
  * Load configuration from server
@@ -51,7 +52,9 @@ export async function loadConfig() {
         const response = await fetch(CONFIG.API.CONFIG);
         const config = await response.json();
         googleMapsApiKey = config.google_maps_api_key || '';
+        mapboxApiKey = config.mapbox_api_key || '';
         console.log('Google Maps API key loaded:', googleMapsApiKey ? 'Yes' : 'No');
+        console.log('Mapbox API key loaded:', mapboxApiKey ? 'Yes' : 'No');
         return config;
     } catch (error) {
         console.error('Error loading config:', error);

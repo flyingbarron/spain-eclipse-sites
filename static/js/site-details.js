@@ -8,6 +8,7 @@ import { decimalToDMS } from './utils.js';
 import { googleMapsApiKey } from './config.js';
 import { loadSiteImages } from './image-loader.js';
 import { initializeSingleSiteMap, updateMapWithMultipleSites } from './map-handler.js';
+import { initialize3DMap, cleanup3DMap } from './terrain-3d.js';
 
 /**
  * Generate external URLs for a site
@@ -239,7 +240,15 @@ function renderDetailsTab(site) {
  */
 function renderMapTab(site) {
     return `
-        <div id="mapContainer" style="height: 600px; width: 100%;"></div>
+        <div style="position: relative;">
+            <div style="position: absolute; top: 10px; right: 10px; z-index: 1000; display: flex; gap: 0.5rem;">
+                <button id="toggle2D3D" class="link-button" style="background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                    🗻 3D Terrain View
+                </button>
+            </div>
+            <div id="mapContainer" style="height: 600px; width: 100%; display: block;"></div>
+            <div id="map3DContainer" style="height: 600px; width: 100%; display: none;"></div>
+        </div>
         <div id="routeSummary" style="display: none; margin-top: 1rem;">
             <div style="background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                 <div id="routeTotal" style="margin-bottom: 1rem;"></div>
@@ -305,8 +314,49 @@ export function displaySiteDetails(site) {
             } else {
                 initializeSingleSiteMap(site);
             }
+            
+            // Setup 3D toggle button
+            setup3DToggle(site);
         }, 100);
     }
+}
+
+/**
+ * Setup 3D terrain toggle button
+ * @param {Object} site - Current site object
+ */
+function setup3DToggle(site) {
+    const toggleBtn = document.getElementById('toggle2D3D');
+    if (!toggleBtn) return;
+    
+    let is3D = false;
+    
+    toggleBtn.addEventListener('click', () => {
+        const mapContainer = document.getElementById('mapContainer');
+        const map3DContainer = document.getElementById('map3DContainer');
+        
+        if (!is3D) {
+            // Switch to 3D
+            mapContainer.style.display = 'none';
+            map3DContainer.style.display = 'block';
+            toggleBtn.innerHTML = '🗺️ 2D Map View';
+            
+            // Get sites to display
+            const sites = appState.selectedSites.length > 1
+                ? appState.selectedSites.map(code => appState.getSiteByCode(code)).filter(s => s)
+                : [site];
+            
+            initialize3DMap(sites);
+            is3D = true;
+        } else {
+            // Switch to 2D
+            map3DContainer.style.display = 'none';
+            mapContainer.style.display = 'block';
+            toggleBtn.innerHTML = '🗻 3D Terrain View';
+            cleanup3DMap();
+            is3D = false;
+        }
+    });
 }
 
 /**
@@ -364,6 +414,9 @@ export function switchTab(tabName) {
                     } else {
                         initializeSingleSiteMap(appState.currentSite);
                     }
+                    
+                    // Setup 3D toggle button
+                    setup3DToggle(appState.currentSite);
                 }, 100);
             }
         }

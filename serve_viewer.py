@@ -66,13 +66,18 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def handle_config(self):
         """Serve configuration data (API keys, etc.)"""
         try:
-            # Load API key from environment variable (preferred) or config.yaml (fallback)
+            # Load API keys from environment variables (preferred) or config.yaml (fallback)
             google_maps_key = os.environ.get('ECLIPSE_SITES_API_KEYS_GOOGLE_MAPS', '')
             if not google_maps_key:
                 google_maps_key = CONFIG.get('api_keys', {}).get('google_maps', '')
             
+            mapbox_key = os.environ.get('ECLIPSE_SITES_API_KEYS_MAPBOX', '')
+            if not mapbox_key:
+                mapbox_key = CONFIG.get('api_keys', {}).get('mapbox', '')
+            
             config_data = {
-                'google_maps_api_key': google_maps_key
+                'google_maps_api_key': google_maps_key,
+                'mapbox_api_key': mapbox_key
             }
             
             self.send_response(200)
