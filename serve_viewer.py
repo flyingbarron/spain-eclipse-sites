@@ -152,7 +152,7 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.send_error(500, f"Error scraping images: {str(e)}")
     
     def handle_image_proxy(self):
-        """Proxy image requests to avoid CORS issues"""
+        """Proxy image requests to avoid CORS issues with disk caching"""
         try:
             # Parse query parameters
             query = urllib.parse.urlparse(self.path).query
@@ -163,16 +163,49 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_error(400, "Missing 'url' parameter")
                 return
             
-            # Fetch the image
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                'Referer': 'https://info.igme.es/'
-            }
-            req = urllib.request.Request(image_url, headers=headers)
+            # Create cache directory if it doesn't exist
+            cache_dir = 'data/igme_image_cache'
+            os.makedirs(cache_dir, exist_ok=True)
             
-            with urllib.request.urlopen(req, timeout=10) as response:
-                image_data = response.read()
-                content_type = response.headers.get('Content-Type', 'image/jpeg')
+            # Generate cache filename from URL hash
+            import hashlib
+            url_hash = hashlib.md5(image_url.encode()).hexdigest()
+            # Try to preserve extension from URL
+            url_ext = os.path.splitext(urllib.parse.urlparse(image_url).path)[1]
+            if not url_ext or url_ext not in ['.jpg', '.jpeg', '.png', '.gif', '.webp']:
+                url_ext = '.jpg'  # Default extension
+            cache_file = os.path.join(cache_dir, f"{url_hash}{url_ext}")
+            
+            # Check if cached file exists
+            if os.path.exists(cache_file):
+                # Serve from cache
+                with open(cache_file, 'rb') as f:
+                    image_data = f.read()
+                
+                # Determine content type from extension
+                content_type_map = {
+                    '.jpg': 'image/jpeg',
+                    '.jpeg': 'image/jpeg',
+                    '.png': 'image/png',
+                    '.gif': 'image/gif',
+                    '.webp': 'image/webp'
+                }
+                content_type = content_type_map.get(url_ext, 'image/jpeg')
+            else:
+                # Fetch the image from IGME
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                    'Referer': 'https://info.igme.es/'
+                }
+                req = urllib.request.Request(image_url, headers=headers)
+                
+                with urllib.request.urlopen(req, timeout=10) as response:
+                    image_data = response.read()
+                    content_type = response.headers.get('Content-Type', 'image/jpeg')
+                
+                # Save to cache
+                with open(cache_file, 'wb') as f:
+                    f.write(image_data)
             
             # Send image response
             self.send_response(200)
