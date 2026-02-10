@@ -96,7 +96,7 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.send_error(500, f"Error during shutdown: {str(e)}")
     
     def handle_images_api(self):
-        """Scrape images from IGME site and return as JSON"""
+        """Scrape images from IGME site and return as JSON with caching"""
         try:
             # Parse query parameters
             query = urllib.parse.urlparse(self.path).query
@@ -107,14 +107,45 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_error(400, "Missing 'url' parameter")
                 return
             
-            # Fetch the IGME page
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-            }
-            req = urllib.request.Request(url, headers=headers)
+            # Create cache directory if it doesn't exist
+            cache_dir = 'data/igme_html_cache'
+            os.makedirs(cache_dir, exist_ok=True)
             
-            with urllib.request.urlopen(req, timeout=10) as response:
-                html = response.read().decode('utf-8')
+            # Generate cache filename from URL hash
+            import hashlib
+            url_hash = hashlib.md5(url.encode()).hexdigest()
+            html_cache_file = os.path.join(cache_dir, f"{url_hash}.html")
+            json_cache_file = os.path.join(cache_dir, f"{url_hash}.json")
+            
+            # Check if cached JSON exists
+            if os.path.exists(json_cache_file):
+                # Serve from cache
+                with open(json_cache_file, 'r', encoding='utf-8') as f:
+                    cached_data = f.read()
+                
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(cached_data.encode())
+                return
+            
+            # Check if HTML is cached
+            if os.path.exists(html_cache_file):
+                with open(html_cache_file, 'r', encoding='utf-8') as f:
+                    html = f.read()
+            else:
+                # Fetch the IGME page
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                }
+                req = urllib.request.Request(url, headers=headers)
+                
+                with urllib.request.urlopen(req, timeout=10) as response:
+                    html = response.read().decode('utf-8')
+                
+                # Cache the HTML
+                with open(html_cache_file, 'w', encoding='utf-8') as f:
+                    f.write(html)
             
             # Parse HTML and extract images
             soup = BeautifulSoup(html, 'html.parser')
@@ -142,11 +173,18 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                         'alt': alt or 'Site image'
                     })
             
+            # Prepare JSON response
+            json_response = json.dumps({'images': images})
+            
+            # Cache the JSON response
+            with open(json_cache_file, 'w', encoding='utf-8') as f:
+                f.write(json_response)
+            
             # Send JSON response
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
-            self.wfile.write(json.dumps({'images': images}).encode())
+            self.wfile.write(json_response.encode())
             
         except Exception as e:
             self.send_error(500, f"Error scraping images: {str(e)}")
