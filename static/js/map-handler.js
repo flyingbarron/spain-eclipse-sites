@@ -178,7 +178,7 @@ function createRoute(sites, showRouteSummary) {
         const color = segmentColors[i % segmentColors.length];
         const segmentIndex = i;
         
-        L.Routing.control({
+        const routingControl = L.Routing.control({
             waypoints: [waypoints[i], waypoints[i + 1]],
             routeWhileDragging: false,
             addWaypoints: false,
@@ -195,7 +195,9 @@ function createRoute(sites, showRouteSummary) {
                 serviceUrl: 'https://router.project-osrm.org/route/v1'
             }),
             show: false // Hide the default routing instructions
-        }).on('routesfound', function(e) {
+        });
+        
+        routingControl.on('routesfound', function(e) {
             const route = e.routes[0];
             const segmentDist = route.summary.totalDistance;
             const segmentTime = route.summary.totalTime;
@@ -233,7 +235,10 @@ function createRoute(sites, showRouteSummary) {
                     currentMap.fitBounds(allRouteBounds, { padding: [50, 50], maxZoom: 15 });
                 }
             }
-        }).addTo(currentMap);
+        });
+        
+        // Explicitly add the routing control to the map
+        routingControl.addTo(currentMap);
     }
 }
 
