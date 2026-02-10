@@ -1,27 +1,31 @@
 # Spain Eclipse Sites 🦕🌑
 
-A comprehensive data collection and visualization tool for Spanish geological sites with 2026 solar eclipse visibility information. Combines data from IGME (Spanish Geological Survey) with eclipse visibility calculations from IGN (National Geographic Institute).
+A comprehensive data collection and visualization tool for Spanish geological sites with 2026 solar eclipse visibility information. Combines data from multiple sources including IGME (Spanish Geological Survey), IGN (National Geographic Institute), EclipseFan, timeanddate.com, Shademap, and Google Maps.
 
 ## Overview
 
-This project scrapes geological site information from IGME's IELIG database and checks eclipse visibility for the August 12, 2026 total solar eclipse. It provides:
+This project aggregates geological site information and eclipse planning data for the August 12, 2026 total solar eclipse. It provides:
 
 - **54 geological sites** in Spain (IB200, IB200a-z, IB034, IB034a-z)
-- **Eclipse visibility data** for each site
-- **Interactive web viewer** with search, filtering, and sorting
+- **Eclipse visibility data** with profile diagrams
+- **Cloud coverage statistics** for eclipse planning
+- **Horizon visualizations** showing eclipse path
+- **Sun/shadow maps** for lighting analysis
+- **Interactive web viewer** with search, filtering, and routing
 - **KML exports** for Google Earth/Maps visualization
-- **Eclipse visibility profile diagrams**
 
 ## Features
 
 ### Data Collection
-- ✅ Automated scraping of IGME IELIG database
-- ✅ Tourist value ratings and site information
-- ✅ Route difficulty levels (translated from Spanish)
-- ✅ Precise GPS coordinates from MapServer API
+- ✅ Automated scraping of IGME IELIG database (sites, photos, coordinates)
+- ✅ Tourist value ratings and route difficulty levels
 - ✅ Eclipse visibility checking via IGN Eclipse 2026 viewer
-- ✅ Automated profile diagram capture
+- ✅ Automated profile diagram capture (IGN)
+- ✅ Historical cloud coverage data (timeanddate.com)
 - ✅ EclipseFan horizon image downloading
+- ✅ Shademap sun/shadow visualization snapshots
+- ✅ Google Maps Static API location thumbnails
+- ✅ Image caching for improved performance
 
 ### Web Viewer
 - 🔍 **Search** by site code or name (sticky controls)
@@ -29,13 +33,17 @@ This project scrapes geological site information from IGME's IELIG database and 
 - 📊 **Sort** by code, name, or tourist value
 - 📚 **Navigation panels** - Resources, About, and Help sections accessible from header
 - 🔗 **Resources panel** - Quick links to eclipse websites and planning tools
-- 🖼️ **Image gallery** with full-screen carousel
-- 🗺️ **Interactive maps** with routing from Hotel Parras Arnedillo
+- 🖼️ **Image gallery** with full-screen carousel (IGME photos cached locally)
+- 🗺️ **Interactive maps** with Leaflet/OpenStreetMap
+- 📍 **Google Maps thumbnails** - Satellite view for each site location
+- 🌄 **Shademap thumbnails** - Sun/shadow visualization with hover preview
 - 🚗 **Multi-site route planning** with Ctrl/Cmd+Click selection
 - 🧭 **Turn-by-turn directions** for each route segment
 - 📦 **Collapsible route summary** to minimize map obstruction
 - 📍 **Export routes** to Google Maps or KML for GPS devices
-- 📈 **Eclipse profile diagrams** with hover preview
+- 📈 **Eclipse profile diagrams** with hover preview (IGN, EclipseFan)
+- ☁️ **Cloud coverage data** for eclipse planning
+- 🔢 **Site counter** showing filtered results
 - 🦕 **Dinosaur emoji** favicon (because dinosaur footprints!)
 
 ### Output Formats

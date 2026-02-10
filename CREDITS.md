@@ -82,27 +82,63 @@ This project uses data and services from multiple sources. We respect the terms 
 
 ## Third-Party Services
 
-### Shademap.app
+### 5. Shademap.app
 **Website**: https://shademap.app/
 
-**Usage**:
+**Data Used**:
 - Sun and shadow visualization tool
-- Linked from viewer for site sun/shadow analysis
+- Shademap snapshots for each site showing sun position at eclipse time
+- Interactive shadow maps for site analysis
+
+**Usage**:
+- Screenshots captured via Playwright automation
+- Stored locally in `data/shademap_snapshot/`
+- Linked from viewer for interactive sun/shadow analysis
 - Helps users understand lighting conditions at eclipse time
 
 **Attribution**:
-> Shademap.app - Sun and shadow visualization
+> Shademap visualizations from Shademap.app
 > © Shademap
 
-### Google Maps
-- Used for location visualization and routing
-- Subject to Google Maps Terms of Service
-- Users must comply with Google's usage policies
+### 6. Google Maps
+**Website**: https://maps.google.com/
 
-### OpenStreetMap
+**Data Used**:
+- Google Maps Static API for location thumbnails
+- Interactive maps for site location and routing
+- Satellite imagery for site context
+
+**Usage**:
+- Static API thumbnails (400x200px satellite view) displayed in viewer
+- Links to interactive Google Maps for each site
+- Routing functionality for trip planning
+- Subject to Google Maps Terms of Service and API usage limits
+
+**Attribution**:
+> Map data and imagery from Google Maps
+> © Google LLC
+
+**API Key**: Configured in `config.yaml` - users must provide their own Google Maps API key
+
+### 7. Leaflet & OpenStreetMap
+**Websites**:
+- https://leafletjs.com/
+- https://www.openstreetmap.org/
+
+**Data Used**:
+- Interactive map display in viewer
+- Map tiles from OpenStreetMap contributors
+- Leaflet Routing Machine for route planning
+
+**Usage**:
+- Open-source mapping library (Leaflet)
 - Map data © OpenStreetMap contributors
 - Used under Open Database License (ODbL)
-- https://www.openstreetmap.org/copyright
+
+**Attribution**:
+> Map data © OpenStreetMap contributors
+> Leaflet mapping library © Vladimir Agafonkin
+> https://www.openstreetmap.org/copyright
 
 ## Web Scraping Ethics
 
