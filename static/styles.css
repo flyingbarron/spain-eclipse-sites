@@ -475,8 +475,8 @@ header h1 {
 
 .eclipse-profile-thumbnail.maps-thumbnail {
     border-color: #28a745;
-    width: 200px;
-    height: auto;
+    height: 80px;
+    width: auto;
 }
 
 .eclipse-profile-thumbnail.maps-thumbnail:hover {
