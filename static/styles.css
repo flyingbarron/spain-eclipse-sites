@@ -473,6 +473,16 @@ header h1 {
     border-color: #e8590c;
 }
 
+.eclipse-profile-thumbnail.maps-thumbnail {
+    border-color: #28a745;
+    width: 200px;
+    height: auto;
+}
+
+.eclipse-profile-thumbnail.maps-thumbnail:hover {
+    border-color: #218838;
+}
+
 .eclipse-profile-overlay {
     display: none;
     position: absolute;

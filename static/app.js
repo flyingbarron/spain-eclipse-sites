@@ -360,11 +360,24 @@ function updateDetailsTabContent(site) {
     // Update the header
     const header = document.querySelector('.detail-header');
     if (header) {
+        // Google Maps Static API thumbnail (400x200, zoom 15, satellite view)
+        const googleMapsThumbUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lon}&zoom=15&size=400x200&maptype=satellite&markers=color:red%7C${lat},${lon}&key=YOUR_API_KEY`;
+        
         header.innerHTML = `
             <h2>${site.denominacion || site.code}</h2>
             <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                 <a href="${site.url}" target="_blank" class="link-button">🪨 View on IGME Website</a>
-                <a href="${mapsUrl}" target="_blank" class="link-button maps">📍 Open in Google Maps</a>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
+                    <a href="${mapsUrl}" target="_blank" class="link-button maps">📍 Open in Google Maps</a>
+                    <div style="position: relative; display: inline-block;">
+                        <img src="${googleMapsThumbUrl}"
+                             alt="Google Maps location for ${site.code}"
+                             class="eclipse-profile-thumbnail maps-thumbnail"
+                             onclick="window.open('${mapsUrl}', '_blank')"
+                             onerror="this.style.display='none'"
+                             title="Click to open in Google Maps">
+                    </div>
+                </div>
                 <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
                     <a href="${shademapUrl}" target="_blank" class="link-button shademap">🌄 View on Shademap</a>
                     <div style="position: relative; display: inline-block;">
