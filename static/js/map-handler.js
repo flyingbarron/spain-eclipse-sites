@@ -252,10 +252,11 @@ function displayRouteSummary(totalDistance, totalTime, routeSegments) {
     const routeSummary = document.getElementById('routeSummary');
     const routeSegmentsEl = document.getElementById('routeSegments');
     const routeTotal = document.getElementById('routeTotal');
+    const routeSummaryContent = document.getElementById('routeSummaryContent');
     
-    if (!routeSummary || !routeSegmentsEl || !routeTotal) return;
+    if (!routeSummary || !routeSegmentsEl || !routeTotal || !routeSummaryContent) return;
     
-    // Build header with collapse button and drag handle
+    // Build header with collapse button and drag handle - insert at top of routeSummary
     const headerHTML = `
         <div class="route-summary-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; cursor: move; padding: 0.5rem; background: #f8f9fa; border-radius: 4px; user-select: none;">
             <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -265,6 +266,11 @@ function displayRouteSummary(totalDistance, totalTime, routeSegments) {
             <button id="routeCollapseBtn" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 0.25rem 0.5rem;">▼</button>
         </div>
     `;
+    
+    // Insert header at the beginning of routeSummary
+    if (!routeSummary.querySelector('.route-summary-header')) {
+        routeSummary.insertAdjacentHTML('afterbegin', headerHTML);
+    }
     
     // Build reorderable site list (only for multi-site routes)
     let siteListHTML = '';
@@ -304,7 +310,7 @@ function displayRouteSummary(totalDistance, totalTime, routeSegments) {
         `;
     });
     
-    routeSegmentsEl.innerHTML = headerHTML + '<div id="routeContent">' + siteListHTML + segmentHTML + '</div>';
+    routeSegmentsEl.innerHTML = siteListHTML + segmentHTML;
     
     // Build Google Maps URL for the entire route
     let googleMapsUrl = 'https://www.google.com/maps/dir/';
@@ -427,11 +433,14 @@ function makeRouteSummaryDraggable(element) {
  */
 function setupCollapseButton() {
     const collapseBtn = document.getElementById('routeCollapseBtn');
-    const routeContent = document.getElementById('routeContent');
-    const routeTotal = document.getElementById('routeTotal');
+    const routeSummaryContent = document.getElementById('routeSummaryContent');
     
-    if (!collapseBtn || !routeContent) return;
+    if (!collapseBtn || !routeSummaryContent) {
+        console.error('Collapse button or content not found');
+        return;
+    }
     
+    console.log('Setting up collapse button');
     let isCollapsed = false;
     
     collapseBtn.addEventListener('click', (e) => {
@@ -440,13 +449,13 @@ function setupCollapseButton() {
         isCollapsed = !isCollapsed;
         
         if (isCollapsed) {
-            routeContent.style.display = 'none';
-            if (routeTotal) routeTotal.style.display = 'none';
+            routeSummaryContent.style.display = 'none';
             collapseBtn.textContent = '▶';
+            console.log('Collapsed');
         } else {
-            routeContent.style.display = 'block';
-            if (routeTotal) routeTotal.style.display = 'block';
+            routeSummaryContent.style.display = 'block';
             collapseBtn.textContent = '▼';
+            console.log('Expanded');
         }
     });
 }

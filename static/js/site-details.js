@@ -251,8 +251,11 @@ function renderMapTab(site) {
             
             <!-- Floating draggable route summary -->
             <div id="routeSummary" class="route-summary-floating" style="display: none;">
-                <div id="routeTotal" style="margin-bottom: 1rem;"></div>
-                <div id="routeSegments"></div>
+                <!-- Header will be inserted by JavaScript -->
+                <div id="routeSummaryContent">
+                    <div id="routeTotal" style="margin-bottom: 1rem;"></div>
+                    <div id="routeSegments"></div>
+                </div>
             </div>
         </div>
         <div id="routeDirections" style="display: none; margin-top: 1rem; background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
