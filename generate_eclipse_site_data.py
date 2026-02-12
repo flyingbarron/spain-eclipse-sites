@@ -200,6 +200,10 @@ Examples:
   python3 generate_eclipse_site_data.py --only-shademap
   python3 generate_eclipse_site_data.py --only-eclipse --no-profile
   
+  # Combine multiple --only-* operations
+  python3 generate_eclipse_site_data.py --only-cloud --only-horizon --only-shademap
+  python3 generate_eclipse_site_data.py --only-eclipse --only-cloud --code IB200a
+  
   # Only update specific site from existing CSV
   python3 generate_eclipse_site_data.py --only-cloud --code IB200a
   python3 generate_eclipse_site_data.py --only-shademap --code IB200b
@@ -258,10 +262,6 @@ Examples:
         print("✗ Error: Cannot use --only-* and --no-* flags together")
         sys.exit(1)
     
-    if sum(only_flags) > 1:
-        print("✗ Error: Can only use one --only-* flag at a time")
-        sys.exit(1)
-    
     print("=" * 60)
     print("Eclipse Site Data Generator")
     print("=" * 60)
@@ -298,7 +298,7 @@ Examples:
                 print(f"✓ Filtering to site: {args.code}")
                 results = filtered_results
         
-        # Perform the requested operation
+        # Perform the requested operations (can be multiple)
         if args.only_eclipse:
             print("\nChecking eclipse visibility...")
             print("=" * 60)
@@ -308,21 +308,21 @@ Examples:
             results = check_sites_eclipse_visibility(results, save_profiles=save_profiles)
             print(f"\n✓ Eclipse visibility checked for {len(results)} site(s)")
         
-        elif args.only_cloud:
+        if args.only_cloud:
             print("\nScraping cloud coverage data...")
             print("=" * 60)
             print("This will take a while (2 second delay between requests)...")
             results = scrape_cloud_coverage_for_sites(results, delay=2.0)
             print(f"\n✓ Cloud coverage scraped for {len(results)} site(s)")
         
-        elif args.only_horizon:
+        if args.only_horizon:
             print("\nDownloading EclipseFan horizon images...")
             print("=" * 60)
             print("This will take a while (2 second delay between requests)...")
             results = download_horizon_images_for_sites(results, delay=2.0)
             print(f"\n✓ Horizon images downloaded for {len(results)} site(s)")
         
-        elif args.only_shademap:
+        if args.only_shademap:
             print("\nDownloading Shademap visualizations...")
             print("=" * 60)
             print("This will take a while (2 second delay between requests)...")
