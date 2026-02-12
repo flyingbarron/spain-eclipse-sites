@@ -107,8 +107,8 @@ Examples:
     args = parser.parse_args()
     
     # Validate arguments
-    only_flags = [args.only_eclipse, args.only_cloud, args.only_horizon]
-    no_flags = [args.no_eclipse, args.no_cloud, args.no_horizon]
+    only_flags = [args.only_eclipse, args.only_cloud, args.only_horizon, args.only_shademap]
+    no_flags = [args.no_eclipse, args.no_cloud, args.no_horizon, args.no_shademap]
     
     if any(only_flags) and any(no_flags):
         print("✗ Error: Cannot use --only-* and --no-* flags together")
