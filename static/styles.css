@@ -426,6 +426,14 @@ header h1 {
     background: #0056b3;
 }
 
+.link-button.inactive {
+    background: #6c757d;
+    color: #adb5bd;
+    cursor: not-allowed;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
 .link-button.maps {
     background: #28a745;
 }

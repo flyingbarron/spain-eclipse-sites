@@ -118,10 +118,16 @@ function createMarkerPopup(site, lat, lon) {
     const yMercator = y * 20037508.34 / 180;
     const eclipseUrl = `https://visualizadores.ign.es/eclipses/2026?center=${x},${yMercator}&zoom=16&srs=EPSG:3857`;
     
+    // Check if IGME URL is valid
+    const hasValidIgmeUrl = site.url && site.url !== 'N/A' && site.url.trim() !== '';
+    const igmeLink = hasValidIgmeUrl
+        ? `<a href="${site.url}" target="_blank">🪨 View on IGME Website</a>`
+        : `<a href="#" class="inactive" title="No IGME website available">🪨 View on IGME Website</a>`;
+    
     return `
         <div style="min-width: 200px;">
             <h4 style="margin: 0 0 8px 0; font-size: 0.95rem;">${site.denominacion || site.code}</h4>
-            <a href="${site.url}" target="_blank">🪨 View on IGME Website</a>
+            ${igmeLink}
             <a href="${mapsUrl}" target="_blank" class="maps">📍 Open in Google Maps</a>
             <a href="${shademapUrl}" target="_blank" class="shademap">🌄 View on Shademap</a>
             <a href="${eclipseUrl}" target="_blank" class="eclipse">🌑 Eclipse 2026 View</a>

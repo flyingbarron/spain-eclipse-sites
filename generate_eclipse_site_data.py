@@ -14,6 +14,7 @@ from src.igme_scraper import scrape_all_sites
 from src.eclipse_checker import check_sites_eclipse_visibility
 from src.cloud_coverage_scraper import scrape_cloud_coverage_for_sites
 from src.eclipsefan_scraper import download_horizon_images_for_sites
+from src.shademap_scraper import download_shademap_for_sites
 from src.output_generator import save_to_csv, save_to_kml, print_summary
 
 
@@ -53,11 +54,11 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Generate all data (IGME + eclipse visibility + cloud coverage + horizon)
+  # Generate all data (IGME + eclipse + cloud + horizon + shademap)
   python3 generate_eclipse_site_data.py
   
   # Skip specific operations (faster)
-  python3 generate_eclipse_site_data.py --no-eclipse --no-cloud
+  python3 generate_eclipse_site_data.py --no-eclipse --no-cloud --no-shademap
   
   # Check visibility without profile screenshots (faster)
   python3 generate_eclipse_site_data.py --no-profile
@@ -68,12 +69,12 @@ Examples:
   # Only perform specific operations on existing CSV
   python3 generate_eclipse_site_data.py --only-cloud
   python3 generate_eclipse_site_data.py --only-horizon
-  python3 generate_eclipse_site_data.py --only-eclipse
+  python3 generate_eclipse_site_data.py --only-shademap
   python3 generate_eclipse_site_data.py --only-eclipse --no-profile
   
   # Only update specific site from existing CSV
   python3 generate_eclipse_site_data.py --only-cloud --code IB200a
-  python3 generate_eclipse_site_data.py --only-horizon --code IB200b
+  python3 generate_eclipse_site_data.py --only-shademap --code IB200b
         """
     )
     parser.add_argument('--code', '-c',
@@ -88,6 +89,8 @@ Examples:
                        help='Skip cloud coverage scraping')
     parser.add_argument('--no-horizon', action='store_true',
                        help='Skip EclipseFan horizon image downloading')
+    parser.add_argument('--no-shademap', action='store_true',
+                       help='Skip Shademap shadow visualization downloading')
     parser.add_argument('--no-profile', action='store_true',
                        help='Skip profile diagram screenshots (check visibility only)')
     
@@ -98,6 +101,8 @@ Examples:
                        help='Only scrape cloud coverage (reads from existing CSV)')
     parser.add_argument('--only-horizon', action='store_true',
                        help='Only download horizon images (reads from existing CSV)')
+    parser.add_argument('--only-shademap', action='store_true',
+                       help='Only download shademap visualizations (reads from existing CSV)')
     
     args = parser.parse_args()
     
@@ -128,11 +133,21 @@ Examples:
         
         # Filter to specific site if requested
         if args.code:
-            results = [s for s in results if s.get('code') == args.code]
-            if not results:
-                print(f"✗ Error: Site {args.code} not found in {args.csv}")
-                sys.exit(1)
-            print(f"✓ Filtering to site: {args.code}")
+            filtered_results = [s for s in results if s.get('code') == args.code]
+            if not filtered_results:
+                # Site not found in CSV - scrape it from IGME first
+                print(f"⚠️  Site {args.code} not found in {args.csv}")
+                print(f"Scraping site {args.code} from IGME first...")
+                print("=" * 60)
+                new_site = scrape_all_sites(specific_code=args.code)
+                if not new_site:
+                    print(f"✗ Error: Could not scrape site {args.code} from IGME")
+                    sys.exit(1)
+                print(f"✓ Successfully scraped site {args.code} from IGME")
+                results = new_site
+            else:
+                print(f"✓ Filtering to site: {args.code}")
+                results = filtered_results
         
         # Perform the requested operation
         if args.only_eclipse:
@@ -157,6 +172,13 @@ Examples:
             print("This will take a while (2 second delay between requests)...")
             results = download_horizon_images_for_sites(results, delay=2.0)
             print(f"\n✓ Horizon images downloaded for {len(results)} site(s)")
+        
+        elif args.only_shademap:
+            print("\nDownloading Shademap visualizations...")
+            print("=" * 60)
+            print("This will take a while (2 second delay between requests)...")
+            results = download_shademap_for_sites(results, delay=2.0)
+            print(f"\n✓ Shademap visualizations downloaded for {len(results)} site(s)")
         
         # If updating specific site, merge back into full dataset
         if args.code:
@@ -235,6 +257,19 @@ Examples:
         print("\n⚠️  Skipping horizon image downloading (--no-horizon flag)")
         for site in results:
             site['horizon_status'] = 'not_checked'
+    
+    # Step 2.8: Download Shademap visualizations (if enabled)
+    if not args.no_shademap:
+        print("\n" + "=" * 60)
+        print("STEP 2.8: Downloading Shademap shadow visualizations...")
+        print("=" * 60)
+        print("This will take a while (2 second delay between requests)...")
+        results = download_shademap_for_sites(results, delay=2.0)
+        print(f"\n✓ Shademap visualizations downloaded for all sites")
+    else:
+        print("\n⚠️  Skipping shademap downloading (--no-shademap flag)")
+        for site in results:
+            site['shademap_status'] = 'not_checked'
     
     # Step 3: Generate outputs
     print("\n" + "=" * 60)

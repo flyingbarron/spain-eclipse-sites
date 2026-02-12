@@ -67,13 +67,19 @@ function renderSiteHeader(site, urls) {
         cloudButton = `<a href="${urls.cloud}" target="_blank" class="link-button cloud">🕐 timeanddate.com</a>`;
     }
     
+    // Check if IGME URL is valid
+    const hasValidIgmeUrl = site.url && site.url !== 'N/A' && site.url.trim() !== '';
+    const igmeButtonClass = hasValidIgmeUrl ? 'link-button' : 'link-button inactive';
+    const igmeButtonHref = hasValidIgmeUrl ? site.url : '#';
+    const igmeButtonTitle = hasValidIgmeUrl ? '' : ' title="No IGME website available for this site"';
+    
     return `
         <div class="detail-header">
             <h2>${site.denominacion || site.code}</h2>
             <div style="display: flex; align-items: flex-start; gap: 0.5rem; flex-wrap: wrap;">
                 <!-- Left column: IGME, timeanddate, Xavier Jubier stacked vertically -->
                 <div style="display: flex; flex-direction: column; gap: 0.25rem;">
-                    <a href="${site.url}" target="_blank" class="link-button">🪨 View on IGME Website</a>
+                    <a href="${igmeButtonHref}" target="_blank" class="${igmeButtonClass}"${igmeButtonTitle}>🪨 View on IGME Website</a>
                     ${cloudButton}
                     <a href="${urls.xavierJubier}" target="_blank" class="link-button xavier">🗺️ Xavier Jubier Eclipse Map</a>
                 </div>

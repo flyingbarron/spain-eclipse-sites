@@ -68,7 +68,7 @@ def save_to_csv(results: List[Dict[str, Any]], filename: str = 'eclipse_site_dat
     filepath = os.path.join(DATA_DIR, filename)
     fieldnames = ['code', 'denominacion', 'url', 'valor_turistico', 'confidencialidad',
                  'route_difficulty', 'latitude', 'longitude', 'eclipse_visibility', 'status',
-                 'cloud_coverage', 'cloud_status', 'cloud_url', 'horizon_status']
+                 'cloud_coverage', 'cloud_status', 'cloud_url', 'horizon_status', 'shademap_status']
     
     # Load existing data if file exists
     existing_data: Dict[str, Dict[str, Any]] = {}
@@ -356,11 +356,16 @@ def print_summary(results: List[Dict[str, Any]]) -> None:
     # Horizon image statistics
     with_horizon = sum(1 for r in results if r.get('horizon_status') == 'success')
     
+    # Shademap statistics
+    with_shademap = sum(1 for r in results if r.get('shademap_status') == 'success')
+    
     print("\nOutput files:")
     print("  • data/eclipse_site_data.csv - Complete dataset")
     print("  • data/sites.kml - All sites organized in 6 folders")
-    print("  • data/ign_visibility_profiles/*.png - IGN visibility profile diagrams")
+    print("  • data/scrape/ign_profiles/*.png - IGN visibility profile diagrams")
     if with_horizon > 0:
-        print(f"  • data/eclipsefan_visibility_profiles/*.png - EclipseFan horizon profiles ({with_horizon} sites)")
+        print(f"  • data/scrape/eclipsefan_horizons/*.png - EclipseFan horizon profiles ({with_horizon} sites)")
+    if with_shademap > 0:
+        print(f"  • data/scrape/shademap_snapshots/*.jpg - Shademap shadow visualizations ({with_shademap} sites)")
 
 # Made with Bob
