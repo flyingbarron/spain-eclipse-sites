@@ -47,6 +47,134 @@ def load_sites_from_csv(csv_filename: str = 'eclipse_site_data.csv') -> List[Dic
         sys.exit(1)
 
 
+def get_next_t_code(csv_filename: str = 'eclipse_site_data.csv') -> str:
+    """Get the next available Txxxx code
+    
+    Args:
+        csv_filename: CSV filename to check for existing codes
+    
+    Returns:
+        Next available code in format Txxxx (e.g., T0001, T0002, etc.)
+    """
+    # Construct full path
+    if csv_filename.startswith('data/'):
+        csv_path = csv_filename
+    else:
+        csv_path = os.path.join('data', csv_filename)
+    
+    max_num = 0
+    
+    # Check if file exists
+    if os.path.exists(csv_path):
+        try:
+            with open(csv_path, 'r', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    code = row.get('code', '')
+                    # Check if code matches Txxxx pattern
+                    if code.startswith('T') and len(code) == 5:
+                        try:
+                            num = int(code[1:])
+                            max_num = max(max_num, num)
+                        except ValueError:
+                            continue
+        except Exception as e:
+            print(f"Warning: Could not read existing CSV: {e}")
+    
+    # Return next number
+    return f"T{max_num + 1:04d}"
+
+
+def add_site_manually(args) -> None:
+    """Add a new site manually to the CSV
+    
+    Args:
+        args: Command-line arguments
+    """
+    # Validate required arguments
+    if not args.name:
+        print("✗ Error: --name is required when using --add-site")
+        sys.exit(1)
+    if args.lat is None:
+        print("✗ Error: --lat is required when using --add-site")
+        sys.exit(1)
+    if args.lon is None:
+        print("✗ Error: --lon is required when using --add-site")
+        sys.exit(1)
+    if not args.visibility:
+        print("✗ Error: --visibility is required when using --add-site")
+        sys.exit(1)
+    
+    # Generate or use provided code
+    if args.site_code:
+        code = args.site_code
+    else:
+        code = get_next_t_code(args.csv)
+        print(f"Auto-generated code: {code}")
+    
+    # Create new site entry
+    new_site = {
+        'code': code,
+        'denominacion': args.name,
+        'url': 'N/A',
+        'valor_turistico': '5',
+        'confidencialidad': 'N/A',
+        'route_difficulty': 'low',
+        'latitude': str(args.lat),
+        'longitude': str(args.lon),
+        'eclipse_visibility': args.visibility,
+        'status': 'manual',
+        'cloud_coverage': None,
+        'cloud_status': 'not_checked',
+        'cloud_url': None,
+        'horizon_status': 'not_checked',
+        'shademap_status': 'not_checked'
+    }
+    
+    print("\n" + "=" * 60)
+    print("Adding new site manually")
+    print("=" * 60)
+    print(f"Code: {code}")
+    print(f"Name: {args.name}")
+    print(f"Coordinates: {args.lat}, {args.lon}")
+    print(f"Eclipse Visibility: {args.visibility}")
+    print(f"Tourist Value: 5 (default)")
+    print(f"Route Difficulty: low (default)")
+    print(f"IGME URL: N/A")
+    
+    # Load existing sites
+    results = []
+    csv_path = os.path.join('data', args.csv) if not args.csv.startswith('data/') else args.csv
+    if os.path.exists(csv_path):
+        try:
+            with open(csv_path, 'r', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                results = list(reader)
+            print(f"\nLoaded {len(results)} existing sites from CSV")
+        except Exception as e:
+            print(f"Warning: Could not load existing CSV: {e}")
+    
+    # Check if code already exists
+    if any(s.get('code') == code for s in results):
+        print(f"\n✗ Error: Site code {code} already exists in CSV")
+        print("  Use --site-code to specify a different code")
+        sys.exit(1)
+    
+    # Add new site
+    results.append(new_site)
+    
+    # Save to CSV
+    print("\n" + "=" * 60)
+    print("Saving to CSV...")
+    print("=" * 60)
+    save_to_csv(results, args.csv)
+    print(f"✓ Site {code} added successfully!")
+    print(f"\nYou can now run operations on this site:")
+    print(f"  python3 generate_eclipse_site_data.py --only-cloud --code {code}")
+    print(f"  python3 generate_eclipse_site_data.py --only-horizon --code {code}")
+    print(f"  python3 generate_eclipse_site_data.py --only-shademap --code {code}")
+
+
 def main():
     """Main entry point for the script"""
     parser = argparse.ArgumentParser(
@@ -75,12 +203,28 @@ Examples:
   # Only update specific site from existing CSV
   python3 generate_eclipse_site_data.py --only-cloud --code IB200a
   python3 generate_eclipse_site_data.py --only-shademap --code IB200b
+  
+  # Add a new site manually (auto-generates code T0001, T0002, etc.)
+  python3 generate_eclipse_site_data.py --add-site --name "My Site" --lat 42.5 --lon -2.3 --visibility visible
+  
+  # Add a new site with custom code
+  python3 generate_eclipse_site_data.py --add-site --name "Custom Site" --lat 42.5 --lon -2.3 --visibility visible --site-code CUSTOM01
         """
     )
     parser.add_argument('--code', '-c',
                        help='Process only a specific site code (e.g., IB200a)')
     parser.add_argument('--csv', default='eclipse_site_data.csv',
                        help='CSV file to read from (default: data/eclipse_site_data.csv)')
+    
+    # Add site manually
+    parser.add_argument('--add-site', action='store_true',
+                       help='Add a new site manually to the CSV')
+    parser.add_argument('--name', help='Site name (required with --add-site)')
+    parser.add_argument('--lat', type=float, help='Latitude in decimal degrees (required with --add-site)')
+    parser.add_argument('--lon', type=float, help='Longitude in decimal degrees (required with --add-site)')
+    parser.add_argument('--visibility', choices=['visible', 'not_visible', 'unknown'],
+                       help='Eclipse visibility status (required with --add-site)')
+    parser.add_argument('--site-code', help='Site code (optional, auto-generates Txxxx if not provided)')
     
     # Skip flags (for full pipeline)
     parser.add_argument('--no-eclipse', action='store_true',
@@ -122,6 +266,11 @@ Examples:
     print("Eclipse Site Data Generator")
     print("=" * 60)
     print()
+    
+    # Handle --add-site mode
+    if args.add_site:
+        add_site_manually(args)
+        return
     
     # Handle --only-* modes (update existing CSV)
     if any(only_flags):
