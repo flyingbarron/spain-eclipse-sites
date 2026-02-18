@@ -45,6 +45,13 @@ This project aggregates geological site information and eclipse planning data fo
 - ☁️ **Cloud coverage data** for eclipse planning
 - 🔢 **Site counter** showing filtered results
 - 🦕 **Dinosaur emoji** favicon (because dinosaur footprints!)
+### Standalone Viewer
+- 📦 **No server required** - Self-contained version that works offline
+- 🚀 **Easy deployment** - Can be hosted on any static file server
+- 💾 **Embedded data** - All site information and images bundled
+- 🌐 **Browser-friendly** - Open directly or serve locally
+- 📖 **Full documentation** - See [STANDALONE_VIEWER.md](STANDALONE_VIEWER.md)
+
 
 ### Output Formats
 - **CSV** - Complete dataset with all fields
@@ -83,6 +90,23 @@ brew install chromedriver
 sudo apt-get install chromium-chromedriver
 
 # Or download from: https://chromedriver.chromium.org/
+
+### Build Standalone Viewer
+
+Create a self-contained version that works without a server:
+
+```bash
+python3 build_standalone_viewer.py
+```
+
+This creates a `standalone_viewer/` directory with:
+- All site data embedded as JavaScript
+- All cached images bundled locally
+- Modified modules that work without server APIs
+- Can be opened directly in browser or hosted anywhere
+
+See [STANDALONE_VIEWER.md](STANDALONE_VIEWER.md) for detailed documentation.
+
 ```
 ## Usage
 

@@ -13,6 +13,7 @@ from typing import List, Dict, Any
 from src.igme_scraper import scrape_all_sites
 from src.eclipse_checker import check_sites_eclipse_visibility
 from src.cloud_coverage_scraper import scrape_cloud_coverage_for_sites
+from src.bortle_scraper import scrape_bortle_for_sites
 from src.eclipsefan_scraper import download_horizon_images_for_sites
 from src.shademap_scraper import download_shademap_for_sites
 from src.output_generator import save_to_csv, save_to_kml, print_summary
@@ -127,6 +128,8 @@ def add_site_manually(args) -> None:
         'cloud_coverage': None,
         'cloud_status': 'not_checked',
         'cloud_url': None,
+        'bortle_scale': None,
+        'bortle_status': 'not_checked',
         'horizon_status': 'not_checked',
         'shademap_status': 'not_checked'
     }
@@ -235,6 +238,8 @@ Examples:
                        help='Skip eclipse visibility checking')
     parser.add_argument('--no-cloud', action='store_true',
                        help='Skip cloud coverage scraping')
+    parser.add_argument('--no-bortle', action='store_true',
+                       help='Skip Bortle scale (light pollution) checking')
     parser.add_argument('--no-horizon', action='store_true',
                        help='Skip EclipseFan horizon image downloading')
     parser.add_argument('--no-shademap', action='store_true',
@@ -247,6 +252,8 @@ Examples:
                        help='Only check eclipse visibility (reads from existing CSV)')
     parser.add_argument('--only-cloud', action='store_true',
                        help='Only scrape cloud coverage (reads from existing CSV)')
+    parser.add_argument('--only-bortle', action='store_true',
+                       help='Only check Bortle scale (reads from existing CSV)')
     parser.add_argument('--only-horizon', action='store_true',
                        help='Only download horizon images (reads from existing CSV)')
     parser.add_argument('--only-shademap', action='store_true',
@@ -255,8 +262,8 @@ Examples:
     args = parser.parse_args()
     
     # Validate arguments
-    only_flags = [args.only_eclipse, args.only_cloud, args.only_horizon, args.only_shademap]
-    no_flags = [args.no_eclipse, args.no_cloud, args.no_horizon, args.no_shademap]
+    only_flags = [args.only_eclipse, args.only_cloud, args.only_bortle, args.only_horizon, args.only_shademap]
+    no_flags = [args.no_eclipse, args.no_cloud, args.no_bortle, args.no_horizon, args.no_shademap]
     
     if any(only_flags) and any(no_flags):
         print("✗ Error: Cannot use --only-* and --no-* flags together")
@@ -314,6 +321,13 @@ Examples:
             print("This will take a while (2 second delay between requests)...")
             results = scrape_cloud_coverage_for_sites(results, delay=2.0)
             print(f"\n✓ Cloud coverage scraped for {len(results)} site(s)")
+        
+        if args.only_bortle:
+            print("\nChecking Bortle scale (light pollution)...")
+            print("=" * 60)
+            print("This will take a while (1 second delay between requests)...")
+            results = scrape_bortle_for_sites(results, delay=1.0)
+            print(f"\n✓ Bortle scale checked for {len(results)} site(s)")
         
         if args.only_horizon:
             print("\nDownloading EclipseFan horizon images...")
@@ -393,6 +407,20 @@ Examples:
             site['cloud_coverage'] = None
             site['cloud_status'] = 'not_checked'
             site['cloud_url'] = None
+    
+    # Step 2.6: Check Bortle scale (if enabled)
+    if not args.no_bortle:
+        print("\n" + "=" * 60)
+        print("STEP 2.6: Checking Bortle scale (light pollution)...")
+        print("=" * 60)
+        print("This will take a while (1 second delay between requests)...")
+        results = scrape_bortle_for_sites(results, delay=1.0)
+        print(f"\n✓ Bortle scale checked for all sites")
+    else:
+        print("\n⚠️  Skipping Bortle scale checking (--no-bortle flag)")
+        for site in results:
+            site['bortle_scale'] = None
+            site['bortle_status'] = 'not_checked'
     
     # Step 2.7: Download EclipseFan horizon images (if enabled)
     if not args.no_horizon:

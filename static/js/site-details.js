@@ -186,6 +186,35 @@ function renderDetailsTab(site) {
         `;
     }
     
+    // Bortle scale display
+    let bortleInfo = '';
+    if (site.bortle_scale && site.bortle_status === 'success') {
+        const bortle = parseInt(site.bortle_scale);
+        let bortleEmoji = '🌌';
+        let bortleDesc = 'Excellent dark-sky site';
+        
+        if (bortle <= 2) {
+            bortleEmoji = '🌌';
+            bortleDesc = bortle === 1 ? 'Excellent dark-sky site' : 'Typical truly dark site';
+        } else if (bortle <= 4) {
+            bortleEmoji = '🌃';
+            bortleDesc = bortle === 3 ? 'Rural sky' : 'Rural/suburban transition';
+        } else if (bortle <= 6) {
+            bortleEmoji = '🌆';
+            bortleDesc = bortle === 5 ? 'Suburban sky' : 'Bright suburban sky';
+        } else {
+            bortleEmoji = '🏙️';
+            bortleDesc = bortle === 7 ? 'Suburban/urban transition' : bortle === 8 ? 'City sky' : 'Inner-city sky';
+        }
+        
+        bortleInfo = `
+            <div class="info-item">
+                <div class="info-label">Bortle Scale (Light Pollution)</div>
+                <div class="info-value">${bortleEmoji} Class ${bortle} - ${bortleDesc}</div>
+            </div>
+        `;
+    }
+    
     return `
         <div class="detail-info">
             <div class="info-item">
@@ -228,6 +257,7 @@ function renderDetailsTab(site) {
                 </div>
             ` : ''}
             ${cloudInfo}
+            ${bortleInfo}
         </div>
         
         <div class="images-section">

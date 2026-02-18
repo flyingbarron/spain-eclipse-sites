@@ -30,6 +30,10 @@ class Site:
     cloud_status: str = 'not_checked'
     cloud_url: Optional[str] = None
     
+    # Bortle scale data (light pollution)
+    bortle_scale: Optional[int] = None
+    bortle_status: str = 'not_checked'
+    
     # Horizon image data
     horizon_status: str = 'not_checked'
     
@@ -154,6 +158,56 @@ class Site:
             return '⛅'
         else:
             return '☁️'
+    
+    @property
+    def bortle_emoji(self) -> str:
+        """Get emoji representing Bortle scale value
+        
+        Returns:
+            Emoji string: 🌌 (excellent), 🌃 (good), 🌆 (suburban), 🏙️ (urban), or ❓ (unknown)
+        """
+        if self.bortle_scale is None:
+            return '❓'
+        elif self.bortle_scale <= 2:
+            return '🌌'  # Excellent dark sky
+        elif self.bortle_scale <= 4:
+            return '🌃'  # Good dark sky
+        elif self.bortle_scale <= 6:
+            return '🌆'  # Suburban
+        else:
+            return '🏙️'  # Urban/city
+    
+    @property
+    def bortle_description(self) -> str:
+        """Get human-readable description of Bortle scale value
+        
+        Returns:
+            Description string or 'Unknown'
+        """
+        if self.bortle_scale is None:
+            return 'Unknown'
+        
+        descriptions = {
+            1: "Excellent dark-sky site",
+            2: "Typical truly dark site",
+            3: "Rural sky",
+            4: "Rural/suburban transition",
+            5: "Suburban sky",
+            6: "Bright suburban sky",
+            7: "Suburban/urban transition",
+            8: "City sky",
+            9: "Inner-city sky"
+        }
+        return descriptions.get(self.bortle_scale, 'Unknown')
+    
+    @property
+    def has_dark_sky(self) -> bool:
+        """Check if site has good dark sky conditions (Bortle <= 4)
+        
+        Returns:
+            True if Bortle scale is 4 or less
+        """
+        return self.bortle_scale is not None and self.bortle_scale <= 4
     
     def __str__(self) -> str:
         """String representation of site
