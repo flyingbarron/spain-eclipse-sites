@@ -50,6 +50,9 @@ def get_bortle_value(lat: float, lon: float, timeout: int = 10) -> Optional[int]
         
         response = requests.get(tile_url, headers=headers, timeout=timeout)
         
+        logger.debug(f"Tile URL: {tile_url}")
+        logger.debug(f"Response status: {response.status_code}")
+        
         if response.status_code == 200:
             # Parse the PNG tile to get the color at our coordinates
             from PIL import Image
@@ -103,15 +106,17 @@ def get_bortle_value(lat: float, lon: float, timeout: int = 10) -> Optional[int]
             logger.info(f"Coordinates ({lat}, {lon}): tile brightness={brightness:.3f}, Bortle={bortle}")
             return bortle
             
-    except ImportError:
-        logger.error("PIL/Pillow not installed. Install with: pip install Pillow")
+    except ImportError as e:
+        logger.error(f"PIL/Pillow not installed. Install with: pip install Pillow - {e}")
         return None
     except Exception as e:
-        logger.error(f"Failed to fetch Bortle data for ({lat}, {lon}): {e}")
+        logger.error(f"Failed to fetch Bortle data for ({lat}, {lon}): {type(e).__name__}: {e}")
+        import traceback
+        logger.debug(traceback.format_exc())
         return None
     
-    # If we get here, something went wrong
-    logger.error(f"Could not determine Bortle scale for ({lat}, {lon})")
+    # If we get here, response was not 200
+    logger.error(f"Could not fetch tile data for ({lat}, {lon}) - HTTP {response.status_code if 'response' in locals() else 'unknown'}")
     return None
 
 
