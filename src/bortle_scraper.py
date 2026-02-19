@@ -28,7 +28,7 @@ def get_bortle_value(lat: float, lon: float, timeout: int = 10) -> Optional[int]
         Bortle scale value (1-9) or None if failed
     """
     
-    # Method: Access Light Pollution Map tile data directly
+    # Access Light Pollution Map tile data directly
     # The tiles are publicly accessible and contain the VIIRS 2015 data
     try:
         import math
@@ -76,9 +76,9 @@ def get_bortle_value(lat: float, lon: float, timeout: int = 10) -> Optional[int]
                 r = pixel[0]
                 brightness = float(r) / 255.0
             else:
-                # Unknown format, use estimation
+                # Unknown format
                 logger.warning(f"Unknown pixel format: {type(pixel)}")
-                return estimate_bortle_from_location(lat, lon)
+                return None
             
             # Map brightness to Bortle scale
             if brightness < 0.1:
@@ -104,77 +104,15 @@ def get_bortle_value(lat: float, lon: float, timeout: int = 10) -> Optional[int]
             return bortle
             
     except ImportError:
-        logger.warning("PIL/Pillow not installed. Install with: pip install Pillow")
+        logger.error("PIL/Pillow not installed. Install with: pip install Pillow")
+        return None
     except Exception as e:
-        logger.warning(f"Tile-based method failed: {e}")
+        logger.error(f"Failed to fetch Bortle data for ({lat}, {lon}): {e}")
+        return None
     
-    # Fallback: Use estimation
-    logger.info(f"Using estimation method for ({lat}, {lon})")
-    return estimate_bortle_from_location(lat, lon)
-
-
-def estimate_bortle_from_location(lat: float, lon: float) -> int:
-    """Estimate Bortle scale based on location (Spain-specific heuristics)
-    
-    This is a fallback method when API is unavailable.
-    Uses distance from major cities and population centers.
-    
-    Args:
-        lat: Latitude in decimal degrees
-        lon: Longitude in decimal degrees
-    
-    Returns:
-        Estimated Bortle scale value (1-9)
-    """
-    import math
-    
-    # Major Spanish cities with approximate Bortle values
-    cities = [
-        # (lat, lon, name, bortle)
-        (40.4168, -3.7038, "Madrid", 8),
-        (41.3851, 2.1734, "Barcelona", 8),
-        (39.4699, -0.3763, "Valencia", 7),
-        (37.3891, -5.9845, "Seville", 7),
-        (43.2630, -2.9350, "Bilbao", 7),
-        (36.7213, -4.4214, "Málaga", 7),
-        (41.6488, -0.8891, "Zaragoza", 7),
-    ]
-    
-    def distance(lat1, lon1, lat2, lon2):
-        """Calculate distance in km using Haversine formula"""
-        R = 6371  # Earth radius in km
-        dlat = math.radians(lat2 - lat1)
-        dlon = math.radians(lon2 - lon1)
-        a = (math.sin(dlat/2) ** 2 +
-             math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) *
-             math.sin(dlon/2) ** 2)
-        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-        return R * c
-    
-    # Find closest city
-    min_distance = float('inf')
-    closest_city_bortle = 5  # Default suburban
-    
-    for city_lat, city_lon, city_name, city_bortle in cities:
-        dist = distance(lat, lon, city_lat, city_lon)
-        if dist < min_distance:
-            min_distance = dist
-            closest_city_bortle = city_bortle
-    
-    # Estimate Bortle based on distance from closest city
-    if min_distance < 10:  # Within 10km of major city
-        estimated_bortle = closest_city_bortle
-    elif min_distance < 30:  # 10-30km: suburban
-        estimated_bortle = max(5, closest_city_bortle - 2)
-    elif min_distance < 60:  # 30-60km: rural/suburban transition
-        estimated_bortle = 4
-    elif min_distance < 100:  # 60-100km: rural
-        estimated_bortle = 3
-    else:  # > 100km: dark rural
-        estimated_bortle = 2
-    
-    logger.info(f"Estimated Bortle {estimated_bortle} for ({lat}, {lon}) - {min_distance:.1f}km from nearest major city")
-    return estimated_bortle
+    # If we get here, something went wrong
+    logger.error(f"Could not determine Bortle scale for ({lat}, {lon})")
+    return None
 
 
 def brightness_to_bortle(brightness: float) -> int:

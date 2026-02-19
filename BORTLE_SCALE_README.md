@@ -51,24 +51,15 @@ python3 generate_eclipse_site_data.py --no-bortle
 
 ## How It Works
 
-The Bortle scraper uses two methods:
+The Bortle scraper uses real satellite data:
 
-1. **Primary Method**: Light Pollution Map Tile Data
-   - Fetches real VIIRS 2015 light pollution data from public tile servers
-   - Accesses the same data that powers lightpollutionmap.info
-   - No API authentication required
-   - Uses color-coded tiles to determine light pollution levels
-   - Requires Pillow (PIL) library for image processing
-
-2. **Fallback Method**: Location-based Estimation
-   - Used if tile data is unavailable or Pillow is not installed
-   - Estimates Bortle scale based on distance from major Spanish cities
-   - Uses geographic heuristics:
-     - < 10km from major city: Urban (Bortle 7-8)
-     - 10-30km: Suburban (Bortle 5-6)
-     - 30-60km: Rural/suburban transition (Bortle 4)
-     - 60-100km: Rural (Bortle 3)
-     - > 100km: Dark rural (Bortle 2)
+**Light Pollution Map Tile Data**
+- Fetches real VIIRS 2015 light pollution data from public tile servers
+- Accesses the same data that powers lightpollutionmap.info
+- No API authentication required
+- Uses color-coded tiles to determine light pollution levels
+- Requires Pillow (PIL) library for image processing
+- Returns None (N/A) if data cannot be fetched
 
 ## Data Fields
 
