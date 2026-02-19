@@ -1,8 +1,8 @@
 # Bortle Scale Integration
 
-⚠️ **IMPORTANT NOTE**: The public tile servers for light pollution data are currently unavailable (returning 404 errors). The Bortle scale integration is implemented but requires an accessible data source.
+✅ **Working with real satellite data!**
 
-This project includes Bortle scale (light pollution) data collection for eclipse viewing sites.
+This project includes Bortle scale (light pollution) data collection for eclipse viewing sites using VIIRS 2024 satellite data.
 
 ## What is the Bortle Scale?
 
@@ -55,12 +55,11 @@ python3 generate_eclipse_site_data.py --no-bortle
 
 The Bortle scraper uses real satellite data:
 
-**Light Pollution Map Tile Data**
-- Fetches real VIIRS 2015 light pollution data from public tile servers
-- Accesses the same data that powers lightpollutionmap.info
-- No API authentication required
-- Uses color-coded tiles to determine light pollution levels
-- Requires Pillow (PIL) library for image processing
+**Binary Tile Data (VIIRS 2024)**
+- Fetches real VIIRS 2024 light pollution data from djlorenz's binary tiles
+- Publicly accessible without authentication
+- Uses gzip-compressed binary tiles (one byte per pixel)
+- No external dependencies beyond standard Python libraries
 - Returns None (N/A) if data cannot be fetched
 
 ## Data Fields
@@ -81,19 +80,11 @@ Bortle Scale (Light Pollution)
 
 ## Data Source
 
-**Current Status**: The public tile servers are returning 404 errors and appear to be unavailable.
-
-The scraper was designed to use publicly available VIIRS 2015 light pollution data from:
-- https://djlorenz.github.io/astronomy/lp2020/ (currently unavailable)
-- https://www.lightpollutionmap.info/ tile servers (currently unavailable)
-
-**Alternative Options**:
-1. Download the World Atlas 2015 dataset locally and serve tiles yourself
-2. Use a different light pollution API service
-3. Contact lightpollutionmap.info for API access
-4. Use the ClearDarkSky or similar astronomy services
-
-The code is ready to use once a working tile server or API is available.
+The scraper uses publicly available VIIRS 2024 light pollution data from:
+- https://djlorenz.github.io/astronomy/binary_tiles/2024/
+- Binary tiles in gzip-compressed format
+- No API key or authentication required
+- Data represents the latest satellite measurements of artificial sky brightness
 
 ## Testing
 

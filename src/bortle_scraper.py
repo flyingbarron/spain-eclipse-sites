@@ -13,11 +13,10 @@ logger = setup_logger(__name__)
 
 
 def get_bortle_value(lat: float, lon: float, timeout: int = 10) -> Optional[int]:
-    """Get Bortle scale value for coordinates using real light pollution data
+    """Get Bortle scale value for coordinates using binary tile data
     
-    Uses the Light Pollution Map's public tile server to get VIIRS data.
-    This method accesses the same data that powers lightpollutionmap.info
-    without requiring API authentication.
+    Uses djlorenz's binary tiles which contain VIIRS 2024 light pollution data.
+    These tiles are publicly accessible without authentication.
     
     Args:
         lat: Latitude in decimal degrees
@@ -28,87 +27,81 @@ def get_bortle_value(lat: float, lon: float, timeout: int = 10) -> Optional[int]
         Bortle scale value (1-9) or None if failed
     """
     
-    # Access Light Pollution Map tile data directly
-    # The tiles are publicly accessible and contain the VIIRS 2015 data
     try:
         import math
+        import gzip
+        import struct
         
-        # Convert lat/lon to tile coordinates at zoom level 8 (good balance)
-        zoom = 8
+        # Binary tiles appear to be at zoom level 6 based on the tile numbers
+        zoom = 6
         lat_rad = math.radians(lat)
         n = 2.0 ** zoom
         xtile = int((lon + 180.0) / 360.0 * n)
         ytile = int((1.0 - math.log(math.tan(lat_rad) + (1 / math.cos(lat_rad))) / math.pi) / 2.0 * n)
         
-        # Fetch the tile image from Light Pollution Map
-        tile_url = f"https://djlorenz.github.io/astronomy/lp2020/overlay/tiles/{zoom}/{xtile}/{ytile}.png"
+        # Fetch the binary tile
+        tile_url = f"https://djlorenz.github.io/astronomy/binary_tiles/2024/binary_tile_{xtile}_{ytile}.dat.gz"
         
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            'Referer': 'https://www.lightpollutionmap.info/'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         }
         
         response = requests.get(tile_url, headers=headers, timeout=timeout)
         
-        logger.debug(f"Tile URL: {tile_url}")
+        logger.debug(f"Binary tile URL: {tile_url}")
         logger.debug(f"Response status: {response.status_code}")
         
         if response.status_code == 200:
-            # Parse the PNG tile to get the color at our coordinates
-            from PIL import Image
-            from io import BytesIO
+            # Decompress the gzipped data
+            try:
+                tile_data = gzip.decompress(response.content)
+            except Exception as e:
+                logger.error(f"Failed to decompress tile: {e}")
+                return None
             
-            img = Image.open(BytesIO(response.content))
-            
-            # Calculate pixel position within the tile (256x256)
+            # Calculate pixel position within the tile (256x256 assumed)
             tile_size = 256
             x_pixel = int((lon + 180.0) / 360.0 * n * tile_size) % tile_size
             y_pixel = int((1.0 - math.log(math.tan(lat_rad) + (1 / math.cos(lat_rad))) / math.pi) / 2.0 * n * tile_size) % tile_size
             
-            # Get pixel color
-            pixel = img.getpixel((x_pixel, y_pixel))
+            # Binary tiles store one byte per pixel
+            pixel_index = y_pixel * tile_size + x_pixel
             
-            # Convert color to Bortle scale
-            # Light pollution maps use color coding:
-            # Black/Dark Blue = Class 1-2, Blue/Cyan = 3-4, Green/Yellow = 5-6, Orange/Red = 7-9
-            if isinstance(pixel, int):
-                # Grayscale
-                brightness = float(pixel) / 255.0
-            elif isinstance(pixel, tuple) and len(pixel) >= 3:
-                # RGB - use red channel as it correlates with light pollution
-                r = pixel[0]
-                brightness = float(r) / 255.0
+            if pixel_index < len(tile_data):
+                # Get the brightness value (0-255)
+                brightness_byte = tile_data[pixel_index]
+                
+                # Convert to Bortle scale
+                # The binary data represents radiance values
+                # We'll map them to Bortle scale
+                brightness = float(brightness_byte) / 255.0
+                
+                # Map brightness to Bortle scale
+                if brightness < 0.1:
+                    bortle = 1
+                elif brightness < 0.2:
+                    bortle = 2
+                elif brightness < 0.3:
+                    bortle = 3
+                elif brightness < 0.4:
+                    bortle = 4
+                elif brightness < 0.5:
+                    bortle = 5
+                elif brightness < 0.6:
+                    bortle = 6
+                elif brightness < 0.75:
+                    bortle = 7
+                elif brightness < 0.9:
+                    bortle = 8
+                else:
+                    bortle = 9
+                
+                logger.info(f"Coordinates ({lat}, {lon}): brightness={brightness:.3f}, Bortle={bortle}")
+                return bortle
             else:
-                # Unknown format
-                logger.warning(f"Unknown pixel format: {type(pixel)}")
+                logger.error(f"Pixel index {pixel_index} out of range (tile size: {len(tile_data)})")
                 return None
             
-            # Map brightness to Bortle scale
-            if brightness < 0.1:
-                bortle = 1
-            elif brightness < 0.2:
-                bortle = 2
-            elif brightness < 0.3:
-                bortle = 3
-            elif brightness < 0.4:
-                bortle = 4
-            elif brightness < 0.5:
-                bortle = 5
-            elif brightness < 0.6:
-                bortle = 6
-            elif brightness < 0.75:
-                bortle = 7
-            elif brightness < 0.9:
-                bortle = 8
-            else:
-                bortle = 9
-            
-            logger.info(f"Coordinates ({lat}, {lon}): tile brightness={brightness:.3f}, Bortle={bortle}")
-            return bortle
-            
-    except ImportError as e:
-        logger.error(f"PIL/Pillow not installed. Install with: pip install Pillow - {e}")
-        return None
     except Exception as e:
         logger.error(f"Failed to fetch Bortle data for ({lat}, {lon}): {type(e).__name__}: {e}")
         import traceback
