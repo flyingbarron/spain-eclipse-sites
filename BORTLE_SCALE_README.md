@@ -1,6 +1,8 @@
 # Bortle Scale Integration
 
-This project now includes Bortle scale (light pollution) data for eclipse viewing sites.
+⚠️ **IMPORTANT NOTE**: The public tile servers for light pollution data are currently unavailable (returning 404 errors). The Bortle scale integration is implemented but requires an accessible data source.
+
+This project includes Bortle scale (light pollution) data collection for eclipse viewing sites.
 
 ## What is the Bortle Scale?
 
@@ -79,11 +81,19 @@ Bortle Scale (Light Pollution)
 
 ## Data Source
 
-The scraper uses publicly available VIIRS 2015 light pollution data from:
-- https://djlorenz.github.io/astronomy/lp2020/
-- This is the same data used by lightpollutionmap.info
-- No API key or authentication required
-- Data is accessed via map tiles (PNG images)
+**Current Status**: The public tile servers are returning 404 errors and appear to be unavailable.
+
+The scraper was designed to use publicly available VIIRS 2015 light pollution data from:
+- https://djlorenz.github.io/astronomy/lp2020/ (currently unavailable)
+- https://www.lightpollutionmap.info/ tile servers (currently unavailable)
+
+**Alternative Options**:
+1. Download the World Atlas 2015 dataset locally and serve tiles yourself
+2. Use a different light pollution API service
+3. Contact lightpollutionmap.info for API access
+4. Use the ClearDarkSky or similar astronomy services
+
+The code is ready to use once a working tile server or API is available.
 
 ## Testing
 
