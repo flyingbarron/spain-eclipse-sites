@@ -43,6 +43,13 @@
       "latitude": 41.3851,
       "longitude": 2.1734,
       "description": "Example custom site - Barcelona"
+    },
+    {
+      "code": "CUSTOM003",
+      "name": "Valencia Test Site",
+      "latitude": 39.4699,
+      "longitude": -0.3763,
+      "description": "Test site near Valencia"
     }
   ],
   "default_values": {
