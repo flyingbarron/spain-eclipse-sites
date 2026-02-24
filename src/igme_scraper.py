@@ -8,44 +8,77 @@ from bs4 import BeautifulSoup
 import re
 import math
 import time
+import json
+import os
 from typing import List, Tuple, Optional, Dict, Any
 
 
-def generate_urls(specific_code: Optional[str] = None) -> List[Tuple[str, str]]:
-    """Generate URLs from IB200, IB200a to IB200z, IB034, and IB034a to IB034z
+def load_sites_config(config_path: str = "data/igme_sites_config.json") -> Dict[str, Any]:
+    """Load site configuration from JSON file
+    
+    Args:
+        config_path: Path to the config file
+    
+    Returns:
+        Configuration dictionary
+    
+    Raises:
+        FileNotFoundError: If config file doesn't exist
+        json.JSONDecodeError: If config file is invalid JSON
+    """
+    if not os.path.exists(config_path):
+        raise FileNotFoundError(f"Config file not found: {config_path}")
+    
+    with open(config_path, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+
+def generate_urls(specific_code: Optional[str] = None, config_path: str = "data/igme_sites_config.json") -> List[Tuple[str, str]]:
+    """Generate URLs from configuration file
     
     Args:
         specific_code: If provided, only generate URL for this specific code
+        config_path: Path to the configuration file
     
     Returns:
         List of tuples (code, url)
     """
     urls: List[Tuple[str, str]] = []
     
+    # Load configuration
+    try:
+        config = load_sites_config(config_path)
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        print(f"Error loading config: {e}")
+        return urls
+    
+    base_url = config.get('base_url', 'https://info.igme.es/ielig/LIGInfo.aspx?codigo=')
+    
     if specific_code:
         code = specific_code.upper()
-        url = f"https://info.igme.es/ielig/LIGInfo.aspx?codigo={code}"
+        url = f"{base_url}{code}"
         return [(code, url)]
     
-    # IB200 without letter suffix
-    urls.append(("IB200", "https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200"))
+    # Process site series (e.g., IB200, IB200a-z)
+    for series in config.get('site_series', []):
+        base_code = series['base_code']
+        
+        # Add base code if specified
+        if series.get('include_base', False):
+            urls.append((base_code, f"{base_url}{base_code}"))
+        
+        # Add suffixed codes if specified
+        suffixes = series.get('suffixes', '')
+        if suffixes == 'a-z':
+            for char_code in range(ord('a'), ord('z') + 1):
+                code = f"{base_code}{chr(char_code)}"
+                url = f"{base_url}{code}"
+                urls.append((code, url))
     
-    # IB200a to IB200z
-    base_url_200 = "https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200"
-    for char_code in range(ord('a'), ord('z') + 1):
-        code = f"IB200{chr(char_code)}"
-        url = f"{base_url_200}{chr(char_code)}"
-        urls.append((code, url))
-    
-    # IB034 without letter suffix
-    urls.append(("IB034", "https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB034"))
-    
-    # IB034a to IB034z
-    base_url_034 = "https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB034"
-    for char_code in range(ord('a'), ord('z') + 1):
-        code = f"IB034{chr(char_code)}"
-        url = f"{base_url_034}{chr(char_code)}"
-        urls.append((code, url))
+    # Process individual sites
+    for site in config.get('individual_sites', []):
+        code = site['code']
+        urls.append((code, f"{base_url}{code}"))
     
     return urls
 

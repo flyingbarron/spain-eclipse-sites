@@ -1,0 +1,32 @@
+{
+  "description": "Configuration file for IGME IELIG site codes to scrape",
+  "base_url": "https://info.igme.es/ielig/LIGInfo.aspx?codigo=",
+  "site_series": [
+    {
+      "base_code": "IB200",
+      "include_base": true,
+      "suffixes": "a-z",
+      "description": "IB200 series sites"
+    },
+    {
+      "base_code": "IB034",
+      "include_base": true,
+      "suffixes": "a-z",
+      "description": "IB034 series sites"
+    }
+  ],
+  "individual_sites": [
+    {
+      "code": "IBs189",
+      "description": "Additional site"
+    },
+    {
+      "code": "IB207",
+      "description": "Galve/Teruel site"
+    },
+    {
+      "code": "IB208",
+      "description": "Galve/Teruel site"
+    }
+  ]
+}
