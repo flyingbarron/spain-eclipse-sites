@@ -1,6 +1,24 @@
 {
   "description": "Configuration file for IGME IELIG site codes to scrape",
   "base_url": "https://info.igme.es/ielig/LIGInfo.aspx?codigo=",
+  "excluded_codes": [
+    "IB034k",
+    "IB034l",
+    "IB034m",
+    "IB034n",
+    "IB034o",
+    "IB034p",
+    "IB034q",
+    "IB034r",
+    "IB034s",
+    "IB034t",
+    "IB034u",
+    "IB034v",
+    "IB034w",
+    "IB034x",
+    "IB034y",
+    "IB034z"
+  ],
   "site_series": [
     {
       "base_code": "IB200",

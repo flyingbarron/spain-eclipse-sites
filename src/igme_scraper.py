@@ -54,9 +54,14 @@ def generate_urls(specific_code: Optional[str] = None, config_path: str = "data/
         return urls
     
     base_url = config.get('base_url', 'https://info.igme.es/ielig/LIGInfo.aspx?codigo=')
+    excluded_codes = set(code.upper() for code in config.get('excluded_codes', []))
     
     if specific_code:
         code = specific_code.upper()
+        # Check if code is excluded
+        if code in excluded_codes:
+            print(f"Warning: {code} is in excluded_codes list")
+            return []
         # Check if it's a custom site
         for custom_site in config.get('custom_sites', []):
             if custom_site['code'].upper() == code:
@@ -69,27 +74,32 @@ def generate_urls(specific_code: Optional[str] = None, config_path: str = "data/
     for series in config.get('site_series', []):
         base_code = series['base_code']
         
-        # Add base code if specified
+        # Add base code if specified and not excluded
         if series.get('include_base', False):
-            urls.append((base_code, f"{base_url}{base_code}", None))
+            if base_code.upper() not in excluded_codes:
+                urls.append((base_code, f"{base_url}{base_code}", None))
         
         # Add suffixed codes if specified
         suffixes = series.get('suffixes', '')
         if suffixes == 'a-z':
             for char_code in range(ord('a'), ord('z') + 1):
                 code = f"{base_code}{chr(char_code)}"
-                url = f"{base_url}{code}"
-                urls.append((code, url, None))
+                # Skip if excluded
+                if code.upper() not in excluded_codes:
+                    url = f"{base_url}{code}"
+                    urls.append((code, url, None))
     
-    # Process individual sites
+    # Process individual sites (skip if excluded)
     for site in config.get('individual_sites', []):
         code = site['code']
-        urls.append((code, f"{base_url}{code}", None))
+        if code.upper() not in excluded_codes:
+            urls.append((code, f"{base_url}{code}", None))
     
-    # Process custom sites
+    # Process custom sites (skip if excluded)
     for custom_site in config.get('custom_sites', []):
         code = custom_site['code']
-        urls.append((code, f"{base_url}{code}", custom_site))
+        if code.upper() not in excluded_codes:
+            urls.append((code, f"{base_url}{code}", custom_site))
     
     return urls
 
