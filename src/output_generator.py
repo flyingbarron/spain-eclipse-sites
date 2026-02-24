@@ -337,10 +337,18 @@ def print_summary(results: List[Dict[str, Any]]) -> None:
     eclipse_not_visible = sum(1 for r in results if r.get('eclipse_visibility') == 'not_visible')
     
     # Cloud coverage statistics
-    with_cloud_data = sum(1 for r in results if r.get('cloud_coverage') is not None)
-    low_cloud = sum(1 for r in results if r.get('cloud_coverage') is not None and r['cloud_coverage'] < 30)
-    medium_cloud = sum(1 for r in results if r.get('cloud_coverage') is not None and 30 <= r['cloud_coverage'] < 60)
-    high_cloud = sum(1 for r in results if r.get('cloud_coverage') is not None and r['cloud_coverage'] >= 60)
+    def get_cloud_value(r):
+        """Safely convert cloud_coverage to int"""
+        try:
+            return int(r['cloud_coverage'])
+        except (ValueError, TypeError, KeyError):
+            return None
+    
+    cloud_values = [(r, get_cloud_value(r)) for r in results]
+    with_cloud_data = sum(1 for r, val in cloud_values if val is not None)
+    low_cloud = sum(1 for r, val in cloud_values if val is not None and val < 30)
+    medium_cloud = sum(1 for r, val in cloud_values if val is not None and 30 <= val < 60)
+    high_cloud = sum(1 for r, val in cloud_values if val is not None and val >= 60)
     
     print(f"Total sites collected: {total}")
     print(f"Sites with coordinates: {with_coords}")
