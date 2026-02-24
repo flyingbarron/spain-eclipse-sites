@@ -186,10 +186,14 @@ def main():
         epilog="""
 Examples:
   # Generate all data (IGME + eclipse + cloud + horizon + shademap)
+  # By default, only processes NEW sites not in CSV
   python3 generate_eclipse_site_data.py
   
+  # Force re-scrape all sites (including existing ones)
+  python3 generate_eclipse_site_data.py --force
+  
   # Skip specific operations (faster)
-  python3 generate_eclipse_site_data.py --no-eclipse --no-cloud --no-shademap
+  python3 generate_eclipse_site_data.py --no-eclipse-view-scrape --no-cloud --no-shademap
   
   # Check visibility without profile screenshots (faster)
   python3 generate_eclipse_site_data.py --no-profile
@@ -222,6 +226,8 @@ Examples:
                        help='Process only a specific site code (e.g., IB200a)')
     parser.add_argument('--csv', default='eclipse_site_data.csv',
                        help='CSV file to read from (default: data/eclipse_site_data.csv)')
+    parser.add_argument('--force', action='store_true',
+                       help='Force re-scrape all sites, even if they exist in CSV')
     
     # Add site manually
     parser.add_argument('--add-site', action='store_true',
@@ -234,8 +240,8 @@ Examples:
     parser.add_argument('--site-code', help='Site code (optional, auto-generates Txxxx if not provided)')
     
     # Skip flags (for full pipeline)
-    parser.add_argument('--no-eclipse', action='store_true',
-                       help='Skip eclipse visibility checking')
+    parser.add_argument('--no-eclipse-view-scrape', action='store_true',
+                       help='Skip eclipse view profile image scraping (still checks visibility)')
     parser.add_argument('--no-cloud', action='store_true',
                        help='Skip cloud coverage scraping')
     parser.add_argument('--no-bortle', action='store_true',
@@ -263,7 +269,7 @@ Examples:
     
     # Validate arguments
     only_flags = [args.only_eclipse, args.only_cloud, args.only_bortle, args.only_horizon, args.only_shademap]
-    no_flags = [args.no_eclipse, args.no_cloud, args.no_bortle, args.no_horizon, args.no_shademap]
+    no_flags = [args.no_eclipse_view_scrape, args.no_cloud, args.no_bortle, args.no_horizon, args.no_shademap]
     
     if any(only_flags) and any(no_flags):
         print("✗ Error: Cannot use --only-* and --no-* flags together")
@@ -367,10 +373,66 @@ Examples:
     print("MODE: Full pipeline (scrape IGME + optional checks)")
     print("=" * 60)
     
+    # Load existing CSV to check for already-scraped sites
+    csv_path = os.path.join('data', args.csv) if not args.csv.startswith('data/') else args.csv
+    existing_sites = []
+    existing_codes = set()
+    
+    if os.path.exists(csv_path) and not args.force:
+        try:
+            with open(csv_path, 'r', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                existing_sites = list(reader)
+                existing_codes = {site.get('code') for site in existing_sites}
+            print(f"\n✓ Found existing CSV with {len(existing_sites)} sites")
+            if not args.code:
+                print(f"  Will only scrape NEW sites not in CSV (use --force to re-scrape all)")
+        except Exception as e:
+            print(f"⚠️  Could not load existing CSV: {e}")
+    
     # Step 1: Scrape IGME sites
     print("\nSTEP 1: Scraping IGME site data...")
     print("=" * 60)
-    results = scrape_all_sites(specific_code=args.code)
+    
+    if args.code:
+        # Specific site requested - always scrape it
+        results = scrape_all_sites(specific_code=args.code)
+    else:
+        # Scrape all sites from config
+        from src.igme_scraper import generate_urls
+        all_urls = generate_urls()
+        
+        if not args.force and existing_codes:
+            # Filter out sites that already exist in CSV
+            new_urls = [(code, url, custom_data) for code, url, custom_data in all_urls
+                       if code not in existing_codes]
+            print(f"  Found {len(all_urls)} total sites in config")
+            print(f"  Skipping {len(all_urls) - len(new_urls)} existing sites")
+            print(f"  Will scrape {len(new_urls)} new sites")
+            
+            if not new_urls:
+                print("\n✓ No new sites to scrape!")
+                print("  All sites in config already exist in CSV")
+                print("  Use --force to re-scrape all sites")
+                print("  Or use --only-* flags to update specific data")
+                return
+            
+            # Scrape only new sites
+            results = []
+            for code, url, custom_data in new_urls:
+                from src.igme_scraper import scrape_site
+                print(f"\n[{code}] Scraping...")
+                site_data = scrape_site(code, url, custom_data)
+                if site_data:
+                    results.append(site_data)
+                    print(f"  ✓ Success")
+                else:
+                    print(f"  ✗ Failed")
+        else:
+            # Force mode or no existing CSV - scrape all
+            if args.force:
+                print("  --force flag set: will re-scrape all sites")
+            results = scrape_all_sites(specific_code=args.code)
     
     if not results:
         print("\n⚠️  No data collected!")
@@ -378,20 +440,22 @@ Examples:
     
     print(f"\n✓ Collected {len(results)} sites from IGME")
     
-    # Step 2: Check eclipse visibility (if enabled)
-    if not args.no_eclipse:
-        print("\n" + "=" * 60)
-        print("STEP 2: Checking eclipse visibility...")
-        print("=" * 60)
-        save_profiles = not args.no_profile
-        if args.no_profile:
-            print("Profile screenshots will be skipped (--no-profile flag)")
-        results = check_sites_eclipse_visibility(results, save_profiles=save_profiles)
-        print(f"\n✓ Eclipse visibility checked for all sites")
-    else:
-        print("\n⚠️  Skipping eclipse visibility checking (--no-eclipse flag)")
-        for site in results:
-            site['eclipse_visibility'] = 'not_checked'
+    # Step 2: Check eclipse visibility
+    print("\n" + "=" * 60)
+    print("STEP 2: Checking eclipse visibility...")
+    print("=" * 60)
+    
+    # Determine if we should save profile images
+    save_profiles = not args.no_profile and not args.no_eclipse_view_scrape
+    
+    if args.no_eclipse_view_scrape:
+        print("Profile image scraping will be skipped (--no-eclipse-view-scrape flag)")
+        print("Visibility will still be checked")
+    elif args.no_profile:
+        print("Profile screenshots will be skipped (--no-profile flag)")
+    
+    results = check_sites_eclipse_visibility(results, save_profiles=save_profiles)
+    print(f"\n✓ Eclipse visibility checked for all sites")
     
     # Step 2.5: Scrape cloud coverage (if enabled)
     if not args.no_cloud:
@@ -448,16 +512,30 @@ Examples:
         for site in results:
             site['shademap_status'] = 'not_checked'
     
-    # Step 3: Generate outputs
+    # Step 3: Merge with existing sites and generate outputs
     print("\n" + "=" * 60)
     print("STEP 3: Generating output files...")
     print("=" * 60)
     
-    save_to_csv(results, 'eclipse_site_data.csv')
-    save_to_kml(results, 'sites.kml')
+    # Merge new results with existing sites
+    if existing_sites and not args.force:
+        print(f"Merging {len(results)} new sites with {len(existing_sites)} existing sites...")
+        # Create a dict of existing sites by code for easy lookup
+        existing_dict = {site['code']: site for site in existing_sites}
+        # Update with new results
+        for site in results:
+            existing_dict[site['code']] = site
+        # Convert back to list
+        all_results = list(existing_dict.values())
+        print(f"✓ Total sites in output: {len(all_results)}")
+    else:
+        all_results = results
+    
+    save_to_csv(all_results, 'eclipse_site_data.csv')
+    save_to_kml(all_results, 'sites.kml')
     
     # Print summary
-    print_summary(results)
+    print_summary(all_results)
     
     print("\n✓ All done!")
 
