@@ -92,7 +92,7 @@ def add_site_to_csv(code: str, name: str, latitude: float, longitude: float,
         new_row = {
             'code': code,
             'denominacion': name,
-            'url': f'https://info.igme.es/ielig/LIGInfo.aspx?codigo={code}',
+            'url': 'N/A',  # Custom sites don't have IGME URLs
             'valor_turistico': valor_turistico,
             'confidencialidad': confidencialidad,
             'route_difficulty': route_difficulty,

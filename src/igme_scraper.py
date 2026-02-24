@@ -326,7 +326,7 @@ def scrape_site(code: str, url: str, custom_data: Optional[Dict[str, Any]] = Non
         return {
             'code': code,
             'denominacion': custom_data.get('name', 'N/A'),
-            'url': url,
+            'url': 'N/A',  # Custom sites don't have IGME URLs
             'valor_turistico': defaults.get('valor_turistico', '5.0'),
             'confidencialidad': defaults.get('confidencialidad', 'Public'),
             'route_difficulty': defaults.get('route_difficulty', 'Medium'),

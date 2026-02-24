@@ -2,6 +2,12 @@
   "description": "Configuration file for IGME IELIG site codes to scrape",
   "base_url": "https://info.igme.es/ielig/LIGInfo.aspx?codigo=",
   "excluded_codes": [
+    "IB200a",
+    "IB200w",
+    "IB200x",
+    "IB200y",
+    "IB200z",
+    "IB034a",
     "IB034k",
     "IB034l",
     "IB034m",
@@ -82,6 +88,13 @@
       "latitude": 37.3891,
       "longitude": -5.9845,
       "description": "Test site in Seville"
+    },
+    {
+      "code": "CUSTOM005",
+      "name": "Test URL Site",
+      "latitude": 38.0,
+      "longitude": -4.0,
+      "description": "Testing URL=N/A"
     }
   ],
   "default_values": {
