@@ -196,8 +196,16 @@ Examples:
     
     if success:
         print("\n✓ Custom site added successfully!")
-        print(f"\nTo scrape all sites including this one, run:")
-        print(f"  python generate_eclipse_site_data.py")
+        if not args.config_only:
+            print(f"\nThe site has been added to the CSV with basic data.")
+            print(f"To update it with eclipse visibility, cloud coverage, etc., run:")
+            print(f"  python generate_eclipse_site_data.py --only-eclipse --only-cloud --code {args.code}")
+            print(f"\nOr update specific data:")
+            print(f"  python generate_eclipse_site_data.py --only-cloud --code {args.code}")
+            print(f"  python generate_eclipse_site_data.py --only-horizon --code {args.code}")
+        else:
+            print(f"\nTo scrape this site and add it to CSV, run:")
+            print(f"  python generate_eclipse_site_data.py")
     else:
         print("\n✗ Failed to add custom site")
         sys.exit(1)
