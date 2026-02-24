@@ -33,7 +33,7 @@ def load_sites_config(config_path: str = "data/igme_sites_config.json") -> Dict[
         return json.load(f)
 
 
-def generate_urls(specific_code: Optional[str] = None, config_path: str = "data/igme_sites_config.json") -> List[Tuple[str, str]]:
+def generate_urls(specific_code: Optional[str] = None, config_path: str = "data/igme_sites_config.json") -> List[Tuple[str, str, Optional[Dict[str, Any]]]]:
     """Generate URLs from configuration file
     
     Args:
@@ -41,9 +41,10 @@ def generate_urls(specific_code: Optional[str] = None, config_path: str = "data/
         config_path: Path to the configuration file
     
     Returns:
-        List of tuples (code, url)
+        List of tuples (code, url, custom_data) where custom_data is None for IGME sites
+        or a dict with custom site information
     """
-    urls: List[Tuple[str, str]] = []
+    urls: List[Tuple[str, str, Optional[Dict[str, Any]]]] = []
     
     # Load configuration
     try:
@@ -56,8 +57,13 @@ def generate_urls(specific_code: Optional[str] = None, config_path: str = "data/
     
     if specific_code:
         code = specific_code.upper()
+        # Check if it's a custom site
+        for custom_site in config.get('custom_sites', []):
+            if custom_site['code'].upper() == code:
+                return [(code, f"{base_url}{code}", custom_site)]
+        # Not a custom site, return as regular IGME site
         url = f"{base_url}{code}"
-        return [(code, url)]
+        return [(code, url, None)]
     
     # Process site series (e.g., IB200, IB200a-z)
     for series in config.get('site_series', []):
@@ -65,7 +71,7 @@ def generate_urls(specific_code: Optional[str] = None, config_path: str = "data/
         
         # Add base code if specified
         if series.get('include_base', False):
-            urls.append((base_code, f"{base_url}{base_code}"))
+            urls.append((base_code, f"{base_url}{base_code}", None))
         
         # Add suffixed codes if specified
         suffixes = series.get('suffixes', '')
@@ -73,12 +79,17 @@ def generate_urls(specific_code: Optional[str] = None, config_path: str = "data/
             for char_code in range(ord('a'), ord('z') + 1):
                 code = f"{base_code}{chr(char_code)}"
                 url = f"{base_url}{code}"
-                urls.append((code, url))
+                urls.append((code, url, None))
     
     # Process individual sites
     for site in config.get('individual_sites', []):
         code = site['code']
-        urls.append((code, f"{base_url}{code}"))
+        urls.append((code, f"{base_url}{code}", None))
+    
+    # Process custom sites
+    for custom_site in config.get('custom_sites', []):
+        code = custom_site['code']
+        urls.append((code, f"{base_url}{code}", custom_site))
     
     return urls
 
@@ -279,16 +290,42 @@ def get_coordinates_from_api(code: str) -> Tuple[Optional[float], Optional[float
         return None, None
 
 
-def scrape_site(code: str, url: str) -> Optional[Dict[str, Any]]:
-    """Scrape a single IGME site
+def scrape_site(code: str, url: str, custom_data: Optional[Dict[str, Any]] = None,
+                config_path: str = "data/igme_sites_config.json") -> Optional[Dict[str, Any]]:
+    """Scrape a single IGME site or use custom site data
     
     Args:
         code: Site code
         url: Site URL
+        custom_data: Custom site data (name, lat, lon) if not an IGME site
+        config_path: Path to config file for default values
     
     Returns:
         Dictionary with site data or None if scraping failed
     """
+    # Load config for default values
+    try:
+        config = load_sites_config(config_path)
+        defaults = config.get('default_values', {})
+    except:
+        defaults = {}
+    
+    # If this is a custom site, use provided data with defaults
+    if custom_data:
+        print(f"  ℹ Using custom site data")
+        return {
+            'code': code,
+            'denominacion': custom_data.get('name', 'N/A'),
+            'url': url,
+            'valor_turistico': defaults.get('valor_turistico', '5.0'),
+            'confidencialidad': defaults.get('confidencialidad', 'Public'),
+            'route_difficulty': defaults.get('route_difficulty', 'Medium'),
+            'latitude': f"{custom_data.get('latitude', 0):.6f}",
+            'longitude': f"{custom_data.get('longitude', 0):.6f}",
+            'status': 'custom'
+        }
+    
+    # Otherwise, scrape from IGME
     try:
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
@@ -325,7 +362,7 @@ def scrape_site(code: str, url: str) -> Optional[Dict[str, Any]]:
 
 
 def scrape_all_sites(specific_code: Optional[str] = None) -> List[Dict[str, Any]]:
-    """Scrape all IGME sites
+    """Scrape all IGME sites and custom sites
     
     Args:
         specific_code: If provided, only scrape this specific site
@@ -336,13 +373,16 @@ def scrape_all_sites(specific_code: Optional[str] = None) -> List[Dict[str, Any]
     urls = generate_urls(specific_code)
     results: List[Dict[str, Any]] = []
     
-    print(f"Scraping {len(urls)} IGME sites...")
+    print(f"Scraping {len(urls)} sites (IGME + custom)...")
     print("-" * 60)
     
-    for code, url in urls:
-        print(f"\n[{code}] Scraping IGME data...")
+    for code, url, custom_data in urls:
+        if custom_data:
+            print(f"\n[{code}] Processing custom site...")
+        else:
+            print(f"\n[{code}] Scraping IGME data...")
         
-        site_data = scrape_site(code, url)
+        site_data = scrape_site(code, url, custom_data)
         if site_data:
             print(f"  ✓ VT: {site_data['valor_turistico']}")
             if site_data['confidencialidad'] != 'N/A':
@@ -355,7 +395,9 @@ def scrape_all_sites(specific_code: Optional[str] = None) -> List[Dict[str, Any]
         else:
             print(f"  ✗ VT not found - skipping site")
         
-        time.sleep(1)  # Be polite to the server
+        # Only sleep for IGME sites to be polite to their server
+        if not custom_data:
+            time.sleep(1)
     
     return results
 

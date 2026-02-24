@@ -28,5 +28,26 @@
       "code": "IB208",
       "description": "Galve/Teruel site"
     }
-  ]
+  ],
+  "custom_sites": [
+    {
+      "code": "T0001",
+      "name": "Custom Test Site 1",
+      "latitude": 40.4168,
+      "longitude": -3.7038,
+      "description": "Example custom site - Madrid"
+    },
+    {
+      "code": "T0002",
+      "name": "Custom Test Site 2",
+      "latitude": 41.3851,
+      "longitude": 2.1734,
+      "description": "Example custom site - Barcelona"
+    }
+  ],
+  "default_values": {
+    "valor_turistico": "5.0",
+    "confidencialidad": "Public",
+    "route_difficulty": "Medium"
+  }
 }
