@@ -13,7 +13,6 @@ from typing import List, Dict, Any
 from src.igme_scraper import scrape_all_sites
 from src.eclipse_checker import check_sites_eclipse_visibility
 from src.cloud_coverage_scraper import scrape_cloud_coverage_for_sites
-from src.bortle_scraper import scrape_bortle_for_sites
 from src.eclipsefan_scraper import download_horizon_images_for_sites
 from src.shademap_scraper import download_shademap_for_sites
 from src.output_generator import save_to_csv, save_to_kml, print_summary
@@ -128,8 +127,10 @@ def add_site_manually(args) -> None:
         'cloud_coverage': None,
         'cloud_status': 'not_checked',
         'cloud_url': None,
-        'bortle_scale': None,
-        'bortle_status': 'not_checked',
+        'darksky_sqm': None,
+        'darksky_bortle': None,
+        'darksky_darkness': None,
+        'darksky_status': 'not_checked',
         'horizon_status': 'not_checked',
         'shademap_status': 'not_checked'
     }
@@ -244,8 +245,8 @@ Examples:
                        help='Skip eclipse view profile image scraping (still checks visibility)')
     parser.add_argument('--no-cloud', action='store_true',
                        help='Skip cloud coverage scraping')
-    parser.add_argument('--no-bortle', action='store_true',
-                       help='Skip Bortle scale (light pollution) checking')
+    parser.add_argument('--no-darksky', action='store_true',
+                       help='Skip Dark Sky Sites data scraping (SQM, Bortle, darkness)')
     parser.add_argument('--no-horizon', action='store_true',
                        help='Skip EclipseFan horizon image downloading')
     parser.add_argument('--no-shademap', action='store_true',
@@ -258,8 +259,8 @@ Examples:
                        help='Only check eclipse visibility (reads from existing CSV)')
     parser.add_argument('--only-cloud', action='store_true',
                        help='Only scrape cloud coverage (reads from existing CSV)')
-    parser.add_argument('--only-bortle', action='store_true',
-                       help='Only check Bortle scale (reads from existing CSV)')
+    parser.add_argument('--only-darksky', action='store_true',
+                       help='Only scrape Dark Sky Sites data (reads from existing CSV)')
     parser.add_argument('--only-horizon', action='store_true',
                        help='Only download horizon images (reads from existing CSV)')
     parser.add_argument('--only-shademap', action='store_true',
@@ -268,8 +269,8 @@ Examples:
     args = parser.parse_args()
     
     # Validate arguments
-    only_flags = [args.only_eclipse, args.only_cloud, args.only_bortle, args.only_horizon, args.only_shademap]
-    no_flags = [args.no_eclipse_view_scrape, args.no_cloud, args.no_bortle, args.no_horizon, args.no_shademap]
+    only_flags = [args.only_eclipse, args.only_cloud, args.only_darksky, args.only_horizon, args.only_shademap]
+    no_flags = [args.no_eclipse_view_scrape, args.no_cloud, args.no_darksky, args.no_horizon, args.no_shademap]
     
     if any(only_flags) and any(no_flags):
         print("✗ Error: Cannot use --only-* and --no-* flags together")
@@ -328,12 +329,72 @@ Examples:
             results = scrape_cloud_coverage_for_sites(results, delay=2.0)
             print(f"\n✓ Cloud coverage scraped for {len(results)} site(s)")
         
-        if args.only_bortle:
-            print("\nChecking Bortle scale (light pollution)...")
+        if args.only_darksky:
+            print("\nScraping Dark Sky Sites data...")
             print("=" * 60)
-            print("This will take a while (1 second delay between requests)...")
-            results = scrape_bortle_for_sites(results, delay=1.0)
-            print(f"\n✓ Bortle scale checked for {len(results)} site(s)")
+            print("This will scrape SQM, Bortle scale, and darkness data from darkskysites.com")
+            print("This will take a while (3 second delay between requests)...")
+            # Import here to avoid dependency if not used
+            import sys
+            import os
+            sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'utilities'))
+            from scrape_darkskysites_data import scrape_darkskysites_data, parse_darksky_data
+            
+            for i, site in enumerate(results, 1):
+                code = site.get('code', 'Unknown')
+                lat_str = site.get('latitude', 'N/A')
+                lon_str = site.get('longitude', 'N/A')
+                
+                if lat_str == 'N/A' or lon_str == 'N/A':
+                    print(f"[{i}/{len(results)}] {code}: No coordinates, skipping")
+                    site['darksky_sqm'] = None
+                    site['darksky_bortle'] = None
+                    site['darksky_darkness'] = None
+                    site['darksky_status'] = 'no_coordinates'
+                    continue
+                
+                try:
+                    lat = float(lat_str)
+                    lon = float(lon_str)
+                except (ValueError, TypeError):
+                    print(f"[{i}/{len(results)}] {code}: Invalid coordinates, skipping")
+                    site['darksky_sqm'] = None
+                    site['darksky_bortle'] = None
+                    site['darksky_darkness'] = None
+                    site['darksky_status'] = 'invalid_coordinates'
+                    continue
+                
+                print(f"[{i}/{len(results)}] {code}: Scraping Dark Sky Sites data...")
+                
+                try:
+                    result = scrape_darkskysites_data(lat, lon, site_code=code, headless=True)
+                    
+                    if result['status'] == 'success' and result.get('parsed_data'):
+                        parsed = result['parsed_data']
+                        site['darksky_sqm'] = parsed.get('sqm')
+                        site['darksky_bortle'] = parsed.get('bortle')
+                        site['darksky_darkness'] = parsed.get('darkness')
+                        site['darksky_status'] = 'success'
+                        print(f"  ✓ SQM={parsed.get('sqm')}, Bortle={parsed.get('bortle')}, Darkness={parsed.get('darkness')}%")
+                    else:
+                        site['darksky_sqm'] = None
+                        site['darksky_bortle'] = None
+                        site['darksky_darkness'] = None
+                        site['darksky_status'] = result['status']
+                        print(f"  ✗ Failed: {result['status']}")
+                except Exception as e:
+                    print(f"  ✗ Error: {e}")
+                    site['darksky_sqm'] = None
+                    site['darksky_bortle'] = None
+                    site['darksky_darkness'] = None
+                    site['darksky_status'] = 'error'
+                
+                # Rate limiting
+                if i < len(results):
+                    import time
+                    time.sleep(3.0)
+            
+            print(f"\n✓ Dark Sky Sites data scraped for {len(results)} site(s)")
         
         if args.only_horizon:
             print("\nDownloading EclipseFan horizon images...")
@@ -472,19 +533,81 @@ Examples:
             site['cloud_status'] = 'not_checked'
             site['cloud_url'] = None
     
-    # Step 2.6: Check Bortle scale (if enabled)
-    if not args.no_bortle:
+    # Step 2.6: Scrape Dark Sky Sites data (if enabled)
+    if not args.no_darksky:
         print("\n" + "=" * 60)
-        print("STEP 2.6: Checking Bortle scale (light pollution)...")
+        print("STEP 2.6: Scraping Dark Sky Sites data...")
         print("=" * 60)
-        print("This will take a while (1 second delay between requests)...")
-        results = scrape_bortle_for_sites(results, delay=1.0)
-        print(f"\n✓ Bortle scale checked for all sites")
+        print("This will scrape SQM, Bortle scale, and darkness data from darkskysites.com")
+        print("This will take a while (3 second delay between requests)...")
+        
+        # Import here to avoid dependency if not used
+        import sys
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'utilities'))
+        from scrape_darkskysites_data import scrape_darkskysites_data, parse_darksky_data
+        
+        for i, site in enumerate(results, 1):
+            code = site.get('code', 'Unknown')
+            lat_str = site.get('latitude', 'N/A')
+            lon_str = site.get('longitude', 'N/A')
+            
+            if lat_str == 'N/A' or lon_str == 'N/A':
+                print(f"[{i}/{len(results)}] {code}: No coordinates, skipping")
+                site['darksky_sqm'] = None
+                site['darksky_bortle'] = None
+                site['darksky_darkness'] = None
+                site['darksky_status'] = 'no_coordinates'
+                continue
+            
+            try:
+                lat = float(lat_str)
+                lon = float(lon_str)
+            except (ValueError, TypeError):
+                print(f"[{i}/{len(results)}] {code}: Invalid coordinates, skipping")
+                site['darksky_sqm'] = None
+                site['darksky_bortle'] = None
+                site['darksky_darkness'] = None
+                site['darksky_status'] = 'invalid_coordinates'
+                continue
+            
+            print(f"[{i}/{len(results)}] {code}: Scraping Dark Sky Sites data...")
+            
+            try:
+                result = scrape_darkskysites_data(lat, lon, site_code=code, headless=True)
+                
+                if result['status'] == 'success' and result.get('parsed_data'):
+                    parsed = result['parsed_data']
+                    site['darksky_sqm'] = parsed.get('sqm')
+                    site['darksky_bortle'] = parsed.get('bortle')
+                    site['darksky_darkness'] = parsed.get('darkness')
+                    site['darksky_status'] = 'success'
+                    print(f"  ✓ SQM={parsed.get('sqm')}, Bortle={parsed.get('bortle')}, Darkness={parsed.get('darkness')}%")
+                else:
+                    site['darksky_sqm'] = None
+                    site['darksky_bortle'] = None
+                    site['darksky_darkness'] = None
+                    site['darksky_status'] = result['status']
+                    print(f"  ✗ Failed: {result['status']}")
+            except Exception as e:
+                print(f"  ✗ Error: {e}")
+                site['darksky_sqm'] = None
+                site['darksky_bortle'] = None
+                site['darksky_darkness'] = None
+                site['darksky_status'] = 'error'
+            
+            # Rate limiting
+            if i < len(results):
+                import time
+                time.sleep(3.0)
+        
+        print(f"\n✓ Dark Sky Sites data scraped for all sites")
     else:
-        print("\n⚠️  Skipping Bortle scale checking (--no-bortle flag)")
+        print("\n⚠️  Skipping Dark Sky Sites data scraping (--no-darksky flag)")
         for site in results:
-            site['bortle_scale'] = None
-            site['bortle_status'] = 'not_checked'
+            site['darksky_sqm'] = None
+            site['darksky_bortle'] = None
+            site['darksky_darkness'] = None
+            site['darksky_status'] = 'not_checked'
     
     # Step 2.7: Download EclipseFan horizon images (if enabled)
     if not args.no_horizon:
