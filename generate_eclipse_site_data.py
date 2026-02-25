@@ -334,9 +334,7 @@ Examples:
             print("=" * 60)
             print("This will scrape SQM, Bortle scale, and darkness data from darkskysites.com")
             print("This will take a while (3 second delay between requests)...")
-            # Import here to avoid dependency if not used
-            import sys
-            import os
+            # Import scraper dynamically to avoid Playwright dependency if not used
             sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'utilities'))
             from scrape_darkskysites_data import scrape_darkskysites_data, parse_darksky_data
             
@@ -541,8 +539,7 @@ Examples:
         print("This will scrape SQM, Bortle scale, and darkness data from darkskysites.com")
         print("This will take a while (3 second delay between requests)...")
         
-        # Import here to avoid dependency if not used
-        import sys
+        # Import scraper dynamically to avoid Playwright dependency if not used
         sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'utilities'))
         from scrape_darkskysites_data import scrape_darkskysites_data, parse_darksky_data
         
