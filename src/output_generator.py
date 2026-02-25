@@ -70,9 +70,8 @@ def save_to_csv(results: List[Dict[str, Any]], filename: str = 'eclipse_site_dat
     filepath = os.path.join(DATA_DIR, filename)
     fieldnames = ['code', 'denominacion', 'url', 'valor_turistico', 'confidencialidad',
                  'route_difficulty', 'latitude', 'longitude', 'eclipse_visibility', 'status',
-                 'cloud_coverage', 'cloud_status', 'cloud_url', 'bortle_scale', 'bortle_status',
-                 'horizon_status', 'shademap_status', 'darksky_sqm', 'darksky_bortle',
-                 'darksky_darkness', 'darksky_status']
+                 'cloud_coverage', 'cloud_status', 'cloud_url', 'horizon_status', 'shademap_status',
+                 'darksky_sqm', 'darksky_bortle', 'darksky_darkness', 'darksky_status']
     
     # Backup existing CSV file if it exists
     if os.path.exists(filepath):
