@@ -22,10 +22,12 @@ This project aggregates geological site information and eclipse planning data fo
 - ✅ Eclipse visibility checking via IGN Eclipse 2026 viewer
 - ✅ Automated profile diagram capture (IGN)
 - ✅ Historical cloud coverage data (timeanddate.com)
+- ✅ **Dark Sky Sites data** (SQM, Bortle scale, darkness percentage)
 - ✅ EclipseFan horizon image downloading
 - ✅ Shademap sun/shadow visualization snapshots
 - ✅ Google Maps Static API location thumbnails
 - ✅ Image caching for improved performance
+- ✅ **Automatic CSV backup** before updates (timestamped)
 
 ### Web Viewer
 - 🔍 **Search** by site code or name (sticky controls)
@@ -43,6 +45,8 @@ This project aggregates geological site information and eclipse planning data fo
 - 📍 **Export routes** to Google Maps or KML for GPS devices
 - 📈 **Eclipse profile diagrams** with hover preview (IGN, EclipseFan)
 - ☁️ **Cloud coverage data** for eclipse planning
+- 🌌 **Dark Sky Sites data** - SQM values, Bortle scale, darkness percentage
+- 🔗 **Dark Sky Sites links** - Direct links to darkskysites.com for each location
 - 🔢 **Site counter** showing filtered results
 - 🦕 **Dinosaur emoji** favicon (because dinosaur footprints!)
 ### Standalone Viewer
@@ -116,7 +120,7 @@ The main script `generate_eclipse_site_data.py` collects all site data with mult
 
 #### Basic Usage
 
-Collect all data (IGME sites + eclipse visibility + cloud coverage + horizon images):
+Collect all data (IGME sites + eclipse visibility + cloud coverage + Dark Sky Sites data + horizon images):
 ```bash
 python3 generate_eclipse_site_data.py
 ```
@@ -125,8 +129,10 @@ This will:
 1. Scrape IGME site data (tourist values, coordinates, etc.)
 2. Check eclipse visibility using IGN Eclipse 2026 viewer
 3. Scrape cloud coverage data from timeanddate.com
-4. Download horizon images from EclipseFan.org
-5. Generate CSV and KML output files
+4. Scrape Dark Sky Sites data (SQM, Bortle scale, darkness percentage)
+5. Download horizon images from EclipseFan.org
+6. Generate CSV and KML output files
+7. Create automatic backup of existing CSV before updates
 
 #### Command-Line Options
 
@@ -141,17 +147,23 @@ python3 generate_eclipse_site_data.py --no-profile
 # Skip cloud coverage scraping
 python3 generate_eclipse_site_data.py --no-cloud
 
+# Skip Dark Sky Sites data scraping
+python3 generate_eclipse_site_data.py --no-darksky
+
 # Skip horizon image downloading
 python3 generate_eclipse_site_data.py --no-horizon
 
 # Combine multiple skips
-python3 generate_eclipse_site_data.py --no-eclipse --no-cloud --no-horizon
+python3 generate_eclipse_site_data.py --no-eclipse --no-cloud --no-darksky --no-horizon
 ```
 
 **Update existing CSV with specific data** (no IGME re-scraping):
 ```bash
 # Add cloud coverage to existing sites
 python3 generate_eclipse_site_data.py --only-cloud
+
+# Add Dark Sky Sites data to existing sites
+python3 generate_eclipse_site_data.py --only-darksky
 
 # Add horizon images to existing sites
 python3 generate_eclipse_site_data.py --only-horizon
@@ -164,7 +176,8 @@ python3 generate_eclipse_site_data.py --only-eclipse --no-profile
 
 # Update specific site only
 python3 generate_eclipse_site_data.py --only-cloud --code IB200a
-python3 generate_eclipse_site_data.py --only-horizon --code IB200b
+python3 generate_eclipse_site_data.py --only-darksky --code IB200b
+python3 generate_eclipse_site_data.py --only-horizon --code IB200c
 
 # Use custom CSV file
 python3 generate_eclipse_site_data.py --only-cloud --csv data/my_sites.csv
@@ -201,30 +214,33 @@ The script generates:
 
 - **Fast visibility check**: Check eclipse visibility without profile screenshots (~10-15 minutes)
   ```bash
-  python3 generate_eclipse_site_data.py --no-profile --no-cloud --no-horizon
+  python3 generate_eclipse_site_data.py --no-profile --no-cloud --no-darksky --no-horizon
   ```
 
 - **Add missing data**: Use `--only-*` flags to update existing CSV without re-scraping IGME
   ```bash
   python3 generate_eclipse_site_data.py --only-cloud
+  python3 generate_eclipse_site_data.py --only-darksky
   python3 generate_eclipse_site_data.py --only-eclipse --no-profile
   ```
 
 - **Update specific site**: Combine `--only-*` with `--code`
   ```bash
   python3 generate_eclipse_site_data.py --only-horizon --code IB200a
+  python3 generate_eclipse_site_data.py --only-darksky --code IB200b
   ```
 
 - **Testing**: Skip slow operations for quick IGME data only (~2-3 minutes)
   ```bash
-  python3 generate_eclipse_site_data.py --no-eclipse --no-cloud --no-horizon
+  python3 generate_eclipse_site_data.py --no-eclipse --no-cloud --no-darksky --no-horizon
   ```
 
 - **Recommended workflow**:
-  1. Quick visibility check: `python3 generate_eclipse_site_data.py --no-profile --no-cloud --no-horizon`
+  1. Quick visibility check: `python3 generate_eclipse_site_data.py --no-profile --no-cloud --no-darksky --no-horizon`
   2. Add cloud data: `python3 generate_eclipse_site_data.py --only-cloud`
-  3. Add horizon images: `python3 generate_eclipse_site_data.py --only-horizon`
-  4. Add profile screenshots: `python3 generate_eclipse_site_data.py --only-eclipse`
+  3. Add Dark Sky Sites data: `python3 generate_eclipse_site_data.py --only-darksky`
+  4. Add horizon images: `python3 generate_eclipse_site_data.py --only-horizon`
+  5. Add profile screenshots: `python3 generate_eclipse_site_data.py --only-eclipse`
 
 ### View Data
 
@@ -235,17 +251,18 @@ python3 serve_viewer.py
 
 ### Utility Scripts
 
-Additional utility scripts are available in the `tests/` directory:
+Additional utility scripts are available in the `utilities/` directory:
 
-- **Shademap automation**: `tests/download_shademap_export_playwright.py`
-- **EclipseFan horizon images**: `tests/download_eclipsefan_horizon.py`
-- **Cloud coverage data**: `tests/add_cloud_data_to_csv.py`
-- **Screenshot tools**: Various screenshot utilities
+- **Dark Sky Sites scraper**: `utilities/scrape_darkskysites_data.py` - Scrape SQM, Bortle, darkness data
+- **Dark Sky Sites CSV updater**: `utilities/add_darksky_data_to_csv.py` - Add scraped data to CSV
+- **Site deletion tool**: `utilities/delete_site.py` - Delete sites and associated files
+- **Shademap automation**: `utilities/download_shademap_export_playwright.py`
+- **EclipseFan horizon images**: `utilities/download_eclipsefan_horizon.py`
 
-See documentation in `tests/` directory for detailed usage:
-- `tests/SHADEMAP_PLAYWRIGHT_README.md` - Shademap automation guide
-- `tests/SCREENSHOT_README.md` - Screenshot tools documentation
-- `tests/SERVER_SHUTDOWN.md` - Server shutdown options
+See documentation in `utilities/` directory for detailed usage:
+- `utilities/DARKSKYSITES_SCRAPER_README.md` - Dark Sky Sites scraper guide
+- `utilities/SHADEMAP_PLAYWRIGHT_README.md` - Shademap automation guide
+- `utilities/SCREENSHOT_README.md` - Screenshot tools documentation
 
 This will:
 - Start a local web server on port 8000
@@ -260,6 +277,7 @@ spain-eclipse-sites/
 │   ├── scrape_igme_sites.py
 │   ├── check_eclipse_visibility.py
 │   ├── add_eclipse_azimuth.py       # Standalone azimuth tool (deprecated)
+│   ├── bortle_scraper.py            # Old PNG tile-based Bortle scraper (replaced by Dark Sky Sites)
 │   └── favicon.svg
 ├── data/                             # Generated data (gitignored)
 │   ├── ign_visibility_profiles/      # IGN eclipse visibility diagrams
@@ -278,7 +296,17 @@ spain-eclipse-sites/
 │   ├── eclipse_checker.py           # Eclipse visibility checking
 │   ├── cloud_coverage_scraper.py    # Cloud coverage data scraping
 │   ├── eclipsefan_scraper.py        # EclipseFan horizon image downloading
-│   └── output_generator.py          # CSV/KML generation with azimuth lines
+│   ├── shademap_scraper.py          # Shademap visualization downloading
+│   └── output_generator.py          # CSV/KML generation with azimuth lines and auto-backup
+├── utilities/                        # Utility scripts
+│   ├── scrape_darkskysites_data.py  # Dark Sky Sites data scraper (Playwright)
+│   ├── add_darksky_data_to_csv.py   # Add Dark Sky Sites data to CSV
+│   ├── delete_site.py               # Delete sites and associated files
+│   ├── download_shademap_export_playwright.py  # Shademap automation
+│   ├── download_eclipsefan_horizon.py          # EclipseFan horizon downloader
+│   ├── DARKSKYSITES_SCRAPER_README.md          # Dark Sky Sites scraper docs
+│   ├── SHADEMAP_PLAYWRIGHT_README.md           # Shademap automation docs
+│   └── SCREENSHOT_README.md                    # Screenshot tools docs
 ├── static/                           # Web viewer assets
 │   ├── app.js                       # Interactive viewer logic
 │   └── styles.css                   # Viewer styling
@@ -341,6 +369,14 @@ spain-eclipse-sites/
 | `longitude` | Longitude in decimal degrees (WGS84) |
 | `eclipse_visibility` | Eclipse visibility status |
 | `status` | Scraping status |
+| `cloud_coverage` | Historical cloud coverage percentage |
+| `cloud_status` | Cloud data scraping status |
+| `darksky_sqm` | Sky Quality Meter value from Dark Sky Sites |
+| `darksky_bortle` | Bortle scale value from Dark Sky Sites |
+| `darksky_darkness` | Darkness percentage from Dark Sky Sites |
+| `darksky_status` | Dark Sky Sites scraping status |
+| `horizon_status` | EclipseFan horizon image status |
+| `shademap_status` | Shademap visualization status |
 
 ### Eclipse Visibility Values
 
@@ -427,6 +463,7 @@ The script uses Selenium to:
   - 📍 Google Maps location
   - 🌄 Shademap.app (sun/shadow visualization)
   - 🕐 timeanddate.com (cloud coverage data)
+  - 🌌 Dark Sky Sites (SQM, Bortle, darkness data)
   - 🌒 EclipseFan.org (horizon views)
   - 🌑 IGN Eclipse 2026 viewer
 
@@ -581,8 +618,10 @@ This project uses data from multiple sources. See **[CREDITS.md](CREDITS.md)** f
 **Primary Sources**:
 - **IGME** (Instituto Geológico y Minero de España) - IELIG Database
 - **IGN** (Instituto Geográfico Nacional) - Eclipse 2026 Viewer
+- **Dark Sky Sites** (darkskysites.com) - SQM, Bortle scale, darkness data
 - **EclipseFan.org** - Horizon visualizations
 - **timeanddate.com** - Historical cloud coverage data
+- **Shademap.app** - Sun/shadow visualizations
 
 **Important**: This project is for educational and non-commercial use only. Please respect all data providers' terms of service.
 
