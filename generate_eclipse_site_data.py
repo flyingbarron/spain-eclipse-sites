@@ -97,7 +97,7 @@ def check_data_exists(site_code: str, data_type: str) -> bool:
     """
     if data_type == 'eclipse':
         # Check if profile image exists
-        profile_path = os.path.join('data', 'ign_visibility_profiles', f'{site_code}_profile.png')
+        profile_path = os.path.join('data', 'scrape', 'ign_profiles', f'{site_code}_profile.png')
         return os.path.exists(profile_path)
     
     elif data_type == 'horizon':
