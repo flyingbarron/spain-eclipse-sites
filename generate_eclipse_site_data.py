@@ -107,7 +107,7 @@ def check_data_exists(site_code: str, data_type: str) -> bool:
     
     elif data_type == 'shademap':
         # Check if shademap image exists
-        shademap_path = os.path.join('data', 'shademap_snapshot', f'{site_code}_shademap.jpg')
+        shademap_path = os.path.join('data', 'shademap_snapshots', f'{site_code}_shademap.jpg')
         return os.path.exists(shademap_path)
     
     elif data_type == 'cloud':
