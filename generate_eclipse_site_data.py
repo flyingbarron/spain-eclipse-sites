@@ -85,6 +85,64 @@ def get_next_t_code(csv_filename: str = 'eclipse_site_data.csv') -> str:
     return f"T{max_num + 1:04d}"
 
 
+def check_data_exists(site_code: str, data_type: str) -> bool:
+    """Check if data already exists for a site
+    
+    Args:
+        site_code: Site code (e.g., IB200a)
+        data_type: Type of data to check ('eclipse', 'cloud', 'darksky', 'horizon', 'shademap')
+    
+    Returns:
+        True if data exists, False otherwise
+    """
+    if data_type == 'eclipse':
+        # Check if profile image exists
+        profile_path = os.path.join('data', 'ign_visibility_profiles', f'{site_code}_profile.png')
+        return os.path.exists(profile_path)
+    
+    elif data_type == 'horizon':
+        # Check if horizon image exists
+        horizon_path = os.path.join('data', 'eclipsefan_visibility_profiles', f'{site_code}_horizon.png')
+        return os.path.exists(horizon_path)
+    
+    elif data_type == 'shademap':
+        # Check if shademap image exists
+        shademap_path = os.path.join('data', 'shademap_snapshot', f'{site_code}_shademap.jpg')
+        return os.path.exists(shademap_path)
+    
+    elif data_type == 'cloud':
+        # Check CSV for cloud data
+        csv_path = os.path.join('data', 'eclipse_site_data.csv')
+        if not os.path.exists(csv_path):
+            return False
+        try:
+            with open(csv_path, 'r', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    if row.get('code') == site_code:
+                        return row.get('cloud_coverage') not in [None, '', 'N/A']
+        except Exception:
+            return False
+        return False
+    
+    elif data_type == 'darksky':
+        # Check CSV for darksky data
+        csv_path = os.path.join('data', 'eclipse_site_data.csv')
+        if not os.path.exists(csv_path):
+            return False
+        try:
+            with open(csv_path, 'r', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    if row.get('code') == site_code:
+                        return row.get('darksky_sqm') not in [None, '', 'N/A']
+        except Exception:
+            return False
+        return False
+    
+    return False
+
+
 def add_site_manually(args) -> None:
     """Add a new site manually to the CSV
     
@@ -253,6 +311,10 @@ Examples:
                        help='Skip Shademap shadow visualization downloading')
     parser.add_argument('--no-profile', action='store_true',
                        help='Skip profile diagram screenshots (check visibility only)')
+    
+    # Smart skip flag
+    parser.add_argument('--skip-existing', action='store_true',
+                       help='Skip scraping if data already exists (checks CSV fields and files)')
     
     # Only flags (for updating existing CSV)
     parser.add_argument('--only-eclipse', action='store_true',
@@ -513,7 +575,23 @@ Examples:
     elif args.no_profile:
         print("Profile screenshots will be skipped (--no-profile flag)")
     
-    results = check_sites_eclipse_visibility(results, save_profiles=save_profiles)
+    # Filter sites if --skip-existing is set
+    if args.skip_existing and save_profiles:
+        sites_to_check = []
+        skipped_count = 0
+        for site in results:
+            if check_data_exists(site.get('code'), 'eclipse'):
+                print(f"  Skipping {site.get('code')}: eclipse profile already exists")
+                skipped_count += 1
+            else:
+                sites_to_check.append(site)
+        if skipped_count > 0:
+            print(f"  Skipped {skipped_count} sites with existing eclipse data")
+        results = check_sites_eclipse_visibility(sites_to_check, save_profiles=save_profiles) + \
+                  [s for s in results if s not in sites_to_check]
+    else:
+        results = check_sites_eclipse_visibility(results, save_profiles=save_profiles)
+    
     print(f"\n✓ Eclipse visibility checked for all sites")
     
     # Step 2.5: Scrape cloud coverage (if enabled)
@@ -522,7 +600,29 @@ Examples:
         print("STEP 2.5: Scraping cloud coverage data...")
         print("=" * 60)
         print("This will take a while (2 second delay between requests)...")
-        results = scrape_cloud_coverage_for_sites(results, delay=2.0)
+        
+        # Filter sites if --skip-existing is set
+        if args.skip_existing:
+            sites_to_scrape = []
+            skipped_count = 0
+            for site in results:
+                if check_data_exists(site.get('code', ''), 'cloud'):
+                    print(f"  Skipping {site.get('code')}: cloud data already exists")
+                    skipped_count += 1
+                else:
+                    sites_to_scrape.append(site)
+            if skipped_count > 0:
+                print(f"  Skipped {skipped_count} sites with existing cloud data")
+            scraped_sites = scrape_cloud_coverage_for_sites(sites_to_scrape, delay=2.0)
+            # Merge results
+            for site in results:
+                for scraped in scraped_sites:
+                    if site.get('code') == scraped.get('code'):
+                        site.update(scraped)
+                        break
+        else:
+            results = scrape_cloud_coverage_for_sites(results, delay=2.0)
+        
         print(f"\n✓ Cloud coverage scraped for all sites")
     else:
         print("\n⚠️  Skipping cloud coverage scraping (--no-cloud flag)")
@@ -565,6 +665,11 @@ Examples:
                 site['darksky_bortle'] = None
                 site['darksky_darkness'] = None
                 site['darksky_status'] = 'invalid_coordinates'
+                continue
+            
+            # Skip if data exists and --skip-existing is set
+            if args.skip_existing and check_data_exists(code, 'darksky'):
+                print(f"[{i}/{len(results)}] {code}: Skipping - Dark Sky data already exists")
                 continue
             
             print(f"[{i}/{len(results)}] {code}: Scraping Dark Sky Sites data...")
@@ -612,7 +717,29 @@ Examples:
         print("STEP 2.7: Downloading EclipseFan horizon images...")
         print("=" * 60)
         print("This will take a while (2 second delay between requests)...")
-        results = download_horizon_images_for_sites(results, delay=2.0)
+        
+        # Filter sites if --skip-existing is set
+        if args.skip_existing:
+            sites_to_download = []
+            skipped_count = 0
+            for site in results:
+                if check_data_exists(site.get('code', ''), 'horizon'):
+                    print(f"  Skipping {site.get('code')}: horizon image already exists")
+                    skipped_count += 1
+                else:
+                    sites_to_download.append(site)
+            if skipped_count > 0:
+                print(f"  Skipped {skipped_count} sites with existing horizon images")
+            downloaded_sites = download_horizon_images_for_sites(sites_to_download, delay=2.0)
+            # Merge results
+            for site in results:
+                for downloaded in downloaded_sites:
+                    if site.get('code') == downloaded.get('code'):
+                        site.update(downloaded)
+                        break
+        else:
+            results = download_horizon_images_for_sites(results, delay=2.0)
+        
         print(f"\n✓ Horizon images downloaded for all sites")
     else:
         print("\n⚠️  Skipping horizon image downloading (--no-horizon flag)")
@@ -625,7 +752,29 @@ Examples:
         print("STEP 2.8: Downloading Shademap shadow visualizations...")
         print("=" * 60)
         print("This will take a while (2 second delay between requests)...")
-        results = download_shademap_for_sites(results, delay=2.0)
+        
+        # Filter sites if --skip-existing is set
+        if args.skip_existing:
+            sites_to_download = []
+            skipped_count = 0
+            for site in results:
+                if check_data_exists(site.get('code', ''), 'shademap'):
+                    print(f"  Skipping {site.get('code')}: shademap already exists")
+                    skipped_count += 1
+                else:
+                    sites_to_download.append(site)
+            if skipped_count > 0:
+                print(f"  Skipped {skipped_count} sites with existing shademap visualizations")
+            downloaded_sites = download_shademap_for_sites(sites_to_download, delay=2.0)
+            # Merge results
+            for site in results:
+                for downloaded in downloaded_sites:
+                    if site.get('code') == downloaded.get('code'):
+                        site.update(downloaded)
+                        break
+        else:
+            results = download_shademap_for_sites(results, delay=2.0)
+        
         print(f"\n✓ Shademap visualizations downloaded for all sites")
     else:
         print("\n⚠️  Skipping shademap downloading (--no-shademap flag)")
