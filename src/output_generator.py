@@ -90,14 +90,18 @@ def save_to_csv(results: List[Dict[str, Any]], filename: str = 'eclipse_site_dat
             with open(filepath, 'r', newline='', encoding='utf-8') as csvfile:
                 reader = csv.DictReader(csvfile)
                 for row in reader:
-                    existing_data[row['code']] = row
+                    # Filter out deprecated fields that are not in current fieldnames
+                    filtered_row = {k: v for k, v in row.items() if k in fieldnames}
+                    existing_data[row['code']] = filtered_row
             print(f"  Loaded {len(existing_data)} existing entries from CSV")
         except Exception as e:
             print(f"  Warning: Could not load existing CSV: {e}")
     
     # Merge new results with existing data (new data takes precedence)
     for result in results:
-        existing_data[result['code']] = result
+        # Also filter new results to only include valid fieldnames
+        filtered_result = {k: v for k, v in result.items() if k in fieldnames}
+        existing_data[result['code']] = filtered_result
     
     # Write merged data
     with open(filepath, 'w', newline='', encoding='utf-8') as csvfile:
