@@ -6,6 +6,8 @@ Functions for generating CSV and KML output files
 import csv
 import os
 import math
+import shutil
+from datetime import datetime
 from typing import List, Dict, Any, Tuple
 
 # Ensure data directory exists
@@ -71,6 +73,16 @@ def save_to_csv(results: List[Dict[str, Any]], filename: str = 'eclipse_site_dat
                  'cloud_coverage', 'cloud_status', 'cloud_url', 'bortle_scale', 'bortle_status',
                  'horizon_status', 'shademap_status', 'darksky_sqm', 'darksky_bortle',
                  'darksky_darkness', 'darksky_status']
+    
+    # Backup existing CSV file if it exists
+    if os.path.exists(filepath):
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        backup_filepath = filepath.replace('.csv', f'_backup_{timestamp}.csv')
+        try:
+            shutil.copy2(filepath, backup_filepath)
+            print(f"  ✓ Backed up existing CSV to {backup_filepath}")
+        except Exception as e:
+            print(f"  Warning: Could not create backup: {e}")
     
     # Load existing data if file exists
     existing_data: Dict[str, Dict[str, Any]] = {}
