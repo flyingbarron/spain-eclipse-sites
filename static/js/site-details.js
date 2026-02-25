@@ -38,6 +38,9 @@ function generateSiteUrls(site) {
     // Xavier Jubier Eclipse Map
     const xavierJubierUrl = `http://xjubier.free.fr/en/site_pages/solar_eclipses/TSE_2026_GoogleMapFull.html?Lat=${lat}&Lng=${lon}&Zoom=8&LC=1`;
     
+    // Dark Sky Sites
+    const darkSkySitesUrl = `https://www.darkskysites.com/?lat=${lat}&lng=${lon}&zoom=8`;
+    
     // Google Maps Static API
     const googleMapsStaticUrl = googleMapsApiKey ?
         `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lon}&zoom=15&size=400x200&maptype=satellite&markers=color:red%7C${lat},${lon}&key=${googleMapsApiKey}` :
@@ -49,6 +52,7 @@ function generateSiteUrls(site) {
         eclipse: eclipseUrl,
         eclipseFan: eclipseFanUrl,
         xavierJubier: xavierJubierUrl,
+        darkSkySites: darkSkySitesUrl,
         googleStatic: googleMapsStaticUrl,
         cloud: site.cloud_url
     };
@@ -77,11 +81,12 @@ function renderSiteHeader(site, urls) {
         <div class="detail-header">
             <h2>${site.denominacion || site.code}</h2>
             <div style="display: flex; align-items: flex-start; gap: 0.5rem; flex-wrap: wrap;">
-                <!-- Left column: IGME, timeanddate, Xavier Jubier stacked vertically -->
+                <!-- Left column: IGME, timeanddate, Xavier Jubier, Dark Sky Sites stacked vertically -->
                 <div style="display: flex; flex-direction: column; gap: 0.25rem;">
                     <a href="${igmeButtonHref}" target="_blank" class="${igmeButtonClass}"${igmeButtonTitle}>🪨 View on IGME Website</a>
                     ${cloudButton}
                     <a href="${urls.xavierJubier}" target="_blank" class="link-button xavier">🗺️ Xavier Jubier Eclipse Map</a>
+                    <a href="${urls.darkSkySites}" target="_blank" class="link-button darksky">🌌 Dark Sky Sites</a>
                 </div>
                 
                 <!-- Right side: Buttons with previews -->
@@ -215,6 +220,31 @@ function renderDetailsTab(site) {
         `;
     }
     
+    // Dark Sky Sites data display
+    let darkSkyInfo = '';
+    if (site.darksky_sqm || site.darksky_bortle || site.darksky_darkness) {
+        const sqm = site.darksky_sqm ? parseFloat(site.darksky_sqm).toFixed(2) : 'N/A';
+        const bortle = site.darksky_bortle || 'N/A';
+        const darkness = site.darksky_darkness ? parseFloat(site.darksky_darkness).toFixed(1) + '%' : 'N/A';
+        
+        darkSkyInfo = `
+            <div class="info-item">
+                <div class="info-label">Dark Sky Sites Data</div>
+                <div class="info-value">
+                    <div style="margin-bottom: 0.25rem;">
+                        <strong>SQM:</strong> ${sqm} ${sqm !== 'N/A' ? '(mag/arcsec²)' : ''}
+                    </div>
+                    <div style="margin-bottom: 0.25rem;">
+                        <strong>Bortle:</strong> ${bortle}
+                    </div>
+                    <div>
+                        <strong>Darkness:</strong> ${darkness}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
     return `
         <div class="detail-info">
             <div class="info-item">
@@ -258,6 +288,7 @@ function renderDetailsTab(site) {
             ` : ''}
             ${cloudInfo}
             ${bortleInfo}
+            ${darkSkyInfo}
         </div>
         
         <div class="images-section">
