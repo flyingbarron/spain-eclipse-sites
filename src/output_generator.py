@@ -69,7 +69,8 @@ def save_to_csv(results: List[Dict[str, Any]], filename: str = 'eclipse_site_dat
     fieldnames = ['code', 'denominacion', 'url', 'valor_turistico', 'confidencialidad',
                  'route_difficulty', 'latitude', 'longitude', 'eclipse_visibility', 'status',
                  'cloud_coverage', 'cloud_status', 'cloud_url', 'bortle_scale', 'bortle_status',
-                 'horizon_status', 'shademap_status']
+                 'horizon_status', 'shademap_status', 'darksky_sqm', 'darksky_bortle',
+                 'darksky_darkness', 'darksky_status']
     
     # Load existing data if file exists
     existing_data: Dict[str, Dict[str, Any]] = {}
