@@ -40,7 +40,7 @@ export function displaySites(sites) {
     list.innerHTML = sites.map(site => {
         // Eclipse visibility label
         const eclipseInfo = getEclipseInfo(site.eclipse_visibility);
-        const eclipseLabel = eclipseInfo.text ? 
+        const eclipseLabel = eclipseInfo.text ?
             `<span class="site-eclipse ${eclipseInfo.class}">${eclipseInfo.text}</span>` : '';
         
         // Cloud coverage label
@@ -49,6 +49,13 @@ export function displaySites(sites) {
             const cloudPct = parseInt(site.cloud_coverage);
             const cloudInfo = getCloudInfo(cloudPct);
             cloudLabel = `<span class="site-cloud ${cloudInfo.class}">${cloudInfo.emoji} ${cloudPct}%</span>`;
+        }
+        
+        // Bortle scale label
+        let bortleLabel = '';
+        if (site.darksky_bortle && site.darksky_status === 'success') {
+            const bortle = parseFloat(site.darksky_bortle);
+            bortleLabel = `<span class="site-bortle">🌌 Bortle ${bortle}</span>`;
         }
         
         const isSelected = appState.isSiteSelected(site.code);
@@ -61,6 +68,7 @@ export function displaySites(sites) {
                     <span class="site-privacy">${site.confidencialidad}</span>
                     ${eclipseLabel}
                     ${cloudLabel}
+                    ${bortleLabel}
                 </div>
             </li>
         `;

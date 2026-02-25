@@ -73,12 +73,32 @@ export function filterAndSortSites(sites, filters) {
             const nameA = (a.denominacion || a.code).toLowerCase();
             const nameB = (b.denominacion || b.code).toLowerCase();
             return nameA.localeCompare(nameB);
+        } else if (sortBy === 'name_desc') {
+            const nameA = (a.denominacion || a.code).toLowerCase();
+            const nameB = (b.denominacion || b.code).toLowerCase();
+            return nameB.localeCompare(nameA);
         } else if (sortBy === 'tourist_value') {
             const valueA = parseFloat(a.valor_turistico) || 0;
             const valueB = parseFloat(b.valor_turistico) || 0;
-            return valueB - valueA; // Descending order
+            return valueB - valueA; // High to low
+        } else if (sortBy === 'tourist_value_asc') {
+            const valueA = parseFloat(a.valor_turistico) || 0;
+            const valueB = parseFloat(b.valor_turistico) || 0;
+            return valueA - valueB; // Low to high
+        } else if (sortBy === 'darkness') {
+            // Darkest first (highest darkness percentage)
+            const darknessA = parseFloat(a.darksky_darkness) || 0;
+            const darknessB = parseFloat(b.darksky_darkness) || 0;
+            return darknessB - darknessA;
+        } else if (sortBy === 'darkness_asc') {
+            // Lightest first (lowest darkness percentage)
+            const darknessA = parseFloat(a.darksky_darkness) || 0;
+            const darknessB = parseFloat(b.darksky_darkness) || 0;
+            return darknessA - darknessB;
+        } else if (sortBy === 'code_desc') {
+            return b.code.localeCompare(a.code);
         } else {
-            // Default: sort by code
+            // Default: sort by code ascending
             return a.code.localeCompare(b.code);
         }
     });
