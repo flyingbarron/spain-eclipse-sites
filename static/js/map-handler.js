@@ -117,6 +117,7 @@ function createMarkerPopup(site, lat, lon) {
     const y = Math.log(Math.tan((90 + lat) * Math.PI / 360)) / (Math.PI / 180);
     const yMercator = y * 20037508.34 / 180;
     const eclipseUrl = `https://visualizadores.ign.es/eclipses/2026?center=${x},${yMercator}&zoom=16&srs=EPSG:3857`;
+    const darkSkySitesUrl = `https://www.darkskysites.com/?lat=${lat}&lng=${lon}&zoom=8`;
     
     // Check if IGME URL is valid
     const hasValidIgmeUrl = site.url && site.url !== 'N/A' && site.url.trim() !== '';
@@ -131,6 +132,7 @@ function createMarkerPopup(site, lat, lon) {
             <a href="${mapsUrl}" target="_blank" class="maps">📍 Open in Google Maps</a>
             <a href="${shademapUrl}" target="_blank" class="shademap">🌄 View on Shademap</a>
             <a href="${eclipseUrl}" target="_blank" class="eclipse">🌑 Eclipse 2026 View</a>
+            <a href="${darkSkySitesUrl}" target="_blank" class="darksky">🌌 Dark Sky Sites</a>
         </div>
     `;
 }

@@ -13,10 +13,10 @@ logger = setup_logger(__name__)
 
 
 def get_bortle_value(lat: float, lon: float, timeout: int = 10) -> Optional[int]:
-    """Get Bortle scale value for coordinates using binary tile data
+    """Get Bortle scale value for coordinates using lightpollutionmap.info PNG tiles
     
-    Uses djlorenz's binary tiles which contain VIIRS 2024 light pollution data.
-    These tiles are publicly accessible without authentication.
+    Uses the same PNG tiles that power lightpollutionmap.info website.
+    The tiles are color-coded with light pollution data.
     
     Args:
         lat: Latitude in decimal degrees
@@ -29,78 +29,57 @@ def get_bortle_value(lat: float, lon: float, timeout: int = 10) -> Optional[int]
     
     try:
         import math
-        import gzip
-        import struct
+        from io import BytesIO
+        from PIL import Image
         
-        # Binary tiles appear to be at zoom level 6 based on the tile numbers
-        zoom = 6
+        # Use zoom level 10 for good resolution
+        zoom = 10
         lat_rad = math.radians(lat)
         n = 2.0 ** zoom
         xtile = int((lon + 180.0) / 360.0 * n)
         ytile = int((1.0 - math.log(math.tan(lat_rad) + (1 / math.cos(lat_rad))) / math.pi) / 2.0 * n)
         
-        # Fetch the binary tile
-        tile_url = f"https://djlorenz.github.io/astronomy/binary_tiles/2024/binary_tile_{xtile}_{ytile}.dat.gz"
+        # Fetch the PNG tile from lightpollutionmap.info
+        tile_url = f"https://www2.lightpollutionmap.info/osm/{zoom}/{xtile}/{ytile}.png"
         
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Referer': 'https://www.lightpollutionmap.info/'
         }
         
         response = requests.get(tile_url, headers=headers, timeout=timeout)
         
-        logger.debug(f"Binary tile URL: {tile_url}")
+        logger.debug(f"PNG tile URL: {tile_url}")
         logger.debug(f"Response status: {response.status_code}")
         
         if response.status_code == 200:
-            # Decompress the gzipped data
+            # Load the PNG image
             try:
-                tile_data = gzip.decompress(response.content)
+                img = Image.open(BytesIO(response.content))
+                img = img.convert('RGB')  # Ensure RGB mode
             except Exception as e:
-                logger.error(f"Failed to decompress tile: {e}")
+                logger.error(f"Failed to load PNG image: {e}")
                 return None
             
-            # Calculate pixel position within the tile (256x256 assumed)
+            # Calculate pixel position within the tile (256x256)
             tile_size = 256
             x_pixel = int((lon + 180.0) / 360.0 * n * tile_size) % tile_size
             y_pixel = int((1.0 - math.log(math.tan(lat_rad) + (1 / math.cos(lat_rad))) / math.pi) / 2.0 * n * tile_size) % tile_size
             
-            # Binary tiles store one byte per pixel
-            pixel_index = y_pixel * tile_size + x_pixel
-            
-            if pixel_index < len(tile_data):
-                # Get the brightness value (0-255)
-                brightness_byte = tile_data[pixel_index]
-                
-                # Convert to Bortle scale
-                # The binary data represents radiance values
-                # We'll map them to Bortle scale
-                brightness = float(brightness_byte) / 255.0
-                
-                # Map brightness to Bortle scale
-                if brightness < 0.1:
-                    bortle = 1
-                elif brightness < 0.2:
-                    bortle = 2
-                elif brightness < 0.3:
-                    bortle = 3
-                elif brightness < 0.4:
-                    bortle = 4
-                elif brightness < 0.5:
-                    bortle = 5
-                elif brightness < 0.6:
-                    bortle = 6
-                elif brightness < 0.75:
-                    bortle = 7
-                elif brightness < 0.9:
-                    bortle = 8
-                else:
-                    bortle = 9
-                
-                logger.info(f"Coordinates ({lat}, {lon}): brightness={brightness:.3f}, Bortle={bortle}")
-                return bortle
-            else:
-                logger.error(f"Pixel index {pixel_index} out of range (tile size: {len(tile_data)})")
+            # Get the pixel color
+            try:
+                r, g, b = img.getpixel((x_pixel, y_pixel))
+            except Exception as e:
+                logger.error(f"Failed to get pixel at ({x_pixel}, {y_pixel}): {e}")
                 return None
+            
+            # Convert RGB color to Bortle scale
+            # The lightpollutionmap.info uses a color gradient:
+            # Black/Dark Blue (1-2) -> Blue (3) -> Green (4) -> Yellow (5-6) -> Orange (7) -> Red (8-9)
+            bortle = rgb_to_bortle(r, g, b)
+            
+            logger.info(f"Coordinates ({lat}, {lon}): RGB=({r},{g},{b}), Bortle={bortle}")
+            return bortle
             
     except Exception as e:
         logger.error(f"Failed to fetch Bortle data for ({lat}, {lon}): {type(e).__name__}: {e}")
@@ -111,6 +90,60 @@ def get_bortle_value(lat: float, lon: float, timeout: int = 10) -> Optional[int]
     # If we get here, response was not 200
     logger.error(f"Could not fetch tile data for ({lat}, {lon}) - HTTP {response.status_code if 'response' in locals() else 'unknown'}")
     return None
+
+
+def rgb_to_bortle(r: int, g: int, b: int) -> int:
+    """Convert RGB color from light pollution map to Bortle scale
+    
+    The lightpollutionmap.info uses a color gradient to represent light pollution:
+    - Black/Very Dark Blue: Bortle 1-2 (excellent dark sky)
+    - Dark Blue: Bortle 3 (rural)
+    - Blue/Cyan: Bortle 4 (rural/suburban transition)
+    - Green: Bortle 5 (suburban)
+    - Yellow/Green: Bortle 6 (bright suburban)
+    - Orange: Bortle 7 (suburban/urban transition)
+    - Red/Orange: Bortle 8 (city)
+    - Bright Red/White: Bortle 9 (inner city)
+    
+    Args:
+        r, g, b: RGB color values (0-255)
+    
+    Returns:
+        Bortle scale value (1-9)
+    """
+    # Calculate color characteristics
+    brightness = (r + g + b) / 3.0
+    
+    # Very dark (black/very dark blue) - Bortle 1-2
+    if brightness < 20:
+        return 1 if brightness < 10 else 2
+    
+    # Dark blue - Bortle 3
+    if b > r and b > g and brightness < 80:
+        return 3
+    
+    # Blue/Cyan - Bortle 4
+    if b >= g and b > r * 1.2 and brightness < 120:
+        return 4
+    
+    # Green dominant - Bortle 5
+    if g > r and g > b and brightness < 150:
+        return 5
+    
+    # Yellow/Yellow-Green - Bortle 6
+    if r > 100 and g > 100 and b < 100 and brightness < 180:
+        return 6
+    
+    # Orange - Bortle 7
+    if r > g * 1.2 and g > b and brightness < 200:
+        return 7
+    
+    # Red/Bright Orange - Bortle 8
+    if r > 150 and r > g * 1.3 and brightness < 220:
+        return 8
+    
+    # Very bright (white/bright red) - Bortle 9
+    return 9
 
 
 def brightness_to_bortle(brightness: float) -> int:
