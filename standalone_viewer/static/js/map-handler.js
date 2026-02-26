@@ -153,6 +153,9 @@ function updateDetailsTabOnly(site) {
  * @param {boolean} showRouteSummary - Whether to show route summary
  */
 function createRoute(sites, showRouteSummary) {
+    // Store sites in appState for KML export
+    appState.currentRouteSites = sites;
+    
     // Create waypoints list
     const waypoints = [
         L.latLng(CONFIG.HOTEL_COORDS[0], CONFIG.HOTEL_COORDS[1]),
@@ -568,19 +571,27 @@ function highlightSegment(index) {
  * Export route as KML file
  */
 function exportRouteAsKML() {
-    console.log('exportRouteAsKML called, selectedSites:', appState.selectedSites);
+    console.log('exportRouteAsKML called');
+    console.log('currentRouteSites:', appState.currentRouteSites);
+    console.log('selectedSites:', appState.selectedSites);
     
-    if (appState.selectedSites.length === 0) {
-        console.log('No sites selected, returning');
+    // Use currentRouteSites if available, otherwise fall back to selectedSites
+    const sites = appState.currentRouteSites || appState.selectedSites.map(code => appState.getSiteByCode(code)).filter(s => s);
+    
+    if (!sites || sites.length === 0) {
+        console.log('No sites in route, returning');
+        alert('No route to export. Please create a route first by selecting sites.');
         return;
     }
+    
+    console.log('Exporting KML for', sites.length, 'sites');
     
     // Build KML content
     let kml = `<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document>
     <name>Spain Eclipse Sites Route</name>
-    <description>Route visiting ${appState.selectedSites.length} geological sites</description>
+    <description>Route visiting ${sites.length} geological sites</description>
     
     <!-- Style for hotel -->
     <Style id="hotelIcon">
@@ -613,10 +624,8 @@ function exportRouteAsKML() {
 `;
     
     // Add each site as a placemark
-    appState.selectedSites.forEach((code, index) => {
-        const site = appState.getSiteByCode(code);
-        if (site) {
-            kml += `    <!-- Site ${index + 1} -->
+    sites.forEach((site, index) => {
+        kml += `    <!-- Site ${index + 1} -->
     <Placemark>
       <name>${index + 1}. ${site.denominacion || site.code}</name>
       <description><![CDATA[
@@ -633,7 +642,6 @@ function exportRouteAsKML() {
     </Placemark>
     
 `;
-        }
     });
     
     // Add return to hotel if enabled
@@ -668,11 +676,8 @@ function exportRouteAsKML() {
           ${CONFIG.HOTEL_COORDS[1]},${CONFIG.HOTEL_COORDS[0]},0
 `;
     
-    appState.selectedSites.forEach(code => {
-        const site = appState.getSiteByCode(code);
-        if (site) {
-            kml += `          ${site.longitude},${site.latitude},0\n`;
-        }
+    sites.forEach(site => {
+        kml += `          ${site.longitude},${site.latitude},0\n`;
     });
     
     if (appState.returnToHotel) {
@@ -691,7 +696,8 @@ function exportRouteAsKML() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `spain-eclipse-route-${appState.selectedSites.length}-sites.kml`;
+    a.download = `spain-eclipse-route-${sites.length}-sites.kml`;
+    console.log('KML file download triggered');
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
