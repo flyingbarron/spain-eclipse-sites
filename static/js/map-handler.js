@@ -475,8 +475,16 @@ function setupRouteListeners() {
     
     // Export KML button
     const exportBtn = document.getElementById('exportKmlBtn');
+    console.log('Looking for exportKmlBtn, found:', exportBtn);
     if (exportBtn) {
-        exportBtn.addEventListener('click', exportRouteAsKML);
+        console.log('Adding click listener to KML export button');
+        exportBtn.addEventListener('click', (e) => {
+            console.log('KML export button clicked');
+            e.preventDefault();
+            exportRouteAsKML();
+        });
+    } else {
+        console.log('exportKmlBtn not found in DOM');
     }
     
     // Initialize drag-and-drop for reordering if we have multiple sites
@@ -560,7 +568,12 @@ function highlightSegment(index) {
  * Export route as KML file
  */
 function exportRouteAsKML() {
-    if (appState.selectedSites.length === 0) return;
+    console.log('exportRouteAsKML called, selectedSites:', appState.selectedSites);
+    
+    if (appState.selectedSites.length === 0) {
+        console.log('No sites selected, returning');
+        return;
+    }
     
     // Build KML content
     let kml = `<?xml version="1.0" encoding="UTF-8"?>
