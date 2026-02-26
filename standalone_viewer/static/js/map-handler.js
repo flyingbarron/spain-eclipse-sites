@@ -326,12 +326,14 @@ function displayRouteSummary(totalDistance, totalTime, routeSegments) {
     // Build Google Maps URL for the entire route
     let googleMapsUrl = 'https://www.google.com/maps/dir/';
     googleMapsUrl += `${CONFIG.HOTEL_COORDS[0]},${CONFIG.HOTEL_COORDS[1]}/`;
-    appState.selectedSites.forEach(code => {
-        const site = appState.getSiteByCode(code);
-        if (site) {
-            googleMapsUrl += `${site.latitude},${site.longitude}/`;
-        }
+    
+    // Use currentRouteSites if available, otherwise fall back to selectedSites
+    const routeSites = appState.currentRouteSites || appState.selectedSites.map(code => appState.getSiteByCode(code)).filter(s => s);
+    
+    routeSites.forEach(site => {
+        googleMapsUrl += `${site.latitude},${site.longitude}/`;
     });
+    
     if (appState.returnToHotel) {
         googleMapsUrl += `${CONFIG.HOTEL_COORDS[0]},${CONFIG.HOTEL_COORDS[1]}/`;
     }
