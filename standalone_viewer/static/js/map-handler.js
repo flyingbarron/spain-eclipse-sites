@@ -478,16 +478,11 @@ function setupRouteListeners() {
     
     // Export KML button
     const exportBtn = document.getElementById('exportKmlBtn');
-    console.log('Looking for exportKmlBtn, found:', exportBtn);
     if (exportBtn) {
-        console.log('Adding click listener to KML export button');
         exportBtn.addEventListener('click', (e) => {
-            console.log('KML export button clicked');
             e.preventDefault();
             exportRouteAsKML();
         });
-    } else {
-        console.log('exportKmlBtn not found in DOM');
     }
     
     // Initialize drag-and-drop for reordering if we have multiple sites
@@ -571,20 +566,13 @@ function highlightSegment(index) {
  * Export route as KML file
  */
 function exportRouteAsKML() {
-    console.log('exportRouteAsKML called');
-    console.log('currentRouteSites:', appState.currentRouteSites);
-    console.log('selectedSites:', appState.selectedSites);
-    
     // Use currentRouteSites if available, otherwise fall back to selectedSites
     const sites = appState.currentRouteSites || appState.selectedSites.map(code => appState.getSiteByCode(code)).filter(s => s);
     
     if (!sites || sites.length === 0) {
-        console.log('No sites in route, returning');
         alert('No route to export. Please create a route first by selecting sites.');
         return;
     }
-    
-    console.log('Exporting KML for', sites.length, 'sites');
     
     // Build KML content
     let kml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -697,7 +685,6 @@ function exportRouteAsKML() {
     const a = document.createElement('a');
     a.href = url;
     a.download = `spain-eclipse-route-${sites.length}-sites.kml`;
-    console.log('KML file download triggered');
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
