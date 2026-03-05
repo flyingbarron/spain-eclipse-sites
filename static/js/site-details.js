@@ -318,6 +318,14 @@ function renderDetailsTab(site) {
                     </div>
                 </div>
             ` : ''}
+            ${site.terrain_clearance ? `
+                <div class="info-item">
+                    <div class="info-label">Horizon Clearance</div>
+                    <div class="info-value" style="color: ${parseFloat(site.terrain_clearance) >= 0 ? '#28a745' : '#dc3545'}">
+                        🏔️ ${site.terrain_clearance}° ${parseFloat(site.terrain_clearance) >= 0 ? '(Clear)' : '(Blocked)'}
+                    </div>
+                </div>
+            ` : ''}
             ${cloudInfo}
             ${darkSkyInfo}
         </div>

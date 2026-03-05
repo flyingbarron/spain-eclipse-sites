@@ -94,6 +94,16 @@ export function filterAndSortSites(sites, filters) {
             const darknessA = parseFloat(a.darksky_darkness) || 0;
             const darknessB = parseFloat(b.darksky_darkness) || 0;
             return darknessA - darknessB;
+        } else if (sortBy === 'clearance') {
+            // Best clearance first (highest positive value)
+            const clearanceA = parseFloat(a.terrain_clearance) || -999;
+            const clearanceB = parseFloat(b.terrain_clearance) || -999;
+            return clearanceB - clearanceA;
+        } else if (sortBy === 'clearance_asc') {
+            // Worst clearance first (lowest/most negative value)
+            const clearanceA = parseFloat(a.terrain_clearance) || 999;
+            const clearanceB = parseFloat(b.terrain_clearance) || 999;
+            return clearanceA - clearanceB;
         } else if (sortBy === 'code_desc') {
             return b.code.localeCompare(a.code);
         } else {
