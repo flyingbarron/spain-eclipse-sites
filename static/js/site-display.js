@@ -38,11 +38,6 @@ export function displaySites(sites) {
     }
     
     list.innerHTML = sites.map(site => {
-        // Eclipse visibility label
-        const eclipseInfo = getEclipseInfo(site.eclipse_visibility);
-        const eclipseLabel = eclipseInfo.text ?
-            `<span class="site-eclipse ${eclipseInfo.class}">${eclipseInfo.text}</span>` : '';
-        
         // Cloud coverage label
         let cloudLabel = '';
         if (site.cloud_coverage && site.cloud_status === 'success') {
@@ -51,11 +46,19 @@ export function displaySites(sites) {
             cloudLabel = `<span class="site-cloud ${cloudInfo.class}">${cloudInfo.emoji} ${cloudPct}%</span>`;
         }
         
-        // Bortle scale label
+        // Bortle scale icon only
         let bortleLabel = '';
         if (site.darksky_bortle && site.darksky_status === 'success') {
-            const bortle = parseFloat(site.darksky_bortle);
-            bortleLabel = `<span class="site-bortle">🌌 Bortle ${bortle}</span>`;
+            bortleLabel = `<span class="site-bortle" title="Bortle ${site.darksky_bortle}">🌌</span>`;
+        }
+        
+        // Horizon clearance label
+        let clearanceLabel = '';
+        if (site.terrain_clearance) {
+            const clearance = parseFloat(site.terrain_clearance);
+            const clearanceColor = clearance >= 0 ? '#28a745' : '#dc3545';
+            const clearanceIcon = clearance >= 0 ? '✓' : '✗';
+            clearanceLabel = `<span class="site-clearance" style="color: ${clearanceColor}" title="Horizon clearance: ${site.terrain_clearance}°">🏔️${clearanceIcon}</span>`;
         }
         
         const isSelected = appState.isSiteSelected(site.code);
@@ -64,11 +67,9 @@ export function displaySites(sites) {
                 <div class="site-code">${site.code}</div>
                 <div class="site-name">${site.denominacion || 'N/A'}</div>
                 <div>
-                    <span class="site-value">VT: ${site.valor_turistico}</span>
-                    <span class="site-privacy">${site.confidencialidad}</span>
-                    ${eclipseLabel}
                     ${cloudLabel}
                     ${bortleLabel}
+                    ${clearanceLabel}
                 </div>
             </li>
         `;
