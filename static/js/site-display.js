@@ -56,11 +56,12 @@ export function displaySites(sites) {
         if (site.darksky_bortle && site.darksky_status === 'success') {
             const bortle = parseFloat(site.darksky_bortle);
             let bortleIcon = '🌌'; // Default
-            if (bortle <= 2) bortleIcon = '✨'; // Excellent dark sky
-            else if (bortle <= 4) bortleIcon = '⭐'; // Good dark sky
-            else if (bortle <= 6) bortleIcon = '🌟'; // Moderate
-            else if (bortle <= 8) bortleIcon = '💫'; // Light pollution
-            else bortleIcon = '🌆'; // Heavy light pollution
+            if (bortle <= 2) bortleIcon = '✨'; // Excellent dark sky (1-2)
+            else if (bortle === 3) bortleIcon = '⭐'; // Good dark sky (3)
+            else if (bortle === 4) bortleIcon = '🌠'; // Rural sky (4)
+            else if (bortle <= 6) bortleIcon = '🌟'; // Moderate (5-6)
+            else if (bortle <= 8) bortleIcon = '💫'; // Light pollution (7-8)
+            else bortleIcon = '🌆'; // Heavy light pollution (9+)
             bortleLabel = `<span class="site-bortle" title="Bortle ${bortle}">${bortleIcon}</span>`;
         }
         
