@@ -15,11 +15,40 @@ import { initialize3DMap, cleanup3DMap } from './terrain-3d.js';
  * Files are in format: horizon_site_name_(code).png
  */
 const HORIZON_FILES = {
+    'IB034': 'horizon_fuente_lacorte-el_frontal_(ib034).png',
+    'IB034B': 'horizon_la_peña__el_corral_de_la_peña___matecasa_(ib034b).png',
+    'IB034C': 'horizon_los_tormos_(ib034c).png',
+    'IB034D': 'horizon_san_roque_(ib034d).png',
+    'IB034E': 'horizon_el_salgar_de_silas_(ib034e).png',
+    'IB034F': 'horizon_fuentesalvo_(ib034f).png',
+    'IB034G': 'horizon_miraflores_i_(ib034g).png',
+    'IB034H': 'horizon_serrantes_(ib034h).png',
     'IB034I': 'horizon_valdegén_(ib034i).png',
-    'IB200G': 'horizon_valdemayor_(ib200g).png',
-    'IB200': 'horizon_valdeté,_perosancio_y_tajugueras_(ib200).png',
     'IB034J': 'horizon_valles_de_valdelalosa_(ib034j).png',
-    'IB200H': 'horizon_virgen_del_prado_(IB200h).png'
+    'IB200': 'horizon_valdeté,_perosancio_y_tajugueras_(ib200).png',
+    'IB200B': 'horizon_la_magdalena_(ib200b).png',
+    'IB200C': 'horizon_los_cayos_a_(ib200c).png',
+    'IB200D': 'horizon_los_cayos_b_(ib200d).png',
+    'IB200E': 'horizon_los_cayos_c_(ib200e).png',
+    'IB200F': 'horizon_los_cayos_s_(ib200f).png',
+    'IB200G': 'horizon_valdemayor_(ib200g).png',
+    'IB200H': 'horizon_virgen_del_prado_(IB200h).png',
+    'IB200I': 'horizon_valdecevillo_(ib200i).png',
+    'IB200J': 'horizon_virgen_del_campo_(ib200j).png',
+    'IB200K': 'horizon_el_villar-poyales_(ib200k).png',
+    'IB200L': 'horizon_peñaportillo_(ib200l).png',
+    'IB200M': 'horizon_la_canal_(ib200m).png',
+    'IB200N': 'horizon_soto_en_cameros_1,_2_y_3_(ib200n).png',
+    'IB200O': 'horizon_la_era_del_peladillo_(ib200o).png',
+    'IB200P': 'horizon_las_navillas_(ib200p).png',
+    'IB200Q': 'horizon_la_torre_(ib200q).png',
+    'IB200R': 'horizon_valdebrajes_(ib200r).png',
+    'IB200S': 'horizon_las_losas_(ib200s).png',
+    'IB200T': 'horizon_la_senoba_(ib200t).png',
+    'IB200U': 'horizon_navalsaz_(ib200u).png',
+    'IB200V': 'horizon_la_pellejera_(ib200v).png',
+    'IB207': 'horizon_yacimientos_de_dinosaurios_del_jurásico-cretácico_en_galve_(ib207).png',
+    'IB208': 'horizon_yacimiento_de_dinosaurios_del_cretácico_inferior_de_vallivana_(morella)_(ib208).png'
 };
 
 /**
