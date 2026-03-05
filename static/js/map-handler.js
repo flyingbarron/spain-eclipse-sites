@@ -16,7 +16,7 @@ let currentMap = null;
  * @param {Object} options - Map options
  */
 export function createMapWithSites(sites, options = {}) {
-    const { showRouting = true, showRouteSummary = false } = options;
+    const { showRouting = true, showRouteSummary = false, mapContainerId = 'mapContainer' } = options;
     
     // Remove existing map
     if (currentMap) {
@@ -33,7 +33,7 @@ export function createMapWithSites(sites, options = {}) {
     
     // Create map with a small delay to ensure container is ready
     setTimeout(() => {
-        currentMap = L.map('mapContainer').fitBounds(bounds, { padding: [50, 50] });
+        currentMap = L.map(mapContainerId).fitBounds(bounds, { padding: [50, 50] });
         
         L.tileLayer(CONFIG.MAP.TILE_LAYER, {
             attribution: CONFIG.MAP.ATTRIBUTION,
@@ -766,14 +766,14 @@ export function updateMapWithMultipleSites() {
  */
 export function initializeSingleSiteMap(site) {
     if (!site || site.latitude === 'N/A' || site.longitude === 'N/A') {
-        const mapContainer = document.getElementById('mapContainer');
+        const mapContainer = document.getElementById('map');
         if (mapContainer) {
             mapContainer.innerHTML = '<div class="loading">No coordinates available for this site</div>';
         }
         return;
     }
     
-    createMapWithSites([site], { showRouting: true, showRouteSummary: true });
+    createMapWithSites([site], { showRouting: true, showRouteSummary: true, mapContainerId: 'map' });
 }
 
 // Made with Bob
