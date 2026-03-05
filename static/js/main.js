@@ -90,10 +90,10 @@ function setupFooterToggle() {
     
     if (footerToggle && footerDetails) {
         footerToggle.addEventListener('click', () => {
-            footerDetails.classList.toggle('show');
+            footerDetails.classList.toggle('expanded');
             const icon = footerToggle.querySelector('.footer-toggle-icon');
             if (icon) {
-                icon.textContent = footerDetails.classList.contains('show') ? '▼' : '▶';
+                icon.textContent = footerDetails.classList.contains('expanded') ? '▼' : '▶';
             }
         });
     }
