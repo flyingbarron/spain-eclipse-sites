@@ -23,6 +23,7 @@ This project aggregates geological site information and eclipse planning data fo
 - ✅ Automated profile diagram capture (IGN)
 - ✅ Historical cloud coverage data (timeanddate.com)
 - ✅ **Dark Sky Sites data** (SQM, Bortle scale, darkness percentage)
+- ✅ **Horizon clearance data** - Sun's clearance above terrain at eclipse time (degrees)
 - ✅ EclipseFan horizon image downloading
 - ✅ Shademap sun/shadow visualization snapshots
 - ✅ Google Maps Static API location thumbnails
@@ -32,7 +33,7 @@ This project aggregates geological site information and eclipse planning data fo
 ### Web Viewer
 - 🔍 **Search** by site code or name (sticky controls)
 - 🌑 **Filter** eclipse-visible sites
-- 📊 **Sort** by code, name, or tourist value
+- 📊 **Sort** by code, name, tourist value, darkness, or horizon clearance
 - 📚 **Navigation panels** - Resources, About, and Help sections accessible from header
 - 🔗 **Resources panel** - Quick links to eclipse websites and planning tools
 - 🖼️ **Image gallery** with full-screen carousel (IGME photos cached locally)
@@ -46,6 +47,7 @@ This project aggregates geological site information and eclipse planning data fo
 - 📍 **Export routes** to Google Maps or KML for GPS devices
 - 📈 **Eclipse profile diagrams** with hover preview (IGN, EclipseFan)
 - ☁️ **Cloud coverage data** for eclipse planning
+- 🏔️ **Horizon clearance** - Shows if terrain blocks the sun during eclipse (color-coded: green=clear, red=blocked)
 - 🌌 **Dark Sky Sites data** - SQM values, Bortle scale, darkness percentage
 - 🔗 **Dark Sky Sites links** - Direct links to darkskysites.com for each location
 - 🔢 **Site counter** showing filtered results
