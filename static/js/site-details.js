@@ -19,7 +19,7 @@ const HORIZON_FILES = {
     'IB200G': 'horizon_valdemayor_(ib200g).png',
     'IB200': 'horizon_valdeté,_perosancio_y_tajugueras_(ib200).png',
     'IB034J': 'horizon_valles_de_valdelalosa_(ib034j).png',
-    'IB200H': 'horizon_virgen_del_prado_(ib200h).png'
+    'IB200H': 'horizon_virgen_del_prado_(IB200h).png'
 };
 
 /**
