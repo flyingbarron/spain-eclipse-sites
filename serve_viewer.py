@@ -53,6 +53,9 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         # Handle config endpoint
         elif self.path == '/api/config':
             self.handle_config()
+        # Handle horizon files list endpoint
+        elif self.path == '/api/horizon-files':
+            self.handle_horizon_files()
         # Handle image scraping API endpoint
         elif self.path.startswith('/api/images?'):
             self.handle_images_api()
@@ -87,6 +90,33 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             
         except Exception as e:
             self.send_error(500, f"Error loading config: {str(e)}")
+    
+    def handle_horizon_files(self):
+        """Serve list of available horizon files"""
+        try:
+            import glob
+            import re
+            
+            # Get all horizon files
+            horizon_files = glob.glob('data/horizons/horizon_*_(ib*.png')
+            
+            # Extract site codes from filenames
+            horizon_map = {}
+            for filepath in horizon_files:
+                filename = os.path.basename(filepath)
+                # Extract code from filename like: horizon_name_(ib034h).png
+                match = re.search(r'\((ib[0-9]+[a-z]*)\)\.png$', filename, re.IGNORECASE)
+                if match:
+                    code = match.group(1).upper()
+                    horizon_map[code] = filename
+            
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(horizon_map).encode())
+            
+        except Exception as e:
+            self.send_error(500, f"Error listing horizon files: {str(e)}")
     
     def handle_shutdown(self):
         """Handle graceful server shutdown"""
