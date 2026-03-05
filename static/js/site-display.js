@@ -38,6 +38,11 @@ export function displaySites(sites) {
     }
     
     list.innerHTML = sites.map(site => {
+        // Eclipse visibility marker
+        const eclipseInfo = getEclipseInfo(site.eclipse_visibility);
+        const eclipseLabel = eclipseInfo.text ?
+            `<span class="site-eclipse ${eclipseInfo.class}">${eclipseInfo.text}</span>` : '';
+        
         // Cloud coverage label
         let cloudLabel = '';
         if (site.cloud_coverage && site.cloud_status === 'success') {
@@ -46,10 +51,17 @@ export function displaySites(sites) {
             cloudLabel = `<span class="site-cloud ${cloudInfo.class}">${cloudInfo.emoji} ${cloudPct}%</span>`;
         }
         
-        // Bortle scale icon only
+        // Bortle scale icon - different icons for different values
         let bortleLabel = '';
         if (site.darksky_bortle && site.darksky_status === 'success') {
-            bortleLabel = `<span class="site-bortle" title="Bortle ${site.darksky_bortle}">🌌</span>`;
+            const bortle = parseFloat(site.darksky_bortle);
+            let bortleIcon = '🌌'; // Default
+            if (bortle <= 2) bortleIcon = '✨'; // Excellent dark sky
+            else if (bortle <= 4) bortleIcon = '⭐'; // Good dark sky
+            else if (bortle <= 6) bortleIcon = '🌟'; // Moderate
+            else if (bortle <= 8) bortleIcon = '💫'; // Light pollution
+            else bortleIcon = '🌆'; // Heavy light pollution
+            bortleLabel = `<span class="site-bortle" title="Bortle ${bortle}">${bortleIcon}</span>`;
         }
         
         // Horizon clearance label
@@ -67,9 +79,10 @@ export function displaySites(sites) {
                 <div class="site-code">${site.code}</div>
                 <div class="site-name">${site.denominacion || 'N/A'}</div>
                 <div>
-                    ${cloudLabel}
-                    ${bortleLabel}
-                    ${clearanceLabel}
+                    ${eclipseLabel}
+                    ${cloudLabel ? ' | ' + cloudLabel : ''}
+                    ${bortleLabel ? ' | ' + bortleLabel : ''}
+                    ${clearanceLabel ? ' | ' + clearanceLabel : ''}
                 </div>
             </li>
         `;
