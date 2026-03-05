@@ -38,6 +38,7 @@ This project aggregates geological site information and eclipse planning data fo
 - 🖼️ **Image gallery** with full-screen carousel (IGME photos cached locally)
 - 🗺️ **Interactive maps** with Leaflet/OpenStreetMap
 - 📍 **Google Maps thumbnails** - Satellite view for each site location
+- 🌄 **Horizon profile images** - Local terrain horizon views with hover preview (from ./data/horizons/)
 - 🌄 **Shademap thumbnails** - Sun/shadow visualization with hover preview
 - 🚗 **Multi-site route planning** with Ctrl/Cmd+Click selection
 - 🧭 **Turn-by-turn directions** for each route segment
