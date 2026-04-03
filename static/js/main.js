@@ -3,13 +3,50 @@
  * Initializes and coordinates all application modules
  */
 
-import { loadConfig } from './config.js';
+import { CONFIG, loadConfig } from './config.js';
 import { appState } from './state.js';
 import { loadCSV } from './data-loader.js';
 import { displaySites, filterSites, setupSiteListListeners } from './site-display.js';
 import { displaySiteDetails, switchTab } from './site-details.js';
 import { setupModalListeners } from './modal-handler.js';
 import { updateMapWithMultipleSites } from './map-handler.js';
+
+function escapeHtml(text) {
+    return text
+        .replace(/&/g, '&')
+        .replace(/</g, '<')
+        .replace(/>/g, '>');
+}
+
+function renderReadmeMarkdown(markdown) {
+    const escaped = escapeHtml(markdown);
+    return escaped
+        .replace(/^### (.*)$/gm, '<h3>$1</h3>')
+        .replace(/^## (.*)$/gm, '<h2>$1</h2>')
+        .replace(/^# (.*)$/gm, '<h1>$1</h1>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\n/g, '<br>');
+}
+
+async function loadReadmeContent() {
+    const readmeContent = document.getElementById('readmeContent');
+    if (!readmeContent) return;
+
+    try {
+        const response = await fetch(CONFIG.API.README);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const payload = await response.json();
+        readmeContent.innerHTML = renderReadmeMarkdown(payload.content || '');
+    } catch (error) {
+        console.error('Error loading README:', error);
+        readmeContent.innerHTML = '<div class="error">Unable to load README content.</div>';
+    }
+}
 
 /**
  * Initialize the application
@@ -33,7 +70,8 @@ async function init() {
         setupSiteClickListeners();
         setupFooterToggle();
         setupModalListeners();
-        
+        await loadReadmeContent();
+
         console.log('Application initialized successfully');
         
     } catch (error) {

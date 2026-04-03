@@ -75,6 +75,9 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         # Handle config endpoint
         elif self.path == '/api/config':
             self.handle_config()
+        # Handle README endpoint
+        elif self.path == '/api/readme':
+            self.handle_readme()
         # Handle horizon files list endpoint
         elif self.path == '/api/horizon-files':
             self.handle_horizon_files()
@@ -110,6 +113,14 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         except Exception as e:
             self.send_error(500, f"Error loading config: {str(e)}")
     
+    def handle_readme(self):
+        """Serve README content for in-app viewing."""
+        try:
+            with open('README.md', 'r', encoding='utf-8') as file:
+                self._send_json_response({'content': file.read()})
+        except Exception as e:
+            self.send_error(500, f"Error loading README: {str(e)}")
+
     def handle_horizon_files(self):
         """Serve list of available horizon files"""
         try:
