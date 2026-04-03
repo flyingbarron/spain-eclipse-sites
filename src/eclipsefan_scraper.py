@@ -1,5 +1,5 @@
 """
-EclipseFan Horizon Scraper Module
+EclipseFan Horizon Downloader Module
 Functions for downloading horizon profile images from EclipseFan.org
 """
 
@@ -17,7 +17,7 @@ HORIZON_DIR = os.path.join(DATA_DIR, "scrape", "eclipsefan_horizons")
 
 
 def setup_webdriver(headless: bool = True) -> Optional[webdriver.Chrome]:
-    """Setup and return a Chrome WebDriver instance for EclipseFan
+    """Set up and return a Chrome WebDriver instance for EclipseFan.
     
     Args:
         headless: Whether to run in headless mode
@@ -59,7 +59,7 @@ def setup_webdriver(headless: bool = True) -> Optional[webdriver.Chrome]:
 
 
 def download_horizon_image(driver: webdriver.Chrome, lat: float, lon: float, code: str) -> str:
-    """Download horizon profile image from EclipseFan.org
+    """Download a horizon profile image from EclipseFan.org.
     
     Args:
         driver: Selenium WebDriver instance
@@ -199,11 +199,11 @@ def download_horizon_image(driver: webdriver.Chrome, lat: float, lon: float, cod
 
 
 def download_horizon_images_for_sites(sites: List[Dict[str, Any]], delay: float = 2.0) -> List[Dict[str, Any]]:
-    """Download horizon images for multiple sites
+    """Download horizon images for multiple sites.
     
     Args:
         sites: List of site dictionaries with 'code', 'latitude', 'longitude'
-        delay: Delay in seconds between requests (default 2.0 for respectful scraping)
+        delay: Delay in seconds between requests (default 2.0 for respectful downloading)
     
     Returns:
         List of site dictionaries with added 'horizon_status' field

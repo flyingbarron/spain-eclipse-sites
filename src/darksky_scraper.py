@@ -1,5 +1,5 @@
 """
-Dark Sky scraper integration helpers.
+Dark Sky data scraping helpers.
 
 Wraps the utility scraper so the main pipeline can call a single function
 instead of inlining import, coordinate parsing, delay, and status mapping.
@@ -9,10 +9,16 @@ import os
 import sys
 import time
 from typing import Any, Dict, List
+from src.constants import (
+    INVALID_COORDINATES_STATUS,
+    NO_COORDINATES_STATUS,
+    SKIPPED_EXISTING_STATUS,
+    SUCCESS_STATUS,
+)
 
 
 def _load_darksky_utility():
-    """Dynamically import the Dark Sky utility scraper."""
+    """Dynamically import the Dark Sky utility data scraper."""
     utilities_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'utilities')
     if utilities_dir not in sys.path:
         sys.path.insert(0, utilities_dir)
@@ -45,7 +51,7 @@ def scrape_darksky_for_sites(
 
         if lat_str == 'N/A' or lon_str == 'N/A':
             print(f"[{i}/{len(sites)}] {code}: No coordinates, skipping")
-            _set_darksky_failure(site, 'no_coordinates')
+            _set_darksky_failure(site, NO_COORDINATES_STATUS)
             continue
 
         try:
@@ -53,12 +59,12 @@ def scrape_darksky_for_sites(
             lon = float(lon_str)
         except (ValueError, TypeError):
             print(f"[{i}/{len(sites)}] {code}: Invalid coordinates, skipping")
-            _set_darksky_failure(site, 'invalid_coordinates')
+            _set_darksky_failure(site, INVALID_COORDINATES_STATUS)
             continue
 
         if skip_existing and data_exists_checker and data_exists_checker(str(code), 'darksky'):
             print(f"[{i}/{len(sites)}] {code}: Skipping - Dark Sky data already exists")
-            site['darksky_status'] = 'skipped_existing'
+            site['darksky_status'] = SKIPPED_EXISTING_STATUS
             continue
 
         print(f"[{i}/{len(sites)}] {code}: Scraping Dark Sky Sites data...")
@@ -66,12 +72,12 @@ def scrape_darksky_for_sites(
         try:
             result = scrape_darkskysites_data(lat, lon, site_code=code, headless=True)
 
-            if result['status'] == 'success' and result.get('parsed_data'):
+            if result['status'] == SUCCESS_STATUS and result.get('parsed_data'):
                 parsed = result['parsed_data']
                 site['darksky_sqm'] = parsed.get('sqm')
                 site['darksky_bortle'] = parsed.get('bortle')
                 site['darksky_darkness'] = parsed.get('darkness')
-                site['darksky_status'] = 'success'
+                site['darksky_status'] = SUCCESS_STATUS
                 print(
                     f"  ✓ SQM={parsed.get('sqm')}, "
                     f"Bortle={parsed.get('bortle')}, "

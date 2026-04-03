@@ -17,14 +17,14 @@ This project aggregates geological site information and eclipse planning data fo
 ## Features
 
 ### Data Collection
-- ✅ Automated scraping of IGME IELIG database (sites, photos, coordinates)
+- ✅ Automated scraping of IGME IELIG database data (sites, photos, coordinates)
 - ✅ Tourist value ratings and route difficulty levels
 - ✅ Eclipse visibility checking via IGN Eclipse 2026 viewer
 - ✅ Automated profile diagram capture (IGN)
 - ✅ Historical cloud coverage data (timeanddate.com)
 - ✅ **Dark Sky Sites data** (SQM, Bortle scale, darkness percentage)
 - ✅ **Horizon clearance data** - Sun's clearance above terrain at eclipse time (degrees)
-- ✅ EclipseFan horizon image downloading
+- ✅ EclipseFan horizon image downloads
 - ✅ Shademap sun/shadow visualization snapshots with retry handling and clearer status reporting
 - ✅ Google Maps Static API location thumbnails
 - ✅ Image caching for improved performance
@@ -103,7 +103,7 @@ sudo apt-get install chromium-chromedriver
 python3 -m playwright install chromium
 ```
 
-If skipped, the Shademap scraper will try to install Chromium automatically on first use.
+If skipped, the Shademap downloader will try to install Chromium automatically on first use.
 
 Shademap behavior:
 - Uses Playwright in headless mode
@@ -133,83 +133,98 @@ See [STANDALONE_VIEWER.md](STANDALONE_VIEWER.md) for detailed documentation.
 
 ### Generate Data
 
-The main script `generate_eclipse_site_data.py` collects all site data with multiple options:
+The main script [`generate_eclipse_site_data.py`](generate_eclipse_site_data.py) now uses a simpler CLI built around [`--mode`](generate_eclipse_site_data.py:1), [`--steps`](generate_eclipse_site_data.py:1), and [`--skip-steps`](generate_eclipse_site_data.py:1).
 
 #### Basic Usage
 
-Collect all data (IGME sites + eclipse visibility + cloud coverage + Dark Sky Sites data + horizon images):
+Collect all configured data for new sites:
 ```bash
 python3 generate_eclipse_site_data.py
 ```
 
-This will:
-1. Scrape IGME site data (tourist values, coordinates, etc.)
-2. Check eclipse visibility using IGN Eclipse 2026 viewer
-3. Scrape cloud coverage data from timeanddate.com
-4. Scrape Dark Sky Sites data (SQM, Bortle scale, darkness percentage)
-5. Download horizon images from EclipseFan.org
-6. Generate CSV and KML output files
-7. Create automatic backup of existing CSV before updates
+This runs the full pipeline:
+1. Scrape IGME site data
+2. Run the selected enrichment steps
+3. Save merged CSV and KML outputs
+4. Create a timestamped CSV backup before overwriting
 
-#### Command-Line Options
+#### Command-Line Model
 
-**Skip specific operations** (faster):
+**Modes**
+- [`--mode full`](generate_eclipse_site_data.py:1): scrape IGME data, then run selected enrichment steps
+- [`--mode update`](generate_eclipse_site_data.py:1): load an existing CSV and run only the selected enrichment steps
+
+**Steps**
+- `eclipse`
+- `cloud`
+- `darksky`
+- `horizon`
+- `shademap`
+
+#### Full Pipeline Examples
+
 ```bash
-# Skip eclipse checking (IGME data only)
-python3 generate_eclipse_site_data.py --no-eclipse
+# Default full pipeline
+python3 generate_eclipse_site_data.py
 
-# Check visibility without profile screenshots (faster)
-python3 generate_eclipse_site_data.py --no-profile
+# Full pipeline with explicit steps
+python3 generate_eclipse_site_data.py --mode full --steps eclipse,cloud,darksky,horizon,shademap
 
-# Skip cloud coverage scraping
-python3 generate_eclipse_site_data.py --no-cloud
+# Skip selected steps
+python3 generate_eclipse_site_data.py --skip-steps cloud,shademap
 
-# Skip Dark Sky Sites data scraping
-python3 generate_eclipse_site_data.py --no-darksky
+# Visibility check without profile screenshots
+python3 generate_eclipse_site_data.py --steps eclipse --no-profile
 
-# Skip horizon image downloading
-python3 generate_eclipse_site_data.py --no-horizon
+# Process one configured site only
+python3 generate_eclipse_site_data.py --code IB200a
 
-# Combine multiple skips
-python3 generate_eclipse_site_data.py --no-eclipse --no-cloud --no-darksky --no-horizon
+# Skip already-existing outputs/data where supported
+python3 generate_eclipse_site_data.py --skip-existing
 ```
 
-**Update existing CSV with specific data** (no IGME re-scraping):
+#### Update Existing CSV Examples
+
 ```bash
 # Add cloud coverage to existing sites
-python3 generate_eclipse_site_data.py --only-cloud
+python3 generate_eclipse_site_data.py --mode update --steps cloud
 
-# Add Dark Sky Sites data to existing sites
-python3 generate_eclipse_site_data.py --only-darksky
+# Add Dark Sky data to existing sites
+python3 generate_eclipse_site_data.py --mode update --steps darksky
 
-# Add horizon images to existing sites
-python3 generate_eclipse_site_data.py --only-horizon
-
-# Add shademap images to existing sites
-python3 generate_eclipse_site_data.py --only-shademap
+# Add horizon or shademap assets
+python3 generate_eclipse_site_data.py --mode update --steps horizon
+python3 generate_eclipse_site_data.py --mode update --steps shademap
 
 # Re-check eclipse visibility for existing sites
-python3 generate_eclipse_site_data.py --only-eclipse
+python3 generate_eclipse_site_data.py --mode update --steps eclipse
 
-# Re-check visibility without downloading profile screenshots (faster)
-python3 generate_eclipse_site_data.py --only-eclipse --no-profile
+# Re-check eclipse visibility without profile screenshots
+python3 generate_eclipse_site_data.py --mode update --steps eclipse --no-profile
 
-# Update specific site only
-python3 generate_eclipse_site_data.py --only-cloud --code IB200a
-python3 generate_eclipse_site_data.py --only-darksky --code IB200b
-python3 generate_eclipse_site_data.py --only-horizon --code IB200c
-python3 generate_eclipse_site_data.py --only-shademap --code IB200d
+# Update several steps at once
+python3 generate_eclipse_site_data.py --mode update --steps cloud,darksky,horizon
 
-# Use custom CSV file
-python3 generate_eclipse_site_data.py --only-cloud --csv data/my_sites.csv
+# Update one site only
+python3 generate_eclipse_site_data.py --mode update --steps cloud --code IB200a
+python3 generate_eclipse_site_data.py --mode update --steps shademap --code IB200b
+
+# Use a custom CSV file
+python3 generate_eclipse_site_data.py --mode update --steps cloud --csv my_sites.csv
 ```
 
-When `--skip-existing` is used, the pipeline now applies the same shared skip/process/merge flow across eclipse, cloud, Dark Sky, horizon, and Shademap steps.
+When [`--skip-existing`](generate_eclipse_site_data.py:1) is used, the pipeline applies the same shared skip/process/merge flow across eclipse, cloud, Dark Sky, horizon, and Shademap steps.
 
-**Process specific site** (full pipeline):
-```bash
-python3 generate_eclipse_site_data.py --code IB200a
-```
+#### Legacy Compatibility
+
+The older legacy flags are still accepted as compatibility aliases:
+- [`--only-*`](generate_eclipse_site_data.py:1)
+- [`--no-cloud`](generate_eclipse_site_data.py:1)
+- [`--no-darksky`](generate_eclipse_site_data.py:1)
+- [`--no-horizon`](generate_eclipse_site_data.py:1)
+- [`--no-shademap`](generate_eclipse_site_data.py:1)
+
+The recommended interface is [`--mode`](generate_eclipse_site_data.py:1) plus [`--steps`](generate_eclipse_site_data.py:1).
 
 #### Help
 
@@ -221,49 +236,44 @@ python3 generate_eclipse_site_data.py --help
 #### Output
 
 The script generates:
-- `data/eclipse_site_data.csv` - Complete dataset
-- `data/sites.kml` - KML file with 6 organized folders
-- `data/ign_visibility_profiles/*.png` - Eclipse profile diagrams (if --no-eclipse not used)
-- `data/eclipsefan_visibility_profiles/*.png` - Horizon images (if --no-horizon not used)
+- [`data/eclipse_site_data.csv`](data/eclipse_site_data.csv) - Complete dataset
+- [`data/sites.kml`](data/sites.kml) - KML file with 6 organized folders
+- [`data/scrape/ign_profiles/`](data/scrape/ign_profiles/) - IGN eclipse profile diagrams
+- [`data/scrape/eclipsefan_horizons/`](data/scrape/eclipsefan_horizons/) - downloaded EclipseFan horizon images
+- [`data/scrape/shademap_snapshots/`](data/scrape/shademap_snapshots/) - downloaded Shademap exports
 
 **Note**: Eclipse azimuth lines (283.7753°, 50km length) are automatically included in the generated KML file, showing the direction toward the eclipse for each site.
 
 #### Performance Tips
 
-- **First run**: Collect complete data (~30-60 minutes)
+- **First run**: collect complete data
   ```bash
   python3 generate_eclipse_site_data.py
   ```
 
-- **Fast visibility check**: Check eclipse visibility without profile screenshots (~10-15 minutes)
+- **Fast visibility-only pass**:
   ```bash
-  python3 generate_eclipse_site_data.py --no-profile --no-cloud --no-darksky --no-horizon
+  python3 generate_eclipse_site_data.py --steps eclipse --no-profile
   ```
 
-- **Add missing data**: Use `--only-*` flags to update existing CSV without re-scraping IGME
+- **Update missing enrichment later**:
   ```bash
-  python3 generate_eclipse_site_data.py --only-cloud
-  python3 generate_eclipse_site_data.py --only-darksky
-  python3 generate_eclipse_site_data.py --only-eclipse --no-profile
+  python3 generate_eclipse_site_data.py --mode update --steps cloud
+  python3 generate_eclipse_site_data.py --mode update --steps darksky
+  python3 generate_eclipse_site_data.py --mode update --steps horizon
   ```
 
-- **Update specific site**: Combine `--only-*` with `--code`
+- **Quick testing**:
   ```bash
-  python3 generate_eclipse_site_data.py --only-horizon --code IB200a
-  python3 generate_eclipse_site_data.py --only-darksky --code IB200b
-  ```
-
-- **Testing**: Skip slow operations for quick IGME data only (~2-3 minutes)
-  ```bash
-  python3 generate_eclipse_site_data.py --no-eclipse --no-cloud --no-darksky --no-horizon
+  python3 generate_eclipse_site_data.py --skip-steps cloud,darksky,horizon,shademap
   ```
 
 - **Recommended workflow**:
-  1. Quick visibility check: `python3 generate_eclipse_site_data.py --no-profile --no-cloud --no-darksky --no-horizon`
-  2. Add cloud data: `python3 generate_eclipse_site_data.py --only-cloud`
-  3. Add Dark Sky Sites data: `python3 generate_eclipse_site_data.py --only-darksky`
-  4. Add horizon images: `python3 generate_eclipse_site_data.py --only-horizon`
-  5. Add profile screenshots: `python3 generate_eclipse_site_data.py --only-eclipse`
+  1. Quick visibility pass: `python3 generate_eclipse_site_data.py --steps eclipse --no-profile`
+  2. Add cloud data: `python3 generate_eclipse_site_data.py --mode update --steps cloud`
+  3. Add Dark Sky data: `python3 generate_eclipse_site_data.py --mode update --steps darksky`
+  4. Add horizon images: `python3 generate_eclipse_site_data.py --mode update --steps horizon`
+  5. Add Shademap exports: `python3 generate_eclipse_site_data.py --mode update --steps shademap`
 
 ### View Data
 
@@ -303,9 +313,10 @@ spain-eclipse-sites/
 │   ├── bortle_scraper.py            # Old PNG tile-based Bortle scraper (replaced by Dark Sky Sites)
 │   └── favicon.svg
 ├── data/                             # Generated data (gitignored)
-│   ├── ign_visibility_profiles/      # IGN eclipse visibility diagrams
-│   ├── eclipsefan_visibility_profiles/ # EclipseFan horizon profiles
-│   ├── scrape/shademap_snapshots/   # Shademap visualizations
+│   ├── scrape/ign_profiles/          # IGN eclipse visibility diagrams
+│   ├── scrape/eclipsefan_horizons/   # EclipseFan horizon profiles
+│   ├── scrape/shademap_snapshots/    # Shademap visualizations
+│   ├── brochures/                    # Downloaded brochure PDFs
 │   ├── eclipse_site_data.csv         # Main dataset
 │   └── sites.kml                     # All sites organized in 6 folders
 ├── src/                              # Modular source code

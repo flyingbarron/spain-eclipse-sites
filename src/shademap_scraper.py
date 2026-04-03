@@ -1,14 +1,14 @@
 """
-Shademap Scraper Module
+Shademap Downloader Module
 Functions for downloading shadow map exports from Shademap.app
 """
 
 import os
 import time
-import base64
 import subprocess
 import sys
 from typing import List, Dict, Any, Optional
+from src.constants import SHADEMAP_SNAPSHOTS_DIR, SUCCESS_STATUS
 
 # Try to import playwright, but make it optional
 sync_playwright = None
@@ -19,17 +19,8 @@ try:
 except ImportError:
     PLAYWRIGHT_AVAILABLE = False
 
-# Data directory for outputs
-DATA_DIR = "data"
-SHADEMAP_DIR = os.path.join(DATA_DIR, "scrape", "shademap_snapshots")
-
 # Eclipse time in milliseconds (August 12, 2026, 18:30 UTC)
 ECLIPSE_TIME = "1786559455614"
-
-
-def btoa(s: str) -> str:
-    """Base64 encode a string (like JavaScript's btoa)"""
-    return base64.b64encode(s.encode()).decode()
 
 
 def ensure_playwright_chromium() -> bool:
@@ -67,7 +58,7 @@ def ensure_playwright_chromium() -> bool:
 
 
 def download_shademap_export(lat: float, lon: float, code: str, zoom_level: int = 19, max_retries: int = 2) -> str:
-    """Download shadow map export from Shademap.app
+    """Download a shadow map export from Shademap.app.
     
     Args:
         lat: Latitude in decimal degrees
@@ -222,11 +213,11 @@ def download_shademap_export(lat: float, lon: float, code: str, zoom_level: int 
                                 jpg_clicked = True
                                 
                                 # Save the download
-                                os.makedirs(SHADEMAP_DIR, exist_ok=True)
-                                output_path = os.path.join(SHADEMAP_DIR, f"{code}_shademap.jpg")
+                                os.makedirs(SHADEMAP_SNAPSHOTS_DIR, exist_ok=True)
+                                output_path = os.path.join(SHADEMAP_SNAPSHOTS_DIR, f"{code}_shademap.jpg")
                                 download.save_as(output_path)
                                 print(f"  ✓ Saved shademap to {output_path}")
-                                return 'success'
+                                return SUCCESS_STATUS
                         except Exception:
                             continue
                     
@@ -261,7 +252,7 @@ def download_shademap_for_sites(sites: List[Dict[str, Any]], delay: float = 2.0,
     
     Args:
         sites: List of site dictionaries with 'code', 'latitude', 'longitude'
-        delay: Delay in seconds between requests (default 2.0 for respectful scraping)
+        delay: Delay in seconds between requests (default 2.0 for respectful downloading)
         zoom_level: Zoom level for Shademap (default: 19)
     
     Returns:
