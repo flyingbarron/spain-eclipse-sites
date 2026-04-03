@@ -197,8 +197,13 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             
             # Find all image tags in the content area
             for img in soup.find_all('img'):
-                src = img.get('src', '')
-                alt = img.get('alt', '')
+                src_attr = img.get('src')
+                alt_attr = img.get('alt')
+                src = src_attr if isinstance(src_attr, str) else ''
+                alt = alt_attr if isinstance(alt_attr, str) else ''
+                
+                if not src:
+                    continue
                 
                 # Skip small icons and logos
                 if any(skip in src.lower() for skip in ['icon', 'logo', 'banner', 'button']):

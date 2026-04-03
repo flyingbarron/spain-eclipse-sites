@@ -6,7 +6,7 @@ A comprehensive data collection and visualization tool for Spanish geological si
 
 This project aggregates geological site information and eclipse planning data for the August 12, 2026 total solar eclipse. It provides:
 
-- **54 geological sites** in Spain (IB200, IB200a-z, IB034, IB034a-z)
+- **37 configured IGME-series and individual sites**, plus **2 custom test sites** (`T0001`, `T0002`) in `data/igme_sites_config.json`
 - **Eclipse visibility data** with profile diagrams
 - **Cloud coverage statistics** for eclipse planning
 - **Horizon visualizations** showing eclipse path
