@@ -45,7 +45,29 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Methods', 'GET')
         self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate')
         super().end_headers()
-    
+
+    def _get_query_param(self, name):
+        """Return a single query parameter value from the request path."""
+        query = urllib.parse.urlparse(self.path).query
+        params = urllib.parse.parse_qs(query)
+        return params.get(name, [None])[0]
+
+    def _send_json_response(self, payload, status=200):
+        """Send a JSON response from a Python object or pre-serialized JSON string."""
+        response_body = payload if isinstance(payload, str) else json.dumps(payload)
+        self.send_response(status)
+        self.send_header('Content-Type', 'application/json')
+        self.end_headers()
+        self.wfile.write(response_body.encode())
+
+    def _send_binary_response(self, data, content_type, status=200):
+        """Send a binary response with content metadata."""
+        self.send_response(status)
+        self.send_header('Content-Type', content_type)
+        self.send_header('Content-Length', str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
+
     def do_GET(self):
         # Handle shutdown endpoint
         if self.path == '/api/shutdown':
@@ -82,12 +104,9 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 'google_maps_api_key': google_maps_key,
                 'mapbox_api_key': mapbox_key
             }
-            
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps(config_data).encode())
-            
+
+            self._send_json_response(config_data)
+
         except Exception as e:
             self.send_error(500, f"Error loading config: {str(e)}")
     
@@ -110,22 +129,16 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                     code = match.group(1).upper()
                     horizon_map[code] = filename
             
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps(horizon_map).encode())
-            
+            self._send_json_response(horizon_map)
+
         except Exception as e:
             self.send_error(500, f"Error listing horizon files: {str(e)}")
     
     def handle_shutdown(self):
         """Handle graceful server shutdown"""
         try:
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps({'message': 'Server shutting down...'}).encode())
-            
+            self._send_json_response({'message': 'Server shutting down...'})
+
             # Schedule immediate shutdown after response is sent
             def shutdown():
                 import time
@@ -142,45 +155,33 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def handle_images_api(self):
         """Scrape images from IGME site and return as JSON with caching"""
         try:
-            # Parse query parameters
-            query = urllib.parse.urlparse(self.path).query
-            params = urllib.parse.parse_qs(query)
-            url = params.get('url', [None])[0]
-            
+            url = self._get_query_param('url')
+
             if not url:
                 self.send_error(400, "Missing 'url' parameter")
                 return
-            
-            json_response = get_cached_igme_images(url)
 
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json_response.encode())
-            
+            json_response = get_cached_igme_images(url)
+            self._send_json_response(json_response)
+
         except Exception as e:
             self.send_error(500, f"Error scraping images: {str(e)}")
     
     def handle_image_proxy(self):
         """Proxy image requests to avoid CORS issues with disk caching"""
         try:
-            # Parse query parameters
-            query = urllib.parse.urlparse(self.path).query
-            params = urllib.parse.parse_qs(query)
-            image_url = params.get('url', [None])[0]
-            
+            image_url = self._get_query_param('url')
+
             if not image_url:
                 self.send_error(400, "Missing 'url' parameter")
                 return
-            
-            proxy_image = get_cached_proxy_image(image_url)
 
-            self.send_response(200)
-            self.send_header('Content-Type', proxy_image['content_type'])
-            self.send_header('Content-Length', str(len(proxy_image['image_data'])))
-            self.end_headers()
-            self.wfile.write(proxy_image['image_data'])
-            
+            proxy_image = get_cached_proxy_image(image_url)
+            self._send_binary_response(
+                proxy_image['image_data'],
+                proxy_image['content_type'],
+            )
+
         except Exception as e:
             self.send_error(500, f"Error proxying image: {str(e)}")
 
