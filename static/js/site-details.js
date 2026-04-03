@@ -10,6 +10,17 @@ import { loadSiteImages } from './image-loader.js';
 import { initializeSingleSiteMap, updateMapWithMultipleSites } from './map-handler.js';
 import { initialize3DMap, cleanup3DMap } from './terrain-3d.js';
 
+const ASSET_PATHS = {
+    horizons: 'data/horizons',
+    shademap: 'data/scrape/shademap_snapshots',
+    eclipsefan: 'data/scrape/eclipsefan_horizons',
+    ignProfiles: 'data/scrape/ign_profiles',
+};
+
+const HEADER_COLUMN_STYLE = 'display: flex; flex-direction: column; align-items: center; gap: 0.25rem;';
+const HEADER_STACK_STYLE = 'display: flex; flex-direction: column; gap: 0.25rem;';
+const THUMBNAIL_WRAPPER_STYLE = 'position: relative; display: inline-block;';
+
 /**
  * Cache for horizon files mapping
  */
@@ -98,6 +109,74 @@ function generateSiteUrls(site) {
     };
 }
 
+function buildAssetUrl(basePath, filename) {
+    return `${basePath}/${filename}`;
+}
+
+function renderHeaderPreview({ buttonHtml, imageUrl, alt, extraClass = '', title }) {
+    return `
+        <div style="${HEADER_COLUMN_STYLE}">
+            ${buttonHtml}
+            <div style="${THUMBNAIL_WRAPPER_STYLE}">
+                <img src="${imageUrl}"
+                     alt="${alt}"
+                     class="eclipse-profile-thumbnail ${extraClass}".trim()
+                     onclick="window.open('${imageUrl}', '_blank')"
+                     onerror="this.parentElement.style.display='none'"
+                     title="${title}">
+                <div class="eclipse-profile-overlay">
+                    <img src="${imageUrl}" alt="${alt}">
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function renderSimplePreview({ linkUrl, buttonClass, buttonLabel, imageUrl, alt, extraClass = '', title }) {
+    return renderHeaderPreview({
+        buttonHtml: `<a href="${linkUrl}" target="_blank" class="${buttonClass}">${buttonLabel}</a>`,
+        imageUrl,
+        alt,
+        extraClass,
+        title,
+    });
+}
+
+function renderMapsPreview(site, urls) {
+    if (!urls.googleStatic) {
+        return '';
+    }
+
+    return `
+        <div style="${HEADER_COLUMN_STYLE}">
+            <a href="${urls.maps}" target="_blank" class="link-button maps">📍 Open in Google Maps</a>
+            <div style="${THUMBNAIL_WRAPPER_STYLE}">
+                <img src="${urls.googleStatic}"
+                     alt="Google Maps location for ${site.code}"
+                     class="eclipse-profile-thumbnail maps-thumbnail"
+                     onclick="window.open('${urls.maps}', '_blank')"
+                     onerror="this.style.display='none'"
+                     title="Click to open in Google Maps">
+            </div>
+        </div>
+    `;
+}
+
+function renderHorizonPreview(site, horizonFile) {
+    if (!horizonFile) {
+        return '';
+    }
+
+    const imageUrl = buildAssetUrl(ASSET_PATHS.horizons, horizonFile);
+    return renderHeaderPreview({
+        buttonHtml: '<span class="link-button" style="background: #17a2b8; cursor: default;">🌄 Horizon Profile</span>',
+        imageUrl,
+        alt: `Horizon profile for ${site.code}`,
+        extraClass: 'horizon-thumbnail',
+        title: 'Hover to preview full size, click to open in new tab',
+    });
+}
+
 /**
  * Render site header with external links and thumbnails
  * @param {Object} site - Site object
@@ -105,121 +184,63 @@ function generateSiteUrls(site) {
  * @returns {string} HTML string
  */
 function renderSiteHeader(site, urls) {
-    // Cloud button if available
-    let cloudButton = '';
-    if (urls.cloud && site.cloud_status === 'success') {
-        cloudButton = `<a href="${urls.cloud}" target="_blank" class="link-button cloud">🕐 timeanddate.com</a>`;
-    }
+    const cloudButton = urls.cloud && site.cloud_status === 'success'
+        ? `<a href="${urls.cloud}" target="_blank" class="link-button cloud">🕐 timeanddate.com</a>`
+        : '';
 
-    // Brochure button if available
-    let brochureButton = '';
-    if (site.brochure_url) {
-        const brochureTitle = site.brochure_title || 'Site brochure';
-        brochureButton = `<a href="${site.brochure_url}" target="_blank" class="link-button" style="background: #8e44ad;">📄 ${brochureTitle} brochure</a>`;
-    }
-    
-    // Check if IGME URL is valid
+    const brochureButton = site.brochure_url
+        ? `<a href="${site.brochure_url}" target="_blank" class="link-button" style="background: #8e44ad;">📄 ${site.brochure_title || 'Site brochure'} brochure</a>`
+        : '';
+
     const hasValidIgmeUrl = site.url && site.url !== 'N/A' && site.url.trim() !== '';
     const igmeButtonClass = hasValidIgmeUrl ? 'link-button' : 'link-button inactive';
     const igmeButtonHref = hasValidIgmeUrl ? site.url : '#';
     const igmeButtonTitle = hasValidIgmeUrl ? '' : ' title="No IGME website available for this site"';
-    
-    // Get horizon file if available
+
     const horizonFile = getHorizonFilename(site.code);
-    
+    const shademapUrl = buildAssetUrl(ASSET_PATHS.shademap, `${site.code}_shademap.jpg`);
+    const eclipsefanUrl = buildAssetUrl(ASSET_PATHS.eclipsefan, `${site.code}_horizon.png`);
+    const ignProfileUrl = buildAssetUrl(ASSET_PATHS.ignProfiles, `${site.code}_profile.png`);
+
     return `
         <div class="detail-header">
             <h2>${site.denominacion || site.code}</h2>
             <div style="display: flex; align-items: flex-start; gap: 0.5rem; flex-wrap: wrap;">
-                <!-- Left column: IGME, timeanddate, Xavier Jubier, Dark Sky Sites stacked vertically -->
-                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                <div style="${HEADER_STACK_STYLE}">
                     <a href="${igmeButtonHref}" target="_blank" class="${igmeButtonClass}"${igmeButtonTitle}>🪨 View on IGME Website</a>
                     ${cloudButton}
                     ${brochureButton}
                     <a href="${urls.xavierJubier}" target="_blank" class="link-button xavier">🗺️ Xavier Jubier Eclipse Map</a>
                     <a href="${urls.darkSkySites}" target="_blank" class="link-button darksky">🌌 Dark Sky Sites</a>
                 </div>
-                
-                <!-- Right side: Buttons with previews -->
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
-                    <a href="${urls.maps}" target="_blank" class="link-button maps">📍 Open in Google Maps</a>
-                    ${urls.googleStatic ? `
-                        <div style="position: relative; display: inline-block;">
-                            <img src="${urls.googleStatic}"
-                                 alt="Google Maps location for ${site.code}"
-                                 class="eclipse-profile-thumbnail maps-thumbnail"
-                                 onclick="window.open('${urls.maps}', '_blank')"
-                                 onerror="this.style.display='none'"
-                                 title="Click to open in Google Maps">
-                        </div>
-                    ` : ''}
-                </div>
-                
-                ${horizonFile ? `
-                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
-                        <span class="link-button" style="background: #17a2b8; cursor: default;">🌄 Horizon Profile</span>
-                        <div style="position: relative; display: inline-block;">
-                            <img src="data/horizons/${horizonFile}"
-                                 alt="Horizon profile for ${site.code}"
-                                 class="eclipse-profile-thumbnail horizon-thumbnail"
-                                 onclick="window.open('data/horizons/${horizonFile}', '_blank')"
-                                 onerror="this.parentElement.style.display='none'"
-                                 title="Hover to preview full size, click to open in new tab">
-                            <div class="eclipse-profile-overlay">
-                                <img src="data/horizons/${horizonFile}"
-                                     alt="Horizon profile for ${site.code}">
-                            </div>
-                        </div>
-                    </div>
-                ` : ''}
-                
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
-                    <a href="${urls.shademap}" target="_blank" class="link-button shademap">🌄 View on Shademap</a>
-                    <div style="position: relative; display: inline-block;">
-                        <img src="data/scrape/shademap_snapshots/${site.code}_shademap.jpg"
-                             alt="Shademap visualization for ${site.code}"
-                             class="eclipse-profile-thumbnail shademap-thumbnail"
-                             onclick="window.open('data/scrape/shademap_snapshots/${site.code}_shademap.jpg', '_blank')"
-                             onerror="this.parentElement.style.display='none'"
-                             title="Hover to preview, click to open full-size">
-                        <div class="eclipse-profile-overlay">
-                            <img src="data/scrape/shademap_snapshots/${site.code}_shademap.jpg"
-                                 alt="Shademap visualization for ${site.code}">
-                        </div>
-                    </div>
-                </div>
-                
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
-                    <a href="${urls.eclipseFan}" target="_blank" class="link-button eclipsefan">🌒 EclipseFan.org</a>
-                    <div style="position: relative; display: inline-block;">
-                        <img src="data/scrape/eclipsefan_horizons/${site.code}_horizon.png"
-                             alt="EclipseFan horizon profile for ${site.code}"
-                             class="eclipse-profile-thumbnail"
-                             onclick="window.open('data/scrape/eclipsefan_horizons/${site.code}_horizon.png', '_blank')"
-                             onerror="this.parentElement.style.display='none'"
-                             title="Hover to preview, click to open full-size">
-                        <div class="eclipse-profile-overlay">
-                            <img src="data/scrape/eclipsefan_horizons/${site.code}_horizon.png"
-                                 alt="EclipseFan horizon profile for ${site.code}">
-                        </div>
-                    </div>
-                </div>
-                
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
-                    <a href="${urls.eclipse}" target="_blank" class="link-button eclipse">🌑 Eclipse 2026 View</a>
-                    <div style="position: relative; display: inline-block;">
-                        <img src="data/scrape/ign_profiles/${site.code}_profile.png"
-                             alt="Eclipse visibility profile for ${site.code}"
-                             class="eclipse-profile-thumbnail"
-                             onclick="window.open('data/scrape/ign_profiles/${site.code}_profile.png', '_blank')"
-                             onerror="this.parentElement.style.display='none'"
-                             title="Hover to preview, click to open full-size">
-                        <div class="eclipse-profile-overlay">
-                            <img src="data/scrape/ign_profiles/${site.code}_profile.png"
-                                 alt="Eclipse visibility profile for ${site.code}">
-                        </div>
-                    </div>
-                </div>
+
+                ${renderMapsPreview(site, urls)}
+                ${renderHorizonPreview(site, horizonFile)}
+                ${renderSimplePreview({
+                    linkUrl: urls.shademap,
+                    buttonClass: 'link-button shademap',
+                    buttonLabel: '🌄 View on Shademap',
+                    imageUrl: shademapUrl,
+                    alt: `Shademap visualization for ${site.code}`,
+                    extraClass: 'shademap-thumbnail',
+                    title: 'Hover to preview, click to open full-size',
+                })}
+                ${renderSimplePreview({
+                    linkUrl: urls.eclipseFan,
+                    buttonClass: 'link-button eclipsefan',
+                    buttonLabel: '🌒 EclipseFan.org',
+                    imageUrl: eclipsefanUrl,
+                    alt: `EclipseFan horizon profile for ${site.code}`,
+                    title: 'Hover to preview, click to open full-size',
+                })}
+                ${renderSimplePreview({
+                    linkUrl: urls.eclipse,
+                    buttonClass: 'link-button eclipse',
+                    buttonLabel: '🌑 Eclipse 2026 View',
+                    imageUrl: ignProfileUrl,
+                    alt: `Eclipse visibility profile for ${site.code}`,
+                    title: 'Hover to preview, click to open full-size',
+                })}
             </div>
         </div>
     `;
