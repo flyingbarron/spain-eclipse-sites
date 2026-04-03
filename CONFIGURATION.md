@@ -17,11 +17,14 @@ app:
 
 # Directories (relative to project root)
 directories:
-  data: "data"                    # Main data directory
-  profiles: "data/ign_visibility_profiles"  # IGN eclipse profiles
-  horizon: "data/eclipsefan_visibility_profiles"  # EclipseFan horizons
-  cache: ".cache"                 # API response cache
-  logs: "logs"                    # Application logs
+  data: "data"                           # Main data directory
+  scrape: "data/scrape"                  # Scraped/downloaded pipeline assets
+  profiles: "data/scrape/ign_profiles"   # IGN eclipse profiles
+  horizon: "data/scrape/eclipsefan_horizons"  # EclipseFan horizons
+  shademap: "data/scrape/shademap_snapshots"  # Shademap snapshots
+  brochures: "data/brochures"            # Downloaded brochure PDFs
+  cache: "data/cache"                    # Viewer-side IGME cache files
+  logs: "logs"                           # Application logs
 
 # Eclipse Configuration
 eclipse:
@@ -182,9 +185,12 @@ Basic application metadata:
 
 All paths are relative to project root:
 - `data`: Main data output directory
+- `scrape`: Shared root for downloaded/scraped enrichment assets
 - `profiles`: IGN eclipse visibility profile images
 - `horizon`: EclipseFan horizon profile images
-- `cache`: API response cache files
+- `shademap`: Shademap snapshot images
+- `brochures`: Downloaded brochure PDFs
+- `cache`: Viewer-side IGME HTML/image cache files
 - `logs`: Application log files
 
 ### Eclipse Section
@@ -238,6 +244,8 @@ Feature toggles:
 - `enable_eclipse_checking`: Check eclipse visibility (requires Selenium)
 - `enable_cloud_coverage`: Scrape cloud coverage data
 - `enable_horizon_download`: Download horizon images
+
+Note: the main pipeline’s canonical output directories and step names are now defined in [`src/constants.py`](src/constants.py), while this document describes the configurable application settings exposed through [`config.yaml`](config.yaml).
 
 ### CSV Section
 

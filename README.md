@@ -112,6 +112,19 @@ Shademap behavior:
 - Uses less strict page readiness checks than `networkidle`
 - Reports per-site Shademap status summaries in the main pipeline
 
+## Architecture Overview
+
+The repo is organized around a small data pipeline plus a lightweight viewer:
+
+- [`generate_eclipse_site_data.py`](generate_eclipse_site_data.py) orchestrates the pipeline through a simplified CLI
+- [`src/constants.py`](src/constants.py) defines canonical step names, schema fields, and output directories
+- [`src/pipeline_utils.py`](src/pipeline_utils.py) provides shared helpers for CSV loading, skip-existing behavior, status summaries, and merging updated sites
+- [`src/output_generator.py`](src/output_generator.py) writes canonical CSV and KML outputs
+- [`serve_viewer.py`](serve_viewer.py) serves the browser viewer plus small JSON/image proxy APIs
+- [`src/igme_image_service.py`](src/igme_image_service.py) handles IGME HTML/image caching used by the viewer server
+- [`static/js/`](static/js/) contains the modular browser viewer
+- [`tests/test_pipeline_utils.py`](tests/test_pipeline_utils.py) covers the shared pipeline helpers and IGME image service helpers
+
 ### Build Standalone Viewer
 
 Create a self-contained version that works without a server:
@@ -230,6 +243,9 @@ The script generates:
 - [`data/scrape/ign_profiles/`](data/scrape/ign_profiles/) - IGN eclipse profile diagrams
 - [`data/scrape/eclipsefan_horizons/`](data/scrape/eclipsefan_horizons/) - downloaded EclipseFan horizon images
 - [`data/scrape/shademap_snapshots/`](data/scrape/shademap_snapshots/) - downloaded Shademap exports
+- [`data/brochures/`](data/brochures/) - downloaded site brochures
+- [`data/cache/igme_html/`](src/constants.py:23) - cached IGME HTML and derived image JSON
+- [`data/cache/igme_images/`](src/constants.py:24) - cached IGME image binaries for the viewer proxy
 
 **Note**: Eclipse azimuth lines (283.7753°, 50km length) are automatically included in the generated KML file, showing the direction toward the eclipse for each site.
 
@@ -271,6 +287,14 @@ Start the web viewer:
 python3 serve_viewer.py
 ```
 
+The viewer server provides:
+- static file serving for the browser UI
+- [`/api/config`](serve_viewer.py:76) for API-key configuration
+- [`/api/horizon-files`](serve_viewer.py:79) for local horizon-file discovery under [`data/horizons/`](src/constants.py:21)
+- [`/api/images`](serve_viewer.py:82) for cached IGME image metadata
+- [`/api/proxy-image`](serve_viewer.py:85) for cached image proxying
+- [`/api/shutdown`](serve_viewer.py:73) for local shutdown convenience
+
 ### Utility Scripts
 
 Additional utility scripts are available in the `utilities/` directory:
@@ -295,74 +319,52 @@ This will:
 
 ```
 spain-eclipse-sites/
-├── archive/                          # Legacy scripts
-│   ├── scrape_igme_sites.py
-│   ├── check_eclipse_visibility.py
-│   ├── add_eclipse_azimuth.py       # Standalone azimuth tool (deprecated)
-│   ├── bortle_scraper.py            # Old PNG tile-based Bortle scraper (replaced by Dark Sky Sites)
-│   └── favicon.svg
-├── data/                             # Generated data (gitignored)
+├── archive/                          # Legacy scripts and old viewer experiments
+├── data/                             # Generated data (mostly gitignored)
 │   ├── scrape/ign_profiles/          # IGN eclipse visibility diagrams
 │   ├── scrape/eclipsefan_horizons/   # EclipseFan horizon profiles
 │   ├── scrape/shademap_snapshots/    # Shademap visualizations
+│   ├── scrape/darkskysites/          # Dark Sky utility outputs
 │   ├── brochures/                    # Downloaded brochure PDFs
+│   ├── cache/igme_html/              # Cached IGME HTML + image metadata JSON
+│   ├── cache/igme_images/            # Cached IGME image binaries
+│   ├── horizons/                     # Local horizon images used directly by the viewer
 │   ├── eclipse_site_data.csv         # Main dataset
-│   └── sites.kml                     # All sites organized in 6 folders
-├── src/                              # Modular source code
-│   ├── __init__.py
-│   ├── cache.py                     # API response caching
-│   ├── config.py                    # Configuration loader
-│   ├── exceptions.py                # Custom exception classes
-│   ├── logger.py                    # Logging configuration
-│   ├── models.py                    # Data models (Site dataclass)
-│   ├── igme_scraper.py              # IGME site scraping
-│   ├── eclipse_checker.py           # Eclipse visibility checking
-│   ├── cloud_coverage_scraper.py    # Cloud coverage data scraping
-│   ├── eclipsefan_scraper.py        # EclipseFan horizon image downloading
-│   ├── shademap_scraper.py          # Shademap visualization downloading
-│   └── output_generator.py          # CSV/KML generation with azimuth lines and auto-backup
-├── utilities/                        # Utility scripts
-│   ├── darksky_scraper.py           # Main-pipeline wrapper for Dark Sky processing
-│   ├── scrape_darkskysites_data.py  # Dark Sky Sites data scraper (Playwright utility)
-│   ├── add_darksky_data_to_csv.py   # Add Dark Sky Sites data to CSV
-│   ├── delete_site.py               # Delete sites and associated files
-│   ├── download_shademap_export_playwright.py  # Shademap automation
-│   ├── download_eclipsefan_horizon.py          # EclipseFan horizon downloader
-│   ├── DARKSKYSITES_SCRAPER_README.md          # Dark Sky Sites scraper docs
-│   ├── SHADEMAP_PLAYWRIGHT_README.md           # Shademap automation docs
-│   └── SCREENSHOT_README.md                    # Screenshot tools docs
-├── static/                           # Web viewer assets
-│   ├── app.js                       # Interactive viewer logic
-│   └── styles.css                   # Viewer styling
-├── tests/                            # Test and utility scripts
-│   ├── __init__.py                  # Tests package
-│   ├── test_models.py               # Unit tests for models
-│   ├── test_config.py               # Unit tests for config
-│   ├── test_cloud_integration.py    # Cloud coverage integration test
-│   ├── test_server_shutdown.py      # Server shutdown test
-│   ├── add_cloud_data_to_csv.py     # Add cloud data to existing CSV
-│   ├── download_*.py                # Various download utilities
-│   ├── scrape_*.py                  # Scraping utilities
-│   ├── take_*.py                    # Screenshot utilities
-│   ├── SHADEMAP_PLAYWRIGHT_README.md # Shademap automation docs
-│   ├── SCREENSHOT_README.md         # Screenshot tools docs
-│   └── SERVER_SHUTDOWN.md           # Server shutdown guide
-├── config.yaml                       # Application configuration
-├── .env.example                      # Environment variables template
-├── Dockerfile                        # Docker container definition
-├── docker-compose.yml                # Docker Compose configuration
-├── .dockerignore                     # Docker build exclusions
+│   ├── sites.kml                     # Main KML output
+│   └── igme_sites_config.json        # Configured IGME and custom sites
+├── src/                              # Modular pipeline and viewer-support code
+│   ├── constants.py                  # Canonical schema, step names, and output paths
+│   ├── pipeline_utils.py             # Shared CSV/merge/skip/status helpers
+│   ├── igme_image_service.py         # Viewer-side IGME HTML/image caching helpers
+│   ├── igme_scraper.py               # IGME site scraping
+│   ├── eclipse_checker.py            # Eclipse visibility checking
+│   ├── cloud_coverage_scraper.py     # Cloud coverage data scraping
+│   ├── darksky_scraper.py            # Dark Sky pipeline integration
+│   ├── eclipsefan_scraper.py         # EclipseFan horizon image downloading
+│   ├── shademap_scraper.py           # Shademap visualization downloading
+│   ├── output_generator.py           # CSV/KML generation and summaries
+│   ├── config.py                     # Configuration loader
+│   ├── models.py                     # Data models
+│   ├── logger.py                     # Logging helpers
+│   ├── cache.py                      # General cache helpers
+│   └── exceptions.py                 # Custom exception classes
+├── static/
+│   ├── styles.css                    # Viewer styling
+│   └── js/                           # Modular browser viewer code
+├── tests/
+│   ├── test_pipeline_utils.py        # Shared helper and IGME image service tests
+│   ├── test_models.py                # Unit tests for models
+│   ├── test_config.py                # Unit tests for config
+│   └── test_cloud_integration.py     # Cloud coverage integration test
+├── utilities/                        # One-off data utilities and helper docs
 ├── generate_eclipse_site_data.py     # Main data generation script
-├── serve_viewer.py                   # Web viewer server
+├── serve_viewer.py                   # Viewer server + small JSON/image APIs
+├── build_standalone_viewer.py        # Offline viewer bundler
 ├── run_tests.py                      # Test runner
-├── viewer.html                       # Interactive web interface
+├── config.yaml                       # Application configuration
 ├── requirements.txt                  # Python dependencies
-├── README.md                         # This file
-├── DOCKER.md                         # Docker deployment guide
-├── REFACTORING_SUGGESTIONS.md        # Code improvement suggestions
-├── CREDITS.md                        # Data attribution
-├── LICENSE                           # MIT License
-└── .gitignore                        # Git ignore rules
+├── README.md                         # Main documentation
+└── CONFIGURATION.md                  # Configuration reference
 ```
 
 ## Data Sources
@@ -429,15 +431,19 @@ Each folder contains:
 
 ### IGN Visibility Profiles
 
-**`data/ign_visibility_profiles/{code}_profile.png`** - Eclipse visibility profile diagrams from IGN showing the eclipse path and visibility details
+**`data/scrape/ign_profiles/{code}_profile.png`** - Eclipse visibility profile diagrams from IGN showing the eclipse path and visibility details
 
 ### EclipseFan Visibility Profiles
 
-**`data/eclipsefan_visibility_profiles/{code}_horizon.png`** - Horizon profile images from EclipseFan.org showing local topography and eclipse direction
+**`data/scrape/eclipsefan_horizons/{code}_horizon.png`** - Horizon profile images from EclipseFan.org showing local topography and eclipse direction
 
 ### Shademap Snapshots
 
 **`data/scrape/shademap_snapshots/{code}_shademap.jpg`** - Sun/shadow visualization snapshots from Shademap.app at eclipse time
+
+### Brochures
+
+**`data/brochures/*.pdf`** - Downloaded brochures associated with matching sites and exposed in the viewer
 
 ## Technical Details
 
@@ -516,10 +522,10 @@ The script uses Selenium to:
 - ESC to close
 
 ### Additional Tools
-- **Shademap Automation**: See `tests/SHADEMAP_PLAYWRIGHT_README.md` for Shademap.app export automation
-- **Server Shutdown**: See `tests/SERVER_SHUTDOWN.md` for clean server shutdown options
-- **Screenshot Tools**: See `tests/SCREENSHOT_README.md` for EclipseFan.org screenshot utilities
-- **Utility Scripts**: Various tools in `tests/` directory for data processing and downloads
+- **Shademap Automation**: See [`utilities/SCREENSHOT_README.md`](utilities/SCREENSHOT_README.md) and the related Playwright/download utilities in [`utilities/`](utilities/)
+- **Server Shutdown**: See [`utilities/SERVER_SHUTDOWN.md`](utilities/SERVER_SHUTDOWN.md) for clean server shutdown options
+- **Brochure Downloading**: See [`utilities/download_brochures.py`](utilities/download_brochures.py)
+- **Utility Scripts**: Supporting tools live under [`utilities/`](utilities/)
 
 ## Configuration
 
@@ -547,14 +553,18 @@ pip install -r requirements.txt
 # Run all tests
 python3 run_tests.py
 
-# Run specific test file
+# Run focused helper coverage
+python3 -m unittest tests.test_pipeline_utils
+
+# Run a specific test module
 python3 -m unittest tests.test_models
 ```
 
-Current test coverage:
-- ✅ Site dataclass (15 tests)
-- ✅ Configuration system (when PyYAML installed)
-- ⚠️ Integration tests (legacy, needs update)
+Current test coverage includes:
+- ✅ [`tests/test_pipeline_utils.py`](tests/test_pipeline_utils.py) for shared pipeline helpers and IGME image service caching/extraction helpers
+- ✅ [`tests/test_models.py`](tests/test_models.py) for the site data model
+- ✅ [`tests/test_config.py`](tests/test_config.py) for the configuration system
+- ⚠️ Some tests require optional dependencies such as PyYAML or BeautifulSoup
 
 ## New Features (2026-02-09 Refactoring)
 
