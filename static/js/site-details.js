@@ -193,14 +193,14 @@ function renderSiteHeader(site, urls) {
                     <a href="${urls.eclipseFan}" target="_blank" class="link-button eclipsefan">🌒 EclipseFan.org</a>
                     <div style="position: relative; display: inline-block;">
                         <img src="data/scrape/eclipsefan_horizons/${site.code}_horizon.png"
-                             alt="Horizon profile for ${site.code}"
+                             alt="EclipseFan horizon profile for ${site.code}"
                              class="eclipse-profile-thumbnail"
                              onclick="window.open('data/scrape/eclipsefan_horizons/${site.code}_horizon.png', '_blank')"
                              onerror="this.parentElement.style.display='none'"
                              title="Hover to preview, click to open full-size">
                         <div class="eclipse-profile-overlay">
                             <img src="data/scrape/eclipsefan_horizons/${site.code}_horizon.png"
-                                 alt="Horizon profile for ${site.code}">
+                                 alt="EclipseFan horizon profile for ${site.code}">
                         </div>
                     </div>
                 </div>
