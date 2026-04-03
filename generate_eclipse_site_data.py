@@ -9,30 +9,25 @@ import argparse
 import csv
 import os
 import sys
-from typing import List, Dict, Any
+from typing import Callable, List, Dict, Any, Optional
 from src.igme_scraper import scrape_all_sites
 from src.eclipse_checker import check_sites_eclipse_visibility
 from src.cloud_coverage_scraper import scrape_cloud_coverage_for_sites
 from src.eclipsefan_scraper import download_horizon_images_for_sites
 from src.shademap_scraper import download_shademap_for_sites
+from src.darksky_scraper import scrape_darksky_for_sites
 from src.output_generator import save_to_csv, save_to_kml, print_summary
 
 
+def resolve_data_csv_path(csv_filename: str = 'eclipse_site_data.csv') -> str:
+    """Return CSV path under data/ unless already prefixed."""
+    return csv_filename if csv_filename.startswith('data/') else os.path.join('data', csv_filename)
+
+
 def load_sites_from_csv(csv_filename: str = 'eclipse_site_data.csv') -> List[Dict[str, Any]]:
-    """Load sites from existing CSV file
-    
-    Args:
-        csv_filename: CSV filename (will be looked for in data/ directory)
-    
-    Returns:
-        List of site dictionaries
-    """
-    # Construct full path - check if filename already includes data/ prefix
-    if csv_filename.startswith('data/'):
-        csv_path = csv_filename
-    else:
-        csv_path = os.path.join('data', csv_filename)
-    
+    """Load sites from existing CSV file."""
+    csv_path = resolve_data_csv_path(csv_filename)
+
     sites = []
     try:
         with open(csv_path, 'r', encoding='utf-8') as f:
@@ -48,20 +43,9 @@ def load_sites_from_csv(csv_filename: str = 'eclipse_site_data.csv') -> List[Dic
 
 
 def get_next_t_code(csv_filename: str = 'eclipse_site_data.csv') -> str:
-    """Get the next available Txxxx code
-    
-    Args:
-        csv_filename: CSV filename to check for existing codes
-    
-    Returns:
-        Next available code in format Txxxx (e.g., T0001, T0002, etc.)
-    """
-    # Construct full path
-    if csv_filename.startswith('data/'):
-        csv_path = csv_filename
-    else:
-        csv_path = os.path.join('data', csv_filename)
-    
+    """Get the next available Txxxx code."""
+    csv_path = resolve_data_csv_path(csv_filename)
+
     max_num = 0
     
     # Check if file exists
@@ -143,6 +127,61 @@ def check_data_exists(site_code: str, data_type: str) -> bool:
     return False
 
 
+def merge_sites_by_code(base_sites: List[Dict[str, Any]], updated_sites: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Merge updated site dictionaries into a base list by code."""
+    updated_by_code = {site.get('code'): site for site in updated_sites}
+    merged = []
+    for site in base_sites:
+        code = site.get('code')
+        merged.append(updated_by_code.get(code, site))
+    return merged
+
+
+def count_statuses(sites: List[Dict[str, Any]], status_field: str) -> Dict[str, int]:
+    """Count sites by a given status field."""
+    counts: Dict[str, int] = {}
+    for site in sites:
+        status = str(site.get(status_field, 'unknown'))
+        counts[status] = counts.get(status, 0) + 1
+    return counts
+
+
+def print_status_summary(sites: List[Dict[str, Any]], status_field: str, label: str) -> None:
+    """Print a sorted status summary for a processing step."""
+    counts = count_statuses(sites, status_field)
+    summary = ", ".join(f"{status}={count}" for status, count in sorted(counts.items()))
+    print(f"\n✓ {label}: {summary}")
+
+
+def process_sites_with_skip(
+    sites: List[Dict[str, Any]],
+    data_type: str,
+    processor: Callable[[List[Dict[str, Any]]], List[Dict[str, Any]]],
+    skip_message: str,
+    skipped_status_field: Optional[str] = None,
+    skipped_status_value: str = 'skipped_existing',
+) -> List[Dict[str, Any]]:
+    """Apply skip-existing filtering, run a processor, and merge results back."""
+    sites_to_process = []
+    skipped_count = 0
+
+    for site in sites:
+        code = str(site.get('code', ''))
+        if check_data_exists(code, data_type):
+            print(skip_message.format(code=code))
+            skipped_count += 1
+            if skipped_status_field:
+                site[skipped_status_field] = skipped_status_value
+        else:
+            sites_to_process.append(site)
+
+    if skipped_count > 0:
+        print(f"  Skipped {skipped_count} sites with existing {data_type} data")
+
+    processed_sites = processor(sites_to_process)
+    return merge_sites_by_code(sites, processed_sites)
+
+
 def add_site_manually(args) -> None:
     """Add a new site manually to the CSV
     
@@ -206,7 +245,7 @@ def add_site_manually(args) -> None:
     
     # Load existing sites
     results = []
-    csv_path = os.path.join('data', args.csv) if not args.csv.startswith('data/') else args.csv
+    csv_path = resolve_data_csv_path(args.csv)
     if os.path.exists(csv_path):
         try:
             with open(csv_path, 'r', encoding='utf-8') as f:
@@ -396,65 +435,8 @@ Examples:
             print("=" * 60)
             print("This will scrape SQM, Bortle scale, and darkness data from darkskysites.com")
             print("This will take a while (3 second delay between requests)...")
-            # Import scraper dynamically to avoid Playwright dependency if not used
-            sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'utilities'))
-            from scrape_darkskysites_data import scrape_darkskysites_data, parse_darksky_data
-            
-            for i, site in enumerate(results, 1):
-                code = site.get('code', 'Unknown')
-                lat_str = site.get('latitude', 'N/A')
-                lon_str = site.get('longitude', 'N/A')
-                
-                if lat_str == 'N/A' or lon_str == 'N/A':
-                    print(f"[{i}/{len(results)}] {code}: No coordinates, skipping")
-                    site['darksky_sqm'] = None
-                    site['darksky_bortle'] = None
-                    site['darksky_darkness'] = None
-                    site['darksky_status'] = 'no_coordinates'
-                    continue
-                
-                try:
-                    lat = float(lat_str)
-                    lon = float(lon_str)
-                except (ValueError, TypeError):
-                    print(f"[{i}/{len(results)}] {code}: Invalid coordinates, skipping")
-                    site['darksky_sqm'] = None
-                    site['darksky_bortle'] = None
-                    site['darksky_darkness'] = None
-                    site['darksky_status'] = 'invalid_coordinates'
-                    continue
-                
-                print(f"[{i}/{len(results)}] {code}: Scraping Dark Sky Sites data...")
-                
-                try:
-                    result = scrape_darkskysites_data(lat, lon, site_code=code, headless=True)
-                    
-                    if result['status'] == 'success' and result.get('parsed_data'):
-                        parsed = result['parsed_data']
-                        site['darksky_sqm'] = parsed.get('sqm')
-                        site['darksky_bortle'] = parsed.get('bortle')
-                        site['darksky_darkness'] = parsed.get('darkness')
-                        site['darksky_status'] = 'success'
-                        print(f"  ✓ SQM={parsed.get('sqm')}, Bortle={parsed.get('bortle')}, Darkness={parsed.get('darkness')}%")
-                    else:
-                        site['darksky_sqm'] = None
-                        site['darksky_bortle'] = None
-                        site['darksky_darkness'] = None
-                        site['darksky_status'] = result['status']
-                        print(f"  ✗ Failed: {result['status']}")
-                except Exception as e:
-                    print(f"  ✗ Error: {e}")
-                    site['darksky_sqm'] = None
-                    site['darksky_bortle'] = None
-                    site['darksky_darkness'] = None
-                    site['darksky_status'] = 'error'
-                
-                # Rate limiting
-                if i < len(results):
-                    import time
-                    time.sleep(3.0)
-            
-            print(f"\n✓ Dark Sky Sites data scraped for {len(results)} site(s)")
+            results = scrape_darksky_for_sites(results, delay=3.0)
+            print_status_summary(results, 'darksky_status', f"Dark Sky Sites data scraped for {len(results)} site(s)")
         
         if args.only_horizon:
             print("\nDownloading EclipseFan horizon images...")
@@ -468,7 +450,7 @@ Examples:
             print("=" * 60)
             print("This will take a while (2 second delay between requests)...")
             results = download_shademap_for_sites(results, delay=2.0)
-            print(f"\n✓ Shademap visualizations downloaded for {len(results)} site(s)")
+            print_status_summary(results, 'shademap_status', f"Shademap step complete for {len(results)} site(s)")
         
         # If updating specific site, merge back into full dataset
         if args.code:
@@ -495,7 +477,7 @@ Examples:
     print("=" * 60)
     
     # Load existing CSV to check for already-scraped sites
-    csv_path = os.path.join('data', args.csv) if not args.csv.startswith('data/') else args.csv
+    csv_path = resolve_data_csv_path(args.csv)
     existing_sites = []
     existing_codes = set()
     
@@ -577,18 +559,12 @@ Examples:
     
     # Filter sites if --skip-existing is set
     if args.skip_existing and save_profiles:
-        sites_to_check = []
-        skipped_count = 0
-        for site in results:
-            if check_data_exists(site.get('code'), 'eclipse'):
-                print(f"  Skipping {site.get('code')}: eclipse profile already exists")
-                skipped_count += 1
-            else:
-                sites_to_check.append(site)
-        if skipped_count > 0:
-            print(f"  Skipped {skipped_count} sites with existing eclipse data")
-        results = check_sites_eclipse_visibility(sites_to_check, save_profiles=save_profiles) + \
-                  [s for s in results if s not in sites_to_check]
+        results = process_sites_with_skip(
+            results,
+            'eclipse',
+            lambda sites: check_sites_eclipse_visibility(sites, save_profiles=save_profiles),
+            "  Skipping {code}: eclipse profile already exists",
+        )
     else:
         results = check_sites_eclipse_visibility(results, save_profiles=save_profiles)
     
@@ -603,23 +579,12 @@ Examples:
         
         # Filter sites if --skip-existing is set
         if args.skip_existing:
-            sites_to_scrape = []
-            skipped_count = 0
-            for site in results:
-                if check_data_exists(site.get('code', ''), 'cloud'):
-                    print(f"  Skipping {site.get('code')}: cloud data already exists")
-                    skipped_count += 1
-                else:
-                    sites_to_scrape.append(site)
-            if skipped_count > 0:
-                print(f"  Skipped {skipped_count} sites with existing cloud data")
-            scraped_sites = scrape_cloud_coverage_for_sites(sites_to_scrape, delay=2.0)
-            # Merge results
-            for site in results:
-                for scraped in scraped_sites:
-                    if site.get('code') == scraped.get('code'):
-                        site.update(scraped)
-                        break
+            results = process_sites_with_skip(
+                results,
+                'cloud',
+                lambda sites: scrape_cloud_coverage_for_sites(sites, delay=2.0),
+                "  Skipping {code}: cloud data already exists",
+            )
         else:
             results = scrape_cloud_coverage_for_sites(results, delay=2.0)
         
@@ -638,71 +603,13 @@ Examples:
         print("=" * 60)
         print("This will scrape SQM, Bortle scale, and darkness data from darkskysites.com")
         print("This will take a while (3 second delay between requests)...")
-        
-        # Import scraper dynamically to avoid Playwright dependency if not used
-        sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'utilities'))
-        from scrape_darkskysites_data import scrape_darkskysites_data, parse_darksky_data
-        
-        for i, site in enumerate(results, 1):
-            code = site.get('code', 'Unknown')
-            lat_str = site.get('latitude', 'N/A')
-            lon_str = site.get('longitude', 'N/A')
-            
-            if lat_str == 'N/A' or lon_str == 'N/A':
-                print(f"[{i}/{len(results)}] {code}: No coordinates, skipping")
-                site['darksky_sqm'] = None
-                site['darksky_bortle'] = None
-                site['darksky_darkness'] = None
-                site['darksky_status'] = 'no_coordinates'
-                continue
-            
-            try:
-                lat = float(lat_str)
-                lon = float(lon_str)
-            except (ValueError, TypeError):
-                print(f"[{i}/{len(results)}] {code}: Invalid coordinates, skipping")
-                site['darksky_sqm'] = None
-                site['darksky_bortle'] = None
-                site['darksky_darkness'] = None
-                site['darksky_status'] = 'invalid_coordinates'
-                continue
-            
-            # Skip if data exists and --skip-existing is set
-            if args.skip_existing and check_data_exists(code, 'darksky'):
-                print(f"[{i}/{len(results)}] {code}: Skipping - Dark Sky data already exists")
-                continue
-            
-            print(f"[{i}/{len(results)}] {code}: Scraping Dark Sky Sites data...")
-            
-            try:
-                result = scrape_darkskysites_data(lat, lon, site_code=code, headless=True)
-                
-                if result['status'] == 'success' and result.get('parsed_data'):
-                    parsed = result['parsed_data']
-                    site['darksky_sqm'] = parsed.get('sqm')
-                    site['darksky_bortle'] = parsed.get('bortle')
-                    site['darksky_darkness'] = parsed.get('darkness')
-                    site['darksky_status'] = 'success'
-                    print(f"  ✓ SQM={parsed.get('sqm')}, Bortle={parsed.get('bortle')}, Darkness={parsed.get('darkness')}%")
-                else:
-                    site['darksky_sqm'] = None
-                    site['darksky_bortle'] = None
-                    site['darksky_darkness'] = None
-                    site['darksky_status'] = result['status']
-                    print(f"  ✗ Failed: {result['status']}")
-            except Exception as e:
-                print(f"  ✗ Error: {e}")
-                site['darksky_sqm'] = None
-                site['darksky_bortle'] = None
-                site['darksky_darkness'] = None
-                site['darksky_status'] = 'error'
-            
-            # Rate limiting
-            if i < len(results):
-                import time
-                time.sleep(3.0)
-        
-        print(f"\n✓ Dark Sky Sites data scraped for all sites")
+        results = scrape_darksky_for_sites(
+            results,
+            delay=3.0,
+            skip_existing=args.skip_existing,
+            data_exists_checker=check_data_exists,
+        )
+        print_status_summary(results, 'darksky_status', "Dark Sky Sites data scraped for all sites")
     else:
         print("\n⚠️  Skipping Dark Sky Sites data scraping (--no-darksky flag)")
         for site in results:
@@ -720,23 +627,12 @@ Examples:
         
         # Filter sites if --skip-existing is set
         if args.skip_existing:
-            sites_to_download = []
-            skipped_count = 0
-            for site in results:
-                if check_data_exists(site.get('code', ''), 'horizon'):
-                    print(f"  Skipping {site.get('code')}: horizon image already exists")
-                    skipped_count += 1
-                else:
-                    sites_to_download.append(site)
-            if skipped_count > 0:
-                print(f"  Skipped {skipped_count} sites with existing horizon images")
-            downloaded_sites = download_horizon_images_for_sites(sites_to_download, delay=2.0)
-            # Merge results
-            for site in results:
-                for downloaded in downloaded_sites:
-                    if site.get('code') == downloaded.get('code'):
-                        site.update(downloaded)
-                        break
+            results = process_sites_with_skip(
+                results,
+                'horizon',
+                lambda sites: download_horizon_images_for_sites(sites, delay=2.0),
+                "  Skipping {code}: horizon image already exists",
+            )
         else:
             results = download_horizon_images_for_sites(results, delay=2.0)
         
@@ -755,27 +651,17 @@ Examples:
         
         # Filter sites if --skip-existing is set
         if args.skip_existing:
-            sites_to_download = []
-            skipped_count = 0
-            for site in results:
-                if check_data_exists(site.get('code', ''), 'shademap'):
-                    print(f"  Skipping {site.get('code')}: shademap already exists")
-                    skipped_count += 1
-                else:
-                    sites_to_download.append(site)
-            if skipped_count > 0:
-                print(f"  Skipped {skipped_count} sites with existing shademap visualizations")
-            downloaded_sites = download_shademap_for_sites(sites_to_download, delay=2.0)
-            # Merge results
-            for site in results:
-                for downloaded in downloaded_sites:
-                    if site.get('code') == downloaded.get('code'):
-                        site.update(downloaded)
-                        break
+            results = process_sites_with_skip(
+                results,
+                'shademap',
+                lambda sites: download_shademap_for_sites(sites, delay=2.0),
+                "  Skipping {code}: shademap already exists",
+                skipped_status_field='shademap_status',
+            )
         else:
             results = download_shademap_for_sites(results, delay=2.0)
         
-        print(f"\n✓ Shademap visualizations downloaded for all sites")
+        print_status_summary(results, 'shademap_status', "Shademap step complete")
     else:
         print("\n⚠️  Skipping shademap downloading (--no-shademap flag)")
         for site in results:

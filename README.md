@@ -25,7 +25,7 @@ This project aggregates geological site information and eclipse planning data fo
 - ✅ **Dark Sky Sites data** (SQM, Bortle scale, darkness percentage)
 - ✅ **Horizon clearance data** - Sun's clearance above terrain at eclipse time (degrees)
 - ✅ EclipseFan horizon image downloading
-- ✅ Shademap sun/shadow visualization snapshots
+- ✅ Shademap sun/shadow visualization snapshots with retry handling and clearer status reporting
 - ✅ Google Maps Static API location thumbnails
 - ✅ Image caching for improved performance
 - ✅ **Automatic CSV backup** before updates (timestamped)
@@ -97,6 +97,20 @@ brew install chromedriver
 sudo apt-get install chromium-chromedriver
 
 # Or download from: https://chromedriver.chromium.org/
+
+5. Optional: preinstall Playwright Chromium (used for Shademap exports)
+```bash
+python3 -m playwright install chromium
+```
+
+If skipped, the Shademap scraper will try to install Chromium automatically on first use.
+
+Shademap behavior:
+- Uses Playwright in headless mode
+- Attempts automatic Chromium install if the browser binary is missing
+- Retries page loads on timeout
+- Uses less strict page readiness checks than `networkidle`
+- Reports per-site Shademap status summaries in the main pipeline
 
 ### Build Standalone Viewer
 
@@ -171,6 +185,9 @@ python3 generate_eclipse_site_data.py --only-darksky
 # Add horizon images to existing sites
 python3 generate_eclipse_site_data.py --only-horizon
 
+# Add shademap images to existing sites
+python3 generate_eclipse_site_data.py --only-shademap
+
 # Re-check eclipse visibility for existing sites
 python3 generate_eclipse_site_data.py --only-eclipse
 
@@ -181,10 +198,13 @@ python3 generate_eclipse_site_data.py --only-eclipse --no-profile
 python3 generate_eclipse_site_data.py --only-cloud --code IB200a
 python3 generate_eclipse_site_data.py --only-darksky --code IB200b
 python3 generate_eclipse_site_data.py --only-horizon --code IB200c
+python3 generate_eclipse_site_data.py --only-shademap --code IB200d
 
 # Use custom CSV file
 python3 generate_eclipse_site_data.py --only-cloud --csv data/my_sites.csv
 ```
+
+When `--skip-existing` is used, the pipeline now applies the same shared skip/process/merge flow across eclipse, cloud, Dark Sky, horizon, and Shademap steps.
 
 **Process specific site** (full pipeline):
 ```bash
@@ -259,7 +279,7 @@ Additional utility scripts are available in the `utilities/` directory:
 - **Dark Sky Sites scraper**: `utilities/scrape_darkskysites_data.py` - Scrape SQM, Bortle, darkness data
 - **Dark Sky Sites CSV updater**: `utilities/add_darksky_data_to_csv.py` - Add scraped data to CSV
 - **Site deletion tool**: `utilities/delete_site.py` - Delete sites and associated files
-- **Shademap automation**: `utilities/download_shademap_export_playwright.py`
+- **Shademap automation**: `utilities/download_shademap_export_playwright.py` - auto-installs Playwright Chromium on first use if missing
 - **EclipseFan horizon images**: `utilities/download_eclipsefan_horizon.py`
 
 See documentation in `utilities/` directory for detailed usage:
@@ -285,7 +305,7 @@ spain-eclipse-sites/
 ├── data/                             # Generated data (gitignored)
 │   ├── ign_visibility_profiles/      # IGN eclipse visibility diagrams
 │   ├── eclipsefan_visibility_profiles/ # EclipseFan horizon profiles
-│   ├── shademap_snapshot/            # Shademap visualizations
+│   ├── scrape/shademap_snapshots/   # Shademap visualizations
 │   ├── eclipse_site_data.csv         # Main dataset
 │   └── sites.kml                     # All sites organized in 6 folders
 ├── src/                              # Modular source code
@@ -302,7 +322,8 @@ spain-eclipse-sites/
 │   ├── shademap_scraper.py          # Shademap visualization downloading
 │   └── output_generator.py          # CSV/KML generation with azimuth lines and auto-backup
 ├── utilities/                        # Utility scripts
-│   ├── scrape_darkskysites_data.py  # Dark Sky Sites data scraper (Playwright)
+│   ├── darksky_scraper.py           # Main-pipeline wrapper for Dark Sky processing
+│   ├── scrape_darkskysites_data.py  # Dark Sky Sites data scraper (Playwright utility)
 │   ├── add_darksky_data_to_csv.py   # Add Dark Sky Sites data to CSV
 │   ├── delete_site.py               # Delete sites and associated files
 │   ├── download_shademap_export_playwright.py  # Shademap automation
@@ -416,7 +437,7 @@ Each folder contains:
 
 ### Shademap Snapshots
 
-**`data/shademap_snapshot/{code}_shademap.jpg`** - Sun/shadow visualization snapshots from Shademap.app at eclipse time
+**`data/scrape/shademap_snapshots/{code}_shademap.jpg`** - Sun/shadow visualization snapshots from Shademap.app at eclipse time
 
 ## Technical Details
 
@@ -588,7 +609,8 @@ Current test coverage:
 - beautifulsoup4 >= 4.12.0
 - selenium >= 4.0.0
 - pyyaml >= 6.0.0
-- playwright >= 1.40.0 (for Shademap automation)
+- playwright >= 1.40.0 (Python package for Shademap and Dark Sky automation)
+- Playwright Chromium browser binary (auto-installed on first Shademap use, or manually via `python3 -m playwright install chromium`)
 - ChromeDriver (for eclipse visibility checking)
 
 ## Docker Deployment

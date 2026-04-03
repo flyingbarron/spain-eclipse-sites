@@ -110,6 +110,13 @@ function renderSiteHeader(site, urls) {
     if (urls.cloud && site.cloud_status === 'success') {
         cloudButton = `<a href="${urls.cloud}" target="_blank" class="link-button cloud">🕐 timeanddate.com</a>`;
     }
+
+    // Brochure button if available
+    let brochureButton = '';
+    if (site.brochure_url) {
+        const brochureTitle = site.brochure_title || 'Site brochure';
+        brochureButton = `<a href="${site.brochure_url}" target="_blank" class="link-button" style="background: #8e44ad;">📄 ${brochureTitle} brochure</a>`;
+    }
     
     // Check if IGME URL is valid
     const hasValidIgmeUrl = site.url && site.url !== 'N/A' && site.url.trim() !== '';
@@ -128,6 +135,7 @@ function renderSiteHeader(site, urls) {
                 <div style="display: flex; flex-direction: column; gap: 0.25rem;">
                     <a href="${igmeButtonHref}" target="_blank" class="${igmeButtonClass}"${igmeButtonTitle}>🪨 View on IGME Website</a>
                     ${cloudButton}
+                    ${brochureButton}
                     <a href="${urls.xavierJubier}" target="_blank" class="link-button xavier">🗺️ Xavier Jubier Eclipse Map</a>
                     <a href="${urls.darkSkySites}" target="_blank" class="link-button darksky">🌌 Dark Sky Sites</a>
                 </div>
@@ -277,6 +285,18 @@ function renderDetailsTab(site) {
         `;
     }
     
+    let brochureInfo = '';
+    if (site.brochure_url) {
+        brochureInfo = `
+            <div class="info-item">
+                <div class="info-label">Brochure</div>
+                <div class="info-value">
+                    <a href="${site.brochure_url}" target="_blank">${site.brochure_title || 'Open brochure PDF'}</a>
+                </div>
+            </div>
+        `;
+    }
+    
     return `
         <div class="detail-info">
             <div class="info-item">
@@ -328,6 +348,7 @@ function renderDetailsTab(site) {
             ` : ''}
             ${cloudInfo}
             ${darkSkyInfo}
+            ${brochureInfo}
         </div>
         
         <div class="images-section">
