@@ -3,13 +3,54 @@ Unit tests for shared pipeline utility helpers.
 """
 
 import csv
+import json
 import os
+import re
+import sys
 import tempfile
+import types
 import unittest
 from contextlib import redirect_stdout
 from io import StringIO
 from unittest.mock import patch
 
+
+class _FakeTag:
+    def __init__(self, attrs):
+        self.attrs = attrs
+
+    def get(self, name):
+        return self.attrs.get(name)
+
+
+class _FakeBeautifulSoup:
+    def __init__(self, html, _parser):
+        self.html = html
+
+    def find_all(self, tag_name):
+        if tag_name != 'img':
+            return []
+
+        matches = re.findall(r'<img\b([^>]*)>', self.html, flags=re.IGNORECASE)
+        tags = []
+        for raw_attrs in matches:
+            attrs = dict(
+                re.findall(r'([a-zA-Z_:][-a-zA-Z0-9_:.]*)=["\']([^"\']*)["\']', raw_attrs)
+            )
+            tags.append(_FakeTag(attrs))
+        return tags
+
+
+fake_bs4_module = types.ModuleType('bs4')
+setattr(fake_bs4_module, 'BeautifulSoup', _FakeBeautifulSoup)
+sys.modules.setdefault('bs4', fake_bs4_module)
+
+from src.igme_image_service import (
+    _normalize_igme_image_src,
+    extract_igme_images,
+    get_cached_igme_images,
+    get_cached_proxy_image,
+)
 from src.pipeline_utils import (
     check_data_exists,
     count_statuses,
@@ -84,6 +125,18 @@ class TestPipelineUtils(unittest.TestCase):
         self.assertEqual(merged[0]['status'], 'old')
         self.assertEqual(merged[1]['status'], 'new')
 
+    def test_merge_sites_by_code_ignores_unknown_updates(self):
+        base_sites = [
+            {'code': 'IB001', 'status': 'old'},
+        ]
+        updated_sites = [
+            {'code': 'IB999', 'status': 'new'},
+        ]
+
+        merged = merge_sites_by_code(base_sites, updated_sites)
+
+        self.assertEqual(merged, base_sites)
+
     def test_merge_updated_site(self):
         base_sites = [
             {'code': 'IB001', 'status': 'old'},
@@ -150,6 +203,122 @@ class TestPipelineUtils(unittest.TestCase):
         output = captured.getvalue()
         self.assertIn('Skipping IB001', output)
         self.assertIn('Skipped 1 sites with existing cloud data', output)
+
+
+class TestIgmeImageService(unittest.TestCase):
+    """Test cases for IGME image extraction and caching helpers."""
+
+    def setUp(self):
+        self.temp_dir = tempfile.mkdtemp()
+        self.html_cache_dir = os.path.join(self.temp_dir, 'html')
+        self.image_cache_dir = os.path.join(self.temp_dir, 'images')
+
+    def tearDown(self):
+        for root, _, files in os.walk(self.temp_dir, topdown=False):
+            for name in files:
+                os.remove(os.path.join(root, name))
+            os.rmdir(root)
+
+    def test_normalize_igme_image_src(self):
+        self.assertEqual(
+            _normalize_igme_image_src('/files/photo.jpg'),
+            'https://info.igme.es/files/photo.jpg',
+        )
+        self.assertEqual(
+            _normalize_igme_image_src('uploads/photo.jpg'),
+            'https://info.igme.es/ielig/uploads/photo.jpg',
+        )
+        self.assertEqual(
+            _normalize_igme_image_src('https://cdn.example.com/photo.jpg'),
+            'https://cdn.example.com/photo.jpg',
+        )
+
+    def test_extract_igme_images_filters_non_site_images(self):
+        html = """
+        <html><body>
+            <img src="/icons/logo.png" alt="Logo">
+            <img src="/ielig/fotos/site-1.jpg" alt="Main view">
+            <img src="uploads/site-2.png">
+            <img src="/banner/header.jpg" alt="Header">
+            <img src="https://example.com/photo.jpg" alt="External">
+        </body></html>
+        """
+
+        images = extract_igme_images(html)
+
+        self.assertEqual(
+            images,
+            [
+                {'src': 'https://info.igme.es/ielig/fotos/site-1.jpg', 'alt': 'Main view'},
+                {'src': 'https://info.igme.es/ielig/uploads/site-2.png', 'alt': 'Site image'},
+            ],
+        )
+
+    def test_get_cached_igme_images_prefers_json_cache(self):
+        url = 'https://info.igme.es/example'
+        cached_json = json.dumps({'images': [{'src': 'cached', 'alt': 'Cached'}]})
+
+        with patch('src.igme_image_service.IGME_HTML_CACHE_DIR', self.html_cache_dir):
+            os.makedirs(self.html_cache_dir, exist_ok=True)
+            url_hash = __import__('src.igme_image_service', fromlist=['_url_hash'])._url_hash(url)
+            with open(
+                os.path.join(self.html_cache_dir, f'{url_hash}.json'),
+                'w',
+                encoding='utf-8',
+            ) as file:
+                file.write(cached_json)
+
+            with patch('src.igme_image_service._fetch_url_text') as mock_fetch:
+                result = get_cached_igme_images(url)
+
+        self.assertEqual(result, cached_json)
+        mock_fetch.assert_not_called()
+
+    def test_get_cached_igme_images_builds_cache_from_html(self):
+        url = 'https://info.igme.es/example'
+        html = '<img src="/ielig/fotos/site.jpg" alt="View">'
+
+        with patch('src.igme_image_service.IGME_HTML_CACHE_DIR', self.html_cache_dir):
+            with patch('src.igme_image_service._fetch_url_text', return_value=html) as mock_fetch:
+                result = get_cached_igme_images(url)
+
+        payload = json.loads(result)
+        self.assertEqual(
+            payload,
+            {'images': [{'src': 'https://info.igme.es/ielig/fotos/site.jpg', 'alt': 'View'}]},
+        )
+        mock_fetch.assert_called_once_with(url)
+
+    def test_get_cached_proxy_image_uses_cached_file_type(self):
+        image_url = 'https://info.igme.es/images/photo.png'
+
+        with patch('src.igme_image_service.IGME_IMAGE_CACHE_DIR', self.image_cache_dir):
+            os.makedirs(self.image_cache_dir, exist_ok=True)
+            url_hash = __import__('src.igme_image_service', fromlist=['_url_hash'])._url_hash(image_url)
+            cache_file = os.path.join(self.image_cache_dir, f'{url_hash}.png')
+            with open(cache_file, 'wb') as file:
+                file.write(b'cached-image')
+
+            with patch('src.igme_image_service._fetch_url_bytes') as mock_fetch:
+                result = get_cached_proxy_image(image_url)
+
+        self.assertEqual(result['content_type'], 'image/png')
+        self.assertEqual(result['image_data'], b'cached-image')
+        mock_fetch.assert_not_called()
+
+    def test_get_cached_proxy_image_downloads_and_defaults_extension(self):
+        image_url = 'https://info.igme.es/images/photo.bmp'
+
+        with patch('src.igme_image_service.IGME_IMAGE_CACHE_DIR', self.image_cache_dir):
+            with patch(
+                'src.igme_image_service._fetch_url_bytes',
+                return_value=(b'downloaded-image', 'image/bmp'),
+            ) as mock_fetch:
+                result = get_cached_proxy_image(image_url)
+
+        self.assertEqual(result['content_type'], 'image/bmp')
+        self.assertEqual(result['image_data'], b'downloaded-image')
+        mock_fetch.assert_called_once_with(image_url)
 
 
 if __name__ == '__main__':
