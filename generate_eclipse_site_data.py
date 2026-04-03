@@ -9,9 +9,22 @@ import argparse
 import csv
 import os
 import sys
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List
 
-from src.constants import CSV_FIELDS, STATUS_FIELDS, NOT_CHECKED_STATUS, resolve_data_csv_path
+from src.constants import (
+    CSV_FIELDS,
+    MODE_FULL,
+    MODE_UPDATE,
+    NOT_CHECKED_STATUS,
+    STATUS_FIELDS,
+    STEP_CLOUD,
+    STEP_DARKSKY,
+    STEP_ECLIPSE,
+    STEP_HORIZON,
+    STEP_SHADEMAP,
+    VALID_STEPS,
+    resolve_data_csv_path,
+)
 from src.igme_scraper import scrape_all_sites
 from src.eclipse_checker import check_sites_eclipse_visibility
 from src.cloud_coverage_scraper import scrape_cloud_coverage_for_sites
@@ -22,19 +35,10 @@ from src.output_generator import save_to_csv, save_to_kml, print_summary
 from src.pipeline_utils import (
     check_data_exists,
     load_sites_from_csv,
+    merge_updated_site,
     print_status_summary,
     process_sites_with_skip,
 )
-
-STEP_ECLIPSE = 'eclipse'
-STEP_CLOUD = 'cloud'
-STEP_DARKSKY = 'darksky'
-STEP_HORIZON = 'horizon'
-STEP_SHADEMAP = 'shademap'
-VALID_STEPS = [STEP_ECLIPSE, STEP_CLOUD, STEP_DARKSKY, STEP_HORIZON, STEP_SHADEMAP]
-MODE_FULL = 'full'
-MODE_UPDATE = 'update'
-
 
 def parse_steps(value: str) -> List[str]:
     """Parse a comma-separated step list and validate supported step names."""
@@ -47,64 +51,23 @@ def parse_steps(value: str) -> List[str]:
     return steps
 
 
-def normalize_cli_mode_and_steps(args: argparse.Namespace) -> None:
-    """Normalize new and legacy CLI flags into a single mode/steps model."""
-    legacy_only_map = {
-        STEP_ECLIPSE: args.only_eclipse,
-        STEP_CLOUD: args.only_cloud,
-        STEP_DARKSKY: args.only_darksky,
-        STEP_HORIZON: args.only_horizon,
-        STEP_SHADEMAP: args.only_shademap,
-    }
-    legacy_skip_map = {
-        STEP_CLOUD: args.no_cloud,
-        STEP_DARKSKY: args.no_darksky,
-        STEP_HORIZON: args.no_horizon,
-        STEP_SHADEMAP: args.no_shademap,
-    }
-
-    legacy_only_steps = [step for step, enabled in legacy_only_map.items() if enabled]
-    legacy_skipped_steps = {step for step, enabled in legacy_skip_map.items() if enabled}
-
-    if legacy_only_steps and args.mode == MODE_FULL:
-        print(f"⚠️  Legacy --only-* flags detected; using --mode {MODE_UPDATE}")
-        args.mode = MODE_UPDATE
-
-    if legacy_only_steps and args.steps:
-        print("✗ Error: Cannot combine legacy --only-* flags with --steps")
-        sys.exit(1)
-
-    if args.mode == MODE_UPDATE and legacy_skipped_steps:
-        print("✗ Error: Cannot use legacy --no-* flags in update mode")
-        sys.exit(1)
-
+def normalize_cli_steps(args: argparse.Namespace) -> None:
+    """Normalize CLI arguments into a valid mode/steps configuration."""
     if args.mode == MODE_UPDATE and args.skip_steps:
         print("✗ Error: Use --steps with --mode update instead of --skip-steps")
         sys.exit(1)
-
-    if legacy_only_steps:
-        args.steps = legacy_only_steps
 
     if args.mode == MODE_UPDATE and not args.steps:
         args.steps = VALID_STEPS.copy()
 
     if args.mode == MODE_FULL and not args.steps:
-        selected_steps = VALID_STEPS.copy()
-        for skipped_step in legacy_skipped_steps:
-            if skipped_step in selected_steps:
-                selected_steps.remove(skipped_step)
-        args.steps = selected_steps
+        args.steps = VALID_STEPS.copy()
 
     if args.skip_steps:
-        args.steps = [step for step in args.steps if step not in set(args.skip_steps)]
+        skipped_steps = set(args.skip_steps)
+        args.steps = [step for step in args.steps if step not in skipped_steps]
 
-    deduped_steps: List[str] = []
-    seen: Set[str] = set()
-    for step in args.steps:
-        if step not in seen:
-            deduped_steps.append(step)
-            seen.add(step)
-    args.steps = deduped_steps
+    args.steps = list(dict.fromkeys(args.steps))
 
     if not args.steps and not args.add_site:
         print("✗ Error: No steps selected")
@@ -427,25 +390,15 @@ Examples:
     parser.add_argument('--visibility', choices=['visible', 'not_visible', 'unknown'], help='Eclipse visibility status (required with --add-site)')
     parser.add_argument('--site-code', help='Site code (optional, auto-generates Txxxx if not provided)')
 
-    parser.add_argument('--no-eclipse-view-scrape', action='store_true', help='Legacy compatibility: skip eclipse profile image downloads in full mode')
-    parser.add_argument('--no-cloud', action='store_true', help='Legacy compatibility: skip cloud coverage data scraping in full mode')
-    parser.add_argument('--no-darksky', action='store_true', help='Legacy compatibility: skip Dark Sky data scraping in full mode')
-    parser.add_argument('--no-horizon', action='store_true', help='Legacy compatibility: skip EclipseFan horizon image downloads in full mode')
-    parser.add_argument('--no-shademap', action='store_true', help='Legacy compatibility: skip Shademap shadow visualization downloads in full mode')
+    parser.add_argument('--no-eclipse-view-scrape', action='store_true', help='Skip eclipse profile image downloads in full mode')
     parser.add_argument('--no-profile', action='store_true', help='Skip profile diagram screenshots (check visibility only)')
     parser.add_argument('--skip-existing', action='store_true', help='Skip step processing if data already exists (checks CSV fields and files)')
-
-    parser.add_argument('--only-eclipse', action='store_true', help='Legacy compatibility: update mode for eclipse step')
-    parser.add_argument('--only-cloud', action='store_true', help='Legacy compatibility: update mode for cloud step')
-    parser.add_argument('--only-darksky', action='store_true', help='Legacy compatibility: update mode for darksky step')
-    parser.add_argument('--only-horizon', action='store_true', help='Legacy compatibility: update mode for horizon step')
-    parser.add_argument('--only-shademap', action='store_true', help='Legacy compatibility: update mode for shademap step')
 
     args = parser.parse_args()
     args.steps = args.steps or []
     args.skip_steps = args.skip_steps or []
 
-    normalize_cli_mode_and_steps(args)
+    normalize_cli_steps(args)
 
     print("=" * 60)
     print("Eclipse Site Data Generator")
@@ -480,14 +433,10 @@ Examples:
 
         results = apply_selected_steps(args, results, update_mode=True)
 
-        if args.code:
+        if args.code and results:
             print(f"\nMerging updated site {args.code} back into CSV...")
             all_sites = load_sites_from_csv(args.csv)
-            for i, site in enumerate(all_sites):
-                if site.get('code') == args.code and results:
-                    all_sites[i] = results[0]
-                    break
-            results = all_sites
+            results = merge_updated_site(all_sites, results[0])
 
         print("\n" + "=" * 60)
         print("Saving updated data...")

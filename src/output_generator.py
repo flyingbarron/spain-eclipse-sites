@@ -9,9 +9,17 @@ import math
 import shutil
 from datetime import datetime
 from typing import List, Dict, Any, Tuple
+from src.constants import (
+    CSV_FIELDS,
+    DATA_DIR,
+    DEFAULT_CSV_FILENAME,
+    STEP_ECLIPSE,
+    STEP_HORIZON,
+    STEP_SHADEMAP,
+    SUMMARY_OUTPUT_LABELS,
+    resolve_data_csv_path,
+)
 
-# Ensure data directory exists
-DATA_DIR = "data"
 os.makedirs(DATA_DIR, exist_ok=True)
 
 # Eclipse azimuth constant (degrees)
@@ -60,18 +68,15 @@ def calculate_endpoint(lat: float, lon: float, azimuth: float, distance_km: floa
     return end_lat, end_lon
 
 
-def save_to_csv(results: List[Dict[str, Any]], filename: str = 'eclipse_site_data.csv') -> None:
+def save_to_csv(results: List[Dict[str, Any]], filename: str = DEFAULT_CSV_FILENAME) -> None:
     """Save results to CSV file, merging with existing data
     
     Args:
         results: List of site dictionaries (new/updated data)
         filename: Output CSV filename
     """
-    filepath = os.path.join(DATA_DIR, filename)
-    fieldnames = ['code', 'denominacion', 'url', 'valor_turistico', 'confidencialidad',
-                 'route_difficulty', 'latitude', 'longitude', 'eclipse_visibility', 'status',
-                 'cloud_coverage', 'cloud_status', 'cloud_url', 'horizon_status', 'shademap_status',
-                 'darksky_sqm', 'darksky_bortle', 'darksky_darkness', 'darksky_status']
+    filepath = resolve_data_csv_path(filename)
+    fieldnames = CSV_FIELDS
     
     # Backup existing CSV file if it exists
     if os.path.exists(filepath):
@@ -146,7 +151,7 @@ def save_to_kml(results: List[Dict[str, Any]], filename: str = 'sites.kml') -> N
     filepath = os.path.join(DATA_DIR, filename)
     
     # Load existing data from CSV (which has all merged data)
-    csv_filepath = os.path.join(DATA_DIR, 'eclipse_site_data.csv')
+    csv_filepath = resolve_data_csv_path(DEFAULT_CSV_FILENAME)
     all_sites: List[Dict[str, Any]] = []
     
     if os.path.exists(csv_filepath):
@@ -387,10 +392,10 @@ def print_summary(results: List[Dict[str, Any]]) -> None:
     print("\nOutput files:")
     print("  • data/eclipse_site_data.csv - Complete dataset")
     print("  • data/sites.kml - All sites organized in 6 folders")
-    print("  • data/scrape/ign_profiles/*.png - IGN visibility profile diagrams")
+    print(f"  • {SUMMARY_OUTPUT_LABELS[STEP_ECLIPSE]}")
     if with_horizon > 0:
-        print(f"  • data/scrape/eclipsefan_horizons/*.png - EclipseFan horizon profiles ({with_horizon} sites)")
+        print(f"  • {SUMMARY_OUTPUT_LABELS[STEP_HORIZON]} ({with_horizon} sites)")
     if with_shademap > 0:
-        print(f"  • data/scrape/shademap_snapshots/*.jpg - Shademap shadow visualizations ({with_shademap} sites)")
+        print(f"  • {SUMMARY_OUTPUT_LABELS[STEP_SHADEMAP]} ({with_shademap} sites)")
 
 # Made with Bob

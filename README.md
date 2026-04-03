@@ -215,17 +215,6 @@ python3 generate_eclipse_site_data.py --mode update --steps cloud --csv my_sites
 
 When [`--skip-existing`](generate_eclipse_site_data.py:1) is used, the pipeline applies the same shared skip/process/merge flow across eclipse, cloud, Dark Sky, horizon, and Shademap steps.
 
-#### Legacy Compatibility
-
-The older legacy flags are still accepted as compatibility aliases:
-- [`--only-*`](generate_eclipse_site_data.py:1)
-- [`--no-cloud`](generate_eclipse_site_data.py:1)
-- [`--no-darksky`](generate_eclipse_site_data.py:1)
-- [`--no-horizon`](generate_eclipse_site_data.py:1)
-- [`--no-shademap`](generate_eclipse_site_data.py:1)
-
-The recommended interface is [`--mode`](generate_eclipse_site_data.py:1) plus [`--steps`](generate_eclipse_site_data.py:1).
-
 #### Help
 
 View all options:
