@@ -85,12 +85,18 @@ export function displaySites(sites) {
         const noteIndicator = hasContent ? '<span class="note-indicator" title="Has personal note or brochure">📝</span>' : '';
         
         return `
-            <li class="site-item ${isSelected ? 'active' : ''}" data-code="${site.code}">
+            <li class="site-item ${isSelected ? 'active' : ''}"
+                data-code="${site.code}"
+                role="listitem"
+                tabindex="0"
+                aria-label="${site.code}: ${site.denominacion || 'N/A'}. ${eclipseInfo.text || ''}. ${site.cloud_coverage ? `Cloud coverage ${site.cloud_coverage}%` : ''}">
                 <div class="site-header">
                     <div class="site-code">${site.code} ${noteIndicator}</div>
                     <button class="favorite-btn ${isFavorite ? 'is-favorite' : ''}"
                             data-code="${site.code}"
                             data-action="favorite"
+                            tabindex="-1"
+                            aria-label="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
                             title="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}">
                         ${favoriteIcon}
                     </button>

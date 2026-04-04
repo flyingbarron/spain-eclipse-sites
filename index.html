@@ -8,52 +8,53 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet" />
-    <link rel="stylesheet" href="static/styles.css?v=1.3.0" />
+    <link rel="stylesheet" href="static/styles.css?v=1.4.0" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
     
     <!-- Modular ES6 JavaScript - GitHub Pages Standalone Build -->
-    <script type="module" src="gh-pages/main.js?v=1.3.0"></script>
+    <script type="module" src="gh-pages/main.js?v=1.4.0"></script>
 </head>
 <body>
-    <header>
+    <a href="#content" class="skip-link">Skip to main content</a>
+    <header role="banner">
         <div class="header-content">
             <h1>🦕 Spain Eclipse Site Viewer</h1>
-            <nav class="header-nav">
-                <button class="nav-item" id="favoritesBtn">⭐ Favorites (<span id="favoritesCount">0</span>)</button>
-                <button class="nav-item" id="resourcesBtn">🔗 Resources</button>
-                <button class="nav-item" id="aboutBtn">ℹ️ About</button>
-                <button class="nav-item" id="helpBtn">❓ Help</button>
+            <nav class="header-nav" role="navigation" aria-label="Main navigation">
+                <button class="nav-item" id="favoritesBtn" aria-label="View favorites">⭐ Favorites (<span id="favoritesCount" aria-live="polite">0</span>)</button>
+                <button class="nav-item" id="resourcesBtn" aria-label="View eclipse resources">🔗 Resources</button>
+                <button class="nav-item" id="aboutBtn" aria-label="About this application">ℹ️ About</button>
+                <button class="nav-item" id="helpBtn" aria-label="Get help">❓ Help</button>
             </nav>
         </div>
     </header>
 
     <div class="container">
-        <aside class="sidebar">
+        <aside class="sidebar" role="complementary" aria-label="Site list and filters">
             <div class="sidebar-controls">
-                <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search sites...">
+                <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search sites..." aria-label="Search eclipse sites by name or code">
                 
                 <div class="filter-controls">
-                    <div class="filter-section">
+                    <div class="filter-section" role="group" aria-label="Quick filters">
                         <label class="filter-label">Quick Filters</label>
                         <label class="checkbox-label">
-                            <input type="checkbox" id="eclipseFilter" class="filter-checkbox">
+                            <input type="checkbox" id="eclipseFilter" class="filter-checkbox" aria-label="Show only eclipse visible sites">
                             <span class="checkbox-text">🌑 Eclipse visible only</span>
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" id="favoritesFilter" class="filter-checkbox">
+                            <input type="checkbox" id="favoritesFilter" class="filter-checkbox" aria-label="Show only favorite sites">
                             <span class="checkbox-text">⭐ Favorites only</span>
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" id="notesFilter" class="filter-checkbox">
+                            <input type="checkbox" id="notesFilter" class="filter-checkbox" aria-label="Show only sites with attachments">
                             <span class="checkbox-text">📎 Sites with attachments</span>
                         </label>
                     </div>
                     
                     <div class="filter-section">
                         <label class="filter-label" for="sortBy">Sort By</label>
-                        <select id="sortBy" class="filter-select">
+                        <select id="sortBy" class="filter-select" aria-label="Sort sites by">
                             <option value="code">Code (A-Z)</option>
                             <option value="code_desc">Code (Z-A)</option>
                             <option value="name">Name (A-Z)</option>
@@ -64,7 +65,7 @@
                     </div>
                     
                     <div class="filter-section">
-                        <button class="filter-toggle-btn" id="advancedFilterToggle">
+                        <button class="filter-toggle-btn" id="advancedFilterToggle" aria-expanded="false" aria-controls="advancedFilters">
                             🔧 Advanced Filters
                         </button>
                     </div>
@@ -118,30 +119,30 @@
                 </div>
             </div>
             <div class="sidebar-list-container" style="display:block !important; min-height:400px !important; max-height:600px !important; overflow-y:scroll !important; background:#fff !important; visibility:visible !important;">
-                <ul class="site-list" id="siteList" style="display:block !important; min-height:300px !important; visibility:visible !important;">
-                    <li class="loading">Loading sites...</li>
+                <ul class="site-list" id="siteList" role="list" aria-label="Eclipse viewing sites" style="display:block !important; min-height:300px !important; visibility:visible !important;">
+                    <li class="loading" role="status" aria-live="polite">Loading sites...</li>
                 </ul>
             </div>
-            <div class="site-counter" id="siteCounter">
+            <div class="site-counter" id="siteCounter" role="status" aria-live="polite" aria-atomic="true">
                 Showing <span id="visibleCount">0</span> of <span id="totalCount">0</span> sites
             </div>
         </aside>
         
         <!-- Mobile expand button (shown when sidebar is collapsed) -->
-        <button class="sidebar-expand-btn" id="sidebarExpandBtn">📋 Show Site List</button>
+        <button class="sidebar-expand-btn" id="sidebarExpandBtn" aria-label="Show site list" aria-expanded="false">📋 Show Site List</button>
 
-        <main class="content" id="content">
-            <div class="loading">
+        <main class="content" id="content" role="main" aria-label="Site details">
+            <div class="loading" role="status">
                 <p>Select a site from the list to view details and images</p>
             </div>
         </main>
     </div>
 
-    <footer>
+    <footer role="contentinfo">
         <div class="footer-main">
             Created by <strong>Robert Barron</strong> • Made with Bob 🤖
         </div>
-        <button class="footer-toggle" id="footerToggle">
+        <button class="footer-toggle" id="footerToggle" aria-expanded="false" aria-controls="footerDetails">
             <span class="footer-toggle-icon">▶</span>
             <span>Data Sources & Attribution</span>
         </button>
@@ -164,12 +165,12 @@
     <div class="info-modal-overlay" id="panelOverlay"></div>
 
     <!-- Modal for full-size images -->
-    <div class="modal" id="imageModal">
-        <span class="modal-close" id="modalClose">&times;</span>
-        <span class="modal-nav prev" id="modalPrev">&#10094;</span>
-        <span class="modal-nav next" id="modalNext">&#10095;</span>
-        <img class="modal-content" id="modalImage">
-        <div class="modal-counter" id="modalCounter"></div>
+    <div class="modal" id="imageModal" role="dialog" aria-modal="true" aria-label="Image viewer">
+        <span class="modal-close" id="modalClose" role="button" tabindex="0" aria-label="Close image viewer">&times;</span>
+        <span class="modal-nav prev" id="modalPrev" role="button" tabindex="0" aria-label="Previous image">&#10094;</span>
+        <span class="modal-nav next" id="modalNext" role="button" tabindex="0" aria-label="Next image">&#10095;</span>
+        <img class="modal-content" id="modalImage" alt="">
+        <div class="modal-counter" id="modalCounter" role="status" aria-live="polite"></div>
     </div>
 
     <!-- Resources Modal -->
@@ -239,7 +240,7 @@
 
                 <h3 style="margin-top: 1.5rem;">Project Info</h3>
                 <p>Created by <strong>Robert Barron</strong> • Made with Bob 🤖</p>
-                <p style="font-size: 0.85rem; color: #6c757d; margin-top: 0.5rem;">Version 1.3.0 (GitHub Pages)</p>
+                <p style="font-size: 0.85rem; color: #6c757d; margin-top: 0.5rem;">Version 1.4.0 (GitHub Pages)</p>
             </div>
         </div>
     </div>

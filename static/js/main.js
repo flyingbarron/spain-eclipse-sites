@@ -12,6 +12,7 @@ import { setupModalListeners } from './modal-handler.js';
 import { updateMapWithMultipleSites } from './map-handler.js';
 import { favoritesManager } from './favorites-manager.js';
 import { getUrlParameter, setUrlParameter } from './utils.js';
+import { accessibilityManager } from './accessibility.js';
 
 
 /**

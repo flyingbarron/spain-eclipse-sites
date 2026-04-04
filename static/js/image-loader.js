@@ -42,19 +42,29 @@ export async function loadSiteImages(site) {
                 container.innerHTML = data.images.map((img, index) => `
                     <div class="image-card">
                         <img src="${CONFIG.API.PROXY_IMAGE}?url=${encodeURIComponent(img.src)}"
-                             alt="${img.alt || 'Site image'}"
+                             alt="${img.alt || `${site.denominacion || site.code} - Image ${index + 1}`}"
                              data-index="${index}"
                              class="site-image"
+                             role="button"
+                             tabindex="0"
+                             aria-label="View full size image ${index + 1} of ${data.images.length}"
                              onerror="this.parentElement.style.display='none'">
-                        <div class="image-caption">${img.alt || 'Site image'}</div>
+                        <div class="image-caption">${img.alt || `Image ${index + 1}`}</div>
                     </div>
                 `).join('');
                 
-                // Add click listeners to images
+                // Add click and keyboard listeners to images
                 container.querySelectorAll('.site-image').forEach(img => {
                     img.addEventListener('click', () => {
                         const index = parseInt(img.dataset.index);
                         openImageModal(index);
+                    });
+                    img.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            const index = parseInt(img.dataset.index);
+                            openImageModal(index);
+                        }
                     });
                 });
                 
@@ -78,19 +88,29 @@ export async function loadSiteImages(site) {
             container.innerHTML = imageUrls.map((url, index) => `
                 <div class="image-card">
                     <img src="${url}"
-                         alt="Site image ${index + 1}"
+                         alt="${site.denominacion || site.code} - Image ${index + 1} of ${imageUrls.length}"
                          data-index="${index}"
                          class="site-image"
+                         role="button"
+                         tabindex="0"
+                         aria-label="View full size image ${index + 1} of ${imageUrls.length}"
                          onerror="this.parentElement.style.display='none'">
                     <div class="image-caption">Image ${index + 1}</div>
                 </div>
             `).join('');
             
-            // Add click listeners to images
+            // Add click and keyboard listeners to images
             container.querySelectorAll('.site-image').forEach(img => {
                 img.addEventListener('click', () => {
                     const index = parseInt(img.dataset.index);
                     openImageModal(index);
+                });
+                img.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        const index = parseInt(img.dataset.index);
+                        openImageModal(index);
+                    }
                 });
             });
             

@@ -1,6 +1,6 @@
 # Spain Eclipse Sites 🦕🌑
 
-**Version:** 1.3.0
+**Version:** 1.4.0
 
 A comprehensive data collection and visualization tool for Spanish geological sites with 2026 solar eclipse visibility information. Combines data from multiple sources including IGME (Spanish Geological Survey), IGN (National Geographic Institute), EclipseFan, timeanddate.com, Shademap, and Google Maps.
 
@@ -67,6 +67,7 @@ This project supports two deployment modes:
 - 📊 **Sort** by code, name, or darkness
 - 📚 **Navigation panels** - Resources, About, and Help sections accessible from header
 - 🔗 **Resources panel** - Quick links to eclipse websites and planning tools
+- ♿ **Accessibility features** - High contrast mode, font size controls, keyboard navigation, ARIA labels, screen reader support
 - 🖼️ **Image gallery** with full-screen carousel (IGME photos cached locally)
 - 🗺️ **Interactive maps** with Leaflet/OpenStreetMap
 - 📍 **Google Maps thumbnails** - Satellite view for each site location
