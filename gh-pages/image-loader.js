@@ -32,16 +32,20 @@ export async function loadSiteImages(site) {
             appState.setCurrentImages(imageUrls);
             
             // Render image grid with descriptions
-            container.innerHTML = images.map((img, index) => `
-                <div class="image-card">
-                    <img src="${img.src}"
-                         alt="${img.alt || 'Site image'}"
-                         data-index="${index}"
-                         class="site-image"
-                         onerror="this.parentElement.style.display='none'">
-                    <div class="image-caption">${img.alt || `Image ${index + 1}`}</div>
-                </div>
-            `).join('');
+            container.innerHTML = images.map((img, index) => {
+                const alt = img.alt || 'Site image';
+                const showCaption = alt !== 'Site image';
+                return `
+                    <div class="image-card">
+                        <img src="${img.src}"
+                             alt="${alt}"
+                             data-index="${index}"
+                             class="site-image"
+                             onerror="this.parentElement.style.display='none'">
+                        ${showCaption ? `<div class="image-caption">${alt}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
             
             // Setup click handlers for modal
             const imageElements = container.querySelectorAll('.site-image');
