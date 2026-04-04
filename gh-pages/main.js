@@ -153,15 +153,18 @@ function setupDocumentationButtons() {
     const openReadmeBtn = document.getElementById('openReadmeBtn');
     const openCreditsBtn = document.getElementById('openCreditsBtn');
     
+    // Get the base path (works for both local and GitHub Pages)
+    const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+    
     if (openReadmeBtn) {
         openReadmeBtn.addEventListener('click', () => {
-            window.open('readme.html', '_blank');
+            window.open(basePath + 'readme.html', '_blank');
         });
     }
     
     if (openCreditsBtn) {
         openCreditsBtn.addEventListener('click', () => {
-            window.open('credits.html', '_blank');
+            window.open(basePath + 'credits.html', '_blank');
         });
     }
 }
