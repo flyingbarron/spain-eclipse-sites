@@ -1994,6 +1994,13 @@ footer a:hover {
         box-sizing: border-box;
     }
     
+    /* Constrain horizon profile thumbnail on mobile */
+    .eclipse-profile-thumbnail.horizon-thumbnail {
+        max-width: 100%;
+        width: 100%;
+        height: auto;
+    }
+    
     .preview-thumbnails-grid .link-button {
         width: 100%;
         max-width: 100%;
