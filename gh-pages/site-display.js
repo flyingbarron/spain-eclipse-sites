@@ -106,9 +106,9 @@ export function displaySites(sites) {
         `;
         }).join('');
         
-        showDebugMessage('Site list rendered successfully with ' + sites.length + ' items');
+        console.log('Site list rendered successfully with ' + sites.length + ' items');
     } catch (error) {
-        showDebugMessage('ERROR in displaySites: ' + error.message, true);
+        console.error('ERROR in displaySites: ' + error.message, error);
         const list = document.getElementById('siteList');
         if (list) {
             list.innerHTML = '<li class="loading">Error: ' + error.message + '</li>';
