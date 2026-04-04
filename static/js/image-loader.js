@@ -68,7 +68,7 @@ export async function loadSiteImages(site) {
     
     // Fall back to static cached images (GitHub Pages mode)
     try {
-        const imageDir = `data/igme_images/${site.code}/`;
+        const imageDir = `data/cache/igme_images/${site.code}/`;
         const imageUrls = await findCachedImages(site.code, imageDir);
         
         if (imageUrls.length > 0) {

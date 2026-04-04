@@ -164,13 +164,23 @@
         async function loadCredits() {
             const contentDiv = document.getElementById('content');
             try {
-                const response = await fetch('/api/credits');
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                // Try API endpoint first (local development)
+                let response = await fetch('/api/credits');
+                let content = '';
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    content = data.content || '';
+                } else {
+                    // Fall back to direct file access (GitHub Pages)
+                    response = await fetch('CREDITS.md');
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    content = await response.text();
                 }
                 
-                const data = await response.json();
-                const html = marked.parse(data.content || '');
+                const html = marked.parse(content);
                 contentDiv.innerHTML = html;
             } catch (error) {
                 console.error('Error loading CREDITS:', error);

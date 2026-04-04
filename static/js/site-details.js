@@ -29,6 +29,7 @@ let horizonFilesCache = null;
 
 /**
  * Fetch available horizon files from server
+ * Falls back to checking files directly for GitHub Pages
  * @returns {Promise<Object>} Map of site codes to filenames
  */
 async function fetchHorizonFiles() {
@@ -43,10 +44,12 @@ async function fetchHorizonFiles() {
             return horizonFilesCache;
         }
     } catch (error) {
-        console.warn('Could not fetch horizon files:', error);
+        console.log('API not available, using direct file access for GitHub Pages');
     }
     
-    return {};
+    // For GitHub Pages, we'll check files directly when needed
+    horizonFilesCache = {};
+    return horizonFilesCache;
 }
 
 /**

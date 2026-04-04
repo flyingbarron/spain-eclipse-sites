@@ -34,7 +34,7 @@ export const CONFIG = {
     
     // Image directories (static paths for GitHub Pages)
     IMAGES: {
-        IGME_CACHE: 'data/igme_images/',
+        IGME_CACHE: 'data/cache/igme_images/',
         HORIZONS: 'data/horizons/',
         SHADEMAPS: 'data/shademap/',
         GOOGLE_MAPS: 'data/google_maps/'
