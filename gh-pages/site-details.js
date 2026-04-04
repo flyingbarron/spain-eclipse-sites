@@ -50,11 +50,17 @@ async function fetchHorizonFiles() {
     
     try {
         // Fall back to static JSON file for GitHub Pages
-        const response = await fetch('data/horizon_files.json');
+        // Use relative path that works with GitHub Pages subdirectory
+        const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+        const jsonUrl = basePath + 'data/horizon_files.json';
+        console.log('Trying to load horizon files from:', jsonUrl);
+        const response = await fetch(jsonUrl);
         if (response.ok) {
             horizonFilesCache = await response.json();
             console.log(`Loaded ${Object.keys(horizonFilesCache).length} horizon files from static JSON`);
             return horizonFilesCache;
+        } else {
+            console.warn('Failed to load horizon files, status:', response.status);
         }
     } catch (error) {
         console.warn('Could not load horizon files:', error);
