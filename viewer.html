@@ -21,6 +21,7 @@
         <div class="header-content">
             <h1>🦕 Spain Eclipse Site Viewer</h1>
             <nav class="header-nav">
+                <button class="nav-item" id="favoritesBtn">⭐ Favorites (<span id="favoritesCount">0</span>)</button>
                 <button class="nav-item" id="resourcesBtn">🔗 Resources</button>
                 <button class="nav-item" id="aboutBtn">ℹ️ About</button>
                 <button class="nav-item" id="helpBtn">❓ Help</button>
@@ -35,10 +36,18 @@
                 
                 <div class="filter-controls">
                     <div class="filter-section">
-                        <label class="filter-label">Filters</label>
+                        <label class="filter-label">Quick Filters</label>
                         <label class="checkbox-label">
                             <input type="checkbox" id="eclipseFilter" class="filter-checkbox">
                             <span class="checkbox-text">🌑 Eclipse visible only</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="favoritesFilter" class="filter-checkbox">
+                            <span class="checkbox-text">⭐ Favorites only</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="notesFilter" class="filter-checkbox">
+                            <span class="checkbox-text">📎 Sites with attachments</span>
                         </label>
                     </div>
                     
@@ -49,13 +58,62 @@
                             <option value="code_desc">Code (Z-A)</option>
                             <option value="name">Name (A-Z)</option>
                             <option value="name_desc">Name (Z-A)</option>
-                            <option value="tourist_value">Tourist Value (High-Low)</option>
-                            <option value="tourist_value_asc">Tourist Value (Low-High)</option>
                             <option value="darkness">Darkness (Darkest First)</option>
                             <option value="darkness_asc">Darkness (Lightest First)</option>
-                            <option value="clearance">Horizon Clearance (Best First)</option>
-                            <option value="clearance_asc">Horizon Clearance (Worst First)</option>
                         </select>
+                    </div>
+                    
+                    <div class="filter-section">
+                        <button class="filter-toggle-btn" id="advancedFilterToggle">
+                            🔧 Advanced Filters
+                        </button>
+                    </div>
+                    
+                    <div class="advanced-filters" id="advancedFilters" style="display: none;">
+                        <div class="filter-group">
+                            <label class="filter-label">Tourist Value</label>
+                            <div class="range-inputs">
+                                <input type="number" id="touristValueMin" min="0" max="10" step="0.1" value="0" class="range-input">
+                                <span>to</span>
+                                <input type="number" id="touristValueMax" min="0" max="10" step="0.1" value="10" class="range-input">
+                            </div>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label">Max Cloud Coverage (%)</label>
+                            <input type="range" id="cloudCoverageMax" min="0" max="100" value="100" class="range-slider">
+                            <span class="range-value" id="cloudCoverageValue">100%</span>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label">Max Bortle Scale</label>
+                            <input type="range" id="bortleMax" min="1" max="9" value="9" class="range-slider">
+                            <span class="range-value" id="bortleValue">9</span>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label">Route Difficulty</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="difficulty-checkbox" value="Low">
+                                    <span>Low</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="difficulty-checkbox" value="Medium">
+                                    <span>Medium</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="difficulty-checkbox" value="High">
+                                    <span>High</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="difficulty-checkbox" value="Very High">
+                                    <span>Very High</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button class="reset-filters-btn" id="resetFiltersBtn">Reset Filters</button>
                     </div>
                 </div>
             </div>
@@ -142,6 +200,7 @@
                         <li><a href="https://info.igme.es/ielig/" target="_blank">IGME</a> - Spanish geological sites database</li>
                         <li><a href="https://www.eclipsefan.org/" target="_blank">EclipseFan.org</a> - Horizon view simulations</li>
                         <li><a href="https://www.timeanddate.com/" target="_blank">timeanddate.com</a> - Weather and cloud coverage data</li>
+                        <li><a href="https://dinosauriosdelarioja.com/" target="_blank">Dinosaurios De La Rioja</a> - Tourism website for La Rioja dinosaurs</li>
                     </ul>
                 </div>
             </div>
@@ -231,3 +290,41 @@
     </div>
 </body>
 </html>
+    <!-- Favorites Modal -->
+    <div class="modal" id="favoritesModal" style="display: none;">
+        <div class="modal-content favorites-modal-content">
+            <div class="modal-header">
+                <h2>⭐ My Favorites</h2>
+                <button class="modal-close" id="closeFavoritesModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="favorites-actions">
+                    <button class="action-btn" id="exportFavoritesBtn">📥 Export</button>
+                    <button class="action-btn" id="importFavoritesBtn">📤 Import</button>
+                    <button class="action-btn" id="clearFavoritesBtn">🗑️ Clear All</button>
+                </div>
+                <div class="favorites-list" id="favoritesList">
+                    <p class="empty-message">No favorites yet. Click the ☆ icon on any site to add it to your favorites.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div class="modal" id="importModal" style="display: none;">
+        <div class="modal-content import-modal-content">
+            <div class="modal-header">
+                <h2>📤 Import Data</h2>
+                <button class="modal-close" id="closeImportModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Paste JSON data below:</p>
+                <textarea id="importDataInput" class="import-textarea" rows="10" placeholder='{"version": "1.0", ...}'></textarea>
+                <div class="import-actions">
+                    <button class="action-btn primary" id="confirmImportBtn">Import</button>
+                    <button class="action-btn" id="cancelImportBtn">Cancel</button>
+                </div>
+                <div class="import-result" id="importResult"></div>
+            </div>
+        </div>
+    </div>

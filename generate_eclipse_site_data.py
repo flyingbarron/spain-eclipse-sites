@@ -7,6 +7,7 @@ Generates a single CSV with all data and three KML files.
 
 import argparse
 import csv
+import json
 import os
 import sys
 from typing import Any, Dict, List
@@ -342,6 +343,61 @@ def apply_selected_steps(args: argparse.Namespace, results: List[Dict[str, Any]]
     return results
 
 
+def apply_brochure_mappings(sites: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Apply brochure mappings from data/brochure_mappings.json to sites.
+    
+    Args:
+        sites: List of site dictionaries
+        
+    Returns:
+        Updated list of sites with brochure information
+    """
+    mappings_file = 'data/brochure_mappings.json'
+    
+    if not os.path.exists(mappings_file):
+        print(f"⚠️  Brochure mappings file not found: {mappings_file}")
+        return sites
+    
+    try:
+        with open(mappings_file, 'r', encoding='utf-8') as f:
+            mappings_data = json.load(f)
+        
+        brochures = mappings_data.get('brochures', [])
+        download_dir = mappings_data.get('download_dir', 'data/brochures')
+        
+        # Create a mapping from site code to brochure info
+        code_to_brochure = {}
+        for brochure in brochures:
+            site_codes = brochure.get('site_codes', [])
+            for code in site_codes:
+                code_to_brochure[code] = {
+                    'title': brochure.get('title', ''),
+                    'filename': brochure.get('filename', ''),
+                    'source_url': brochure.get('source_url', '')
+                }
+        
+        # Apply brochure info to sites
+        updated_count = 0
+        for site in sites:
+            code = site.get('code', '')
+            if code in code_to_brochure:
+                brochure = code_to_brochure[code]
+                site['brochure_file'] = brochure['filename']
+                site['brochure_title'] = brochure['title']
+                site['brochure_url'] = f"{download_dir}/{brochure['filename']}"
+                site['brochure_source_url'] = brochure['source_url']
+                updated_count += 1
+        
+        if updated_count > 0:
+            print(f"✓ Applied brochure mappings to {updated_count} site(s)")
+        
+    except Exception as e:
+        print(f"⚠️  Error loading brochure mappings: {e}")
+    
+    return sites
+
+
 def main() -> None:
     """Main entry point for the script."""
     parser = argparse.ArgumentParser(
@@ -432,6 +488,10 @@ Examples:
                 results = filtered_results
 
         results = apply_selected_steps(args, results, update_mode=True)
+        
+        # Apply brochure mappings
+        print("\nApplying brochure mappings...")
+        results = apply_brochure_mappings(results)
 
         if args.code and results:
             print(f"\nMerging updated site {args.code} back into CSV...")
@@ -514,6 +574,10 @@ Examples:
     print(f"\n✓ Collected {len(results)} sites from IGME")
 
     results = apply_selected_steps(args, results, update_mode=False)
+    
+    # Apply brochure mappings
+    print("\nApplying brochure mappings...")
+    results = apply_brochure_mappings(results)
 
     print("\n" + "=" * 60)
     print("STEP 3: Generating output files...")

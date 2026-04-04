@@ -9,6 +9,7 @@ import { googleMapsApiKey } from './config.js';
 import { loadSiteImages } from './image-loader.js';
 import { initializeSingleSiteMap, updateMapWithMultipleSites } from './map-handler.js';
 import { initialize3DMap, cleanup3DMap } from './terrain-3d.js';
+import { notesManager } from './notes-manager.js';
 
 const ASSET_PATHS = {
     horizons: 'data/horizons',
@@ -188,10 +189,6 @@ function renderSiteHeader(site, urls) {
         ? `<a href="${urls.cloud}" target="_blank" class="link-button cloud">🕐 timeanddate.com</a>`
         : '';
 
-    const brochureButton = site.brochure_url
-        ? `<a href="${site.brochure_url}" target="_blank" class="link-button" style="background: #8e44ad;">📄 ${site.brochure_title || 'Site brochure'} brochure</a>`
-        : '';
-
     const hasValidIgmeUrl = site.url && site.url !== 'N/A' && site.url.trim() !== '';
     const igmeButtonClass = hasValidIgmeUrl ? 'link-button' : 'link-button inactive';
     const igmeButtonHref = hasValidIgmeUrl ? site.url : '#';
@@ -209,7 +206,6 @@ function renderSiteHeader(site, urls) {
                 <div style="${HEADER_STACK_STYLE}">
                     <a href="${igmeButtonHref}" target="_blank" class="${igmeButtonClass}"${igmeButtonTitle}>🪨 View on IGME Website</a>
                     ${cloudButton}
-                    ${brochureButton}
                     <a href="${urls.xavierJubier}" target="_blank" class="link-button xavier">🗺️ Xavier Jubier Eclipse Map</a>
                     <a href="${urls.darkSkySites}" target="_blank" class="link-button darksky">🌌 Dark Sky Sites</a>
                 </div>
@@ -306,18 +302,6 @@ function renderDetailsTab(site) {
         `;
     }
     
-    let brochureInfo = '';
-    if (site.brochure_url) {
-        brochureInfo = `
-            <div class="info-item">
-                <div class="info-label">Brochure</div>
-                <div class="info-value">
-                    <a href="${site.brochure_url}" target="_blank">${site.brochure_title || 'Open brochure PDF'}</a>
-                </div>
-            </div>
-        `;
-    }
-    
     return `
         <div class="detail-info">
             <div class="info-item">
@@ -325,19 +309,21 @@ function renderDetailsTab(site) {
                 <div class="info-value">${site.code}</div>
             </div>
             <div class="info-item">
-                <div class="info-label">Tourist Value</div>
-                <div class="info-value">${site.valor_turistico}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Privacy</div>
-                <div class="info-value">${site.confidencialidad}</div>
-            </div>
-            ${site.route_difficulty && site.route_difficulty !== 'N/A' ? `
-                <div class="info-item">
-                    <div class="info-label">Route Difficulty</div>
-                    <div class="info-value">${site.route_difficulty}</div>
+                <div class="info-label">Site Info</div>
+                <div class="info-value">
+                    <div style="margin-bottom: 0.25rem;">
+                        <strong>Tourist Value:</strong> ${site.valor_turistico}
+                    </div>
+                    <div style="margin-bottom: 0.25rem;">
+                        <strong>Privacy:</strong> ${site.confidencialidad}
+                    </div>
+                    ${site.route_difficulty && site.route_difficulty !== 'N/A' ? `
+                        <div>
+                            <strong>Route Difficulty:</strong> ${site.route_difficulty}
+                        </div>
+                    ` : ''}
                 </div>
-            ` : ''}
+            </div>
             <div class="info-item">
                 <div class="info-label">Coordinates</div>
                 <div class="info-value">
@@ -369,7 +355,26 @@ function renderDetailsTab(site) {
             ` : ''}
             ${cloudInfo}
             ${darkSkyInfo}
-            ${brochureInfo}
+        </div>
+        
+        <div class="notes-section">
+            <div class="notes-header" id="notesHeader">
+                <h3>📎 Attachments</h3>
+                <button class="notes-toggle-btn" id="notesToggleBtn">▼</button>
+            </div>
+            <div class="notes-content" id="notesContent">
+                ${site.brochure_url ? `
+                    <div style="margin-bottom: 0.75rem; padding: 0.5rem; background: #f0e6ff; border-left: 3px solid #8e44ad; border-radius: 4px;">
+                        <strong>📄 Site Brochure:</strong>
+                        <a href="${site.brochure_url}" target="_blank" style="color: #8e44ad; text-decoration: underline;">${site.brochure_title || 'View PDF'}</a>
+                    </div>
+                ` : ''}
+                <textarea id="siteNotes" class="site-notes-textarea" placeholder="Add your personal notes about this site...">${notesManager.getNote(site.code)}</textarea>
+                <div class="notes-actions">
+                    <button class="save-note-btn" id="saveNoteBtn">💾 Save Note</button>
+                    <button class="delete-note-btn" id="deleteNoteBtn">🗑️ Delete Note</button>
+                </div>
+            </div>
         </div>
         
         <div class="images-section">
@@ -490,6 +495,78 @@ export async function displaySiteDetails(site) {
     
     // Setup route functionality if on route tab
     setupRouteFunctionality();
+    
+    // Setup notes functionality
+    setupNotesFunctionality(site);
+}
+
+/**
+ * Setup notes save/delete functionality
+ * @param {Object} site - Site object
+ */
+function setupNotesFunctionality(site) {
+    const saveBtn = document.getElementById('saveNoteBtn');
+    const deleteBtn = document.getElementById('deleteNoteBtn');
+    const notesTextarea = document.getElementById('siteNotes');
+    const notesToggleBtn = document.getElementById('notesToggleBtn');
+    const notesContent = document.getElementById('notesContent');
+    const notesHeader = document.getElementById('notesHeader');
+    
+    // Check if site has a note or brochure
+    const hasNote = notesManager.hasNote(site.code);
+    const hasBrochure = site.brochure_url && site.brochure_url.trim() !== '';
+    const hasContent = hasNote || hasBrochure;
+    
+    // Setup toggle functionality and set initial state
+    if (notesToggleBtn && notesContent) {
+        // Start closed if no note or brochure exists
+        if (!hasContent) {
+            notesContent.style.display = 'none';
+            notesToggleBtn.textContent = '▶';
+        }
+        
+        notesToggleBtn.addEventListener('click', () => {
+            const isVisible = notesContent.style.display !== 'none';
+            notesContent.style.display = isVisible ? 'none' : 'block';
+            notesToggleBtn.textContent = isVisible ? '▶' : '▼';
+        });
+    }
+    
+    if (saveBtn && notesTextarea) {
+        saveBtn.addEventListener('click', () => {
+            const note = notesTextarea.value.trim();
+            notesManager.setNote(site.code, note);
+            
+            // Show feedback
+            saveBtn.textContent = '✅ Saved!';
+            setTimeout(() => {
+                saveBtn.textContent = '💾 Save Note';
+            }, 2000);
+            
+            // Refresh site list to show note indicator
+            import('./site-display.js').then(module => {
+                module.filterSites();
+            });
+        });
+    }
+    
+    if (deleteBtn && notesTextarea) {
+        deleteBtn.addEventListener('click', () => {
+            notesManager.deleteNote(site.code);
+            notesTextarea.value = '';
+            
+            // Show feedback
+            deleteBtn.textContent = '✅ Deleted!';
+            setTimeout(() => {
+                deleteBtn.textContent = '🗑️ Delete Note';
+            }, 2000);
+            
+            // Refresh site list to remove note indicator
+            import('./site-display.js').then(module => {
+                module.filterSites();
+            });
+        });
+    }
 }
 
 /**

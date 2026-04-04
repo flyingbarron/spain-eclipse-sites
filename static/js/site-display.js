@@ -6,6 +6,8 @@
 import { appState } from './state.js';
 import { getCloudInfo, getEclipseInfo } from './utils.js';
 import { filterAndSortSites } from './data-loader.js';
+import { favoritesManager } from './favorites-manager.js';
+import { notesManager } from './notes-manager.js';
 
 /**
  * Update site counter display
@@ -56,11 +58,11 @@ export function displaySites(sites) {
         if (site.darksky_bortle && site.darksky_status === 'success') {
             const bortle = parseFloat(site.darksky_bortle);
             let bortleIcon = '🌌'; // Default
-            if (bortle <= 2) bortleIcon = '✨'; // Excellent dark sky (1-2)
-            else if (bortle === 3) bortleIcon = '⭐'; // Good dark sky (3)
+            if (bortle <= 2) bortleIcon = '🌙'; // Excellent dark sky (1-2)
+            else if (bortle === 3) bortleIcon = '🌃'; // Good dark sky (3)
             else if (bortle === 4) bortleIcon = '🌠'; // Rural sky (4)
-            else if (bortle <= 6) bortleIcon = '🌟'; // Moderate (5-6)
-            else if (bortle <= 8) bortleIcon = '💫'; // Light pollution (7-8)
+            else if (bortle <= 6) bortleIcon = '🌌'; // Moderate (5-6)
+            else if (bortle <= 8) bortleIcon = '💡'; // Light pollution (7-8)
             else bortleIcon = '🌆'; // Heavy light pollution (9+)
             bortleLabel = `<span class="site-bortle" title="Bortle ${bortle}">${bortleIcon}</span>`;
         }
@@ -75,9 +77,24 @@ export function displaySites(sites) {
         }
         
         const isSelected = appState.isSiteSelected(site.code);
+        const isFavorite = favoritesManager.isFavorite(site.code);
+        const favoriteIcon = isFavorite ? '⭐' : '☆';
+        const hasNote = notesManager.hasNote(site.code);
+        const hasBrochure = site.brochure_url && site.brochure_url.trim() !== '';
+        const hasContent = hasNote || hasBrochure;
+        const noteIndicator = hasContent ? '<span class="note-indicator" title="Has personal note or brochure">📝</span>' : '';
+        
         return `
             <li class="site-item ${isSelected ? 'active' : ''}" data-code="${site.code}">
-                <div class="site-code">${site.code}</div>
+                <div class="site-header">
+                    <div class="site-code">${site.code} ${noteIndicator}</div>
+                    <button class="favorite-btn ${isFavorite ? 'is-favorite' : ''}"
+                            data-code="${site.code}"
+                            data-action="favorite"
+                            title="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}">
+                        ${favoriteIcon}
+                    </button>
+                </div>
                 <div class="site-name">${site.denominacion || 'N/A'}</div>
                 <div>
                     ${eclipseLabel}
@@ -91,18 +108,80 @@ export function displaySites(sites) {
 }
 
 /**
+ * Apply advanced filters to sites
+ * @param {Array} sites - Sites to filter
+ * @returns {Array} Filtered sites
+ */
+export function applyAdvancedFilters(sites) {
+    const filters = appState.advancedFilters;
+    
+    return sites.filter(site => {
+        // Tourist value range
+        const touristValue = parseFloat(site.valor_turistico) || 0;
+        if (touristValue < filters.touristValueMin || touristValue > filters.touristValueMax) {
+            return false;
+        }
+        
+        // Cloud coverage max
+        if (site.cloud_coverage && site.cloud_status === 'success') {
+            const cloudPct = parseInt(site.cloud_coverage);
+            if (cloudPct > filters.cloudCoverageMax) {
+                return false;
+            }
+        }
+        
+        // Bortle scale max
+        if (site.darksky_bortle && site.darksky_status === 'success') {
+            const bortle = parseFloat(site.darksky_bortle);
+            if (bortle > filters.bortleMax) {
+                return false;
+            }
+        }
+        
+        // Route difficulty
+        if (filters.routeDifficulty.length > 0) {
+            if (!filters.routeDifficulty.includes(site.route_difficulty)) {
+                return false;
+            }
+        }
+        
+        return true;
+    });
+}
+
+/**
  * Filter and display sites based on current filter settings
  */
 export function filterSites() {
     const searchTerm = document.getElementById('searchBox').value;
     const eclipseOnly = document.getElementById('eclipseFilter').checked;
+    const favoritesOnly = document.getElementById('favoritesFilter')?.checked || false;
+    const notesOnly = document.getElementById('notesFilter')?.checked || false;
     const sortBy = document.getElementById('sortBy').value;
     
-    const filtered = filterAndSortSites(appState.sitesData, {
+    let filtered = filterAndSortSites(appState.sitesData, {
         searchTerm,
         eclipseOnly,
         sortBy
     });
+    
+    // Apply favorites filter
+    if (favoritesOnly) {
+        const favoriteCodes = favoritesManager.favorites;
+        filtered = filtered.filter(site => favoriteCodes.includes(site.code));
+    }
+    
+    // Apply notes filter (includes sites with notes OR brochures)
+    if (notesOnly) {
+        filtered = filtered.filter(site => {
+            const hasNote = notesManager.hasNote(site.code);
+            const hasBrochure = site.brochure_url && site.brochure_url.trim() !== '';
+            return hasNote || hasBrochure;
+        });
+    }
+    
+    // Apply advanced filters
+    filtered = applyAdvancedFilters(filtered);
     
     displaySites(filtered);
 }
@@ -123,11 +202,46 @@ export function setupSiteListListeners() {
         eclipseFilter.addEventListener('change', filterSites);
     }
     
+    // Favorites filter checkbox
+    const favoritesFilter = document.getElementById('favoritesFilter');
+    if (favoritesFilter) {
+        favoritesFilter.addEventListener('change', filterSites);
+    }
+    
+    // Notes filter checkbox
+    const notesFilter = document.getElementById('notesFilter');
+    if (notesFilter) {
+        notesFilter.addEventListener('change', filterSites);
+    }
+    
     // Sort dropdown
     const sortBy = document.getElementById('sortBy');
     if (sortBy) {
         sortBy.addEventListener('change', filterSites);
     }
+    
+    // Favorite buttons (event delegation)
+    const siteList = document.getElementById('siteList');
+    if (siteList) {
+        siteList.addEventListener('click', (e) => {
+            // Check if clicked element or its parent is the favorite button
+            const favoriteBtn = e.target.closest('[data-action="favorite"]');
+            if (favoriteBtn) {
+                e.stopPropagation(); // Prevent site selection
+                const code = favoriteBtn.dataset.code;
+                favoritesManager.toggleFavorite(code);
+                filterSites(); // Refresh display
+                return;
+            }
+        });
+    }
+    
+    // Subscribe to favorites changes
+    appState.subscribe((property, value) => {
+        if (property === 'favorites') {
+            filterSites(); // Refresh when favorites change
+        }
+    });
 }
 
 // Made with Bob
