@@ -48,7 +48,30 @@ async function init() {
         console.error('Error initializing application:', error);
         const siteList = document.getElementById('siteList');
         if (siteList) {
-            siteList.innerHTML = '<li class="error">Error loading data. Please refresh the page.</li>';
+            siteList.innerHTML = `<li class="error">
+                <strong>Error loading data</strong><br>
+                ${error.message || error}<br>
+                <small>Check console for details</small>
+            </li>`;
+        }
+        
+        // Also show error in content area
+        const content = document.getElementById('content');
+        if (content) {
+            content.innerHTML = `
+                <div class="error" style="padding: 2rem; margin: 1rem;">
+                    <h3>Error Loading Application</h3>
+                    <p><strong>Error:</strong> ${error.message || error}</p>
+                    <p><strong>Stack:</strong></p>
+                    <pre style="background: #f8f9fa; padding: 1rem; overflow-x: auto; font-size: 0.8rem;">${error.stack || 'No stack trace available'}</pre>
+                    <p>Please try:</p>
+                    <ul>
+                        <li>Refreshing the page</li>
+                        <li>Clearing your browser cache</li>
+                        <li>Using a different browser</li>
+                    </ul>
+                </div>
+            `;
         }
     }
 }
