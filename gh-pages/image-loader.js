@@ -9,7 +9,7 @@ import { openImageModal } from '../static/js/modal-handler.js';
 
 /**
  * Load images for a site from cached IGME images
- * @param {Object} site - Site object with code
+ * @param {Object} site - Site object with code and url
  * @returns {Promise<Array>} Array of image URLs
  */
 export async function loadSiteImages(site) {
@@ -24,37 +24,36 @@ export async function loadSiteImages(site) {
     container.innerHTML = '<div class="loading">Loading images...</div>';
     
     try {
-        // For GitHub Pages, we look for cached images in data/igme_images/{site_code}/
-        const imageDir = `${CONFIG.IMAGES.IGME_CACHE}${site.code}/`;
+        // Try to load from cached IGME HTML metadata (has descriptions)
+        const images = await loadFromIgmeCache(site);
         
-        // Try to load a manifest file if it exists, otherwise try common image names
-        const imageUrls = await findSiteImages(site.code, imageDir);
-        
-        if (imageUrls.length > 0) {
+        if (images && images.length > 0) {
+            const imageUrls = images.map(img => img.src);
             appState.setCurrentImages(imageUrls);
             
-            // Render image grid
-            container.innerHTML = imageUrls.map((url, index) => `
+            // Render image grid with descriptions
+            container.innerHTML = images.map((img, index) => `
                 <div class="image-card">
-                    <img src="${url}"
-                         alt="Site image ${index + 1}"
+                    <img src="${img.src}"
+                         alt="${img.alt || 'Site image'}"
                          data-index="${index}"
                          class="site-image"
                          onerror="this.parentElement.style.display='none'">
-                    <div class="image-caption">Image ${index + 1}</div>
+                    <div class="image-caption">${img.alt || `Image ${index + 1}`}</div>
                 </div>
             `).join('');
             
             // Setup click handlers for modal
-            const images = container.querySelectorAll('.site-image');
-            images.forEach(img => {
+            const imageElements = container.querySelectorAll('.site-image');
+            imageElements.forEach(img => {
                 img.addEventListener('click', () => {
                     const index = parseInt(img.dataset.index);
                     openImageModal(index);
                 });
             });
             
-            return imageUrls;
+            console.log('[Static] Loaded', images.length, 'cached images for', site.code);
+            return images;
         } else {
             container.innerHTML = '<div class="no-images">No images available for this site</div>';
             return [];
@@ -68,44 +67,43 @@ export async function loadSiteImages(site) {
 }
 
 /**
- * Find cached images for a site
- * @param {string} siteCode - Site code
- * @param {string} imageDir - Image directory path
- * @returns {Promise<Array>} Array of image URLs
+ * Load images from IGME HTML cache (includes descriptions)
+ * @param {Object} site - Site object with url
+ * @returns {Promise<Array>} Array of image objects with src and alt
  */
-async function findSiteImages(siteCode, imageDir) {
-    // Try to load images.json manifest if it exists
+async function loadFromIgmeCache(site) {
+    if (!site.url) {
+        return null;
+    }
+    
+    // Calculate MD5 hash of the URL (same as Python backend)
+    const hash = await md5(site.url);
+    const jsonPath = `data/cache/igme_html/${hash}.json`;
+    
     try {
-        const manifestResponse = await fetch(`${imageDir}images.json`);
-        if (manifestResponse.ok) {
-            const manifest = await manifestResponse.json();
-            return manifest.images.map(img => `${imageDir}${img}`);
+        const response = await fetch(jsonPath);
+        if (response.ok) {
+            const data = await response.json();
+            return data.images || [];
         }
     } catch (e) {
-        // Manifest doesn't exist, try common patterns
+        console.log('No cached IGME metadata found for', site.code);
     }
     
-    // Try common image file patterns
-    const patterns = [
-        'image_1.jpg', 'image_2.jpg', 'image_3.jpg', 'image_4.jpg', 'image_5.jpg',
-        '1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg',
-        'photo_1.jpg', 'photo_2.jpg', 'photo_3.jpg'
-    ];
-    
-    const imageUrls = [];
-    for (const pattern of patterns) {
-        const url = `${imageDir}${pattern}`;
-        try {
-            const response = await fetch(url, { method: 'HEAD' });
-            if (response.ok) {
-                imageUrls.push(url);
-            }
-        } catch (e) {
-            // Image doesn't exist, continue
-        }
-    }
-    
-    return imageUrls;
+    return null;
+}
+
+/**
+ * Calculate MD5 hash of a string (for cache key)
+ * @param {string} str - String to hash
+ * @returns {Promise<string>} MD5 hash
+ */
+async function md5(str) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(str);
+    const hashBuffer = await crypto.subtle.digest('MD5', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 // Made with Bob
