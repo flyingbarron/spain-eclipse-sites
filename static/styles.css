@@ -2066,6 +2066,17 @@ footer a:hover {
         text-align: center;
     }
     
+    /* Action buttons in header - stack vertically and full width on mobile */
+    .detail-header > div[style*="flex-direction: row"] {
+        flex-direction: column !important;
+    }
+    
+    .detail-header .link-button {
+        width: 100%;
+        display: block;
+        text-align: center;
+    }
+    
     /* Link buttons - full width, larger touch targets on mobile */
     .site-links .link-button,
     .modal-button {
