@@ -223,13 +223,20 @@ function expandSidebarOnMobile() {
     const sidebar = document.querySelector('.sidebar');
     const content = document.querySelector('.content');
     
+    console.log('expandSidebarOnMobile called');
+    console.log('Window width:', window.innerWidth);
+    console.log('Sidebar element:', sidebar);
+    console.log('Sidebar classes before:', sidebar?.className);
+    
     if (sidebar) {
         sidebar.classList.remove('collapsed');
+        console.log('Sidebar classes after:', sidebar.className);
     }
     
     // On mobile, collapse content area when showing list
     if (content && window.innerWidth <= 768) {
         content.classList.add('collapsed');
+        console.log('Content collapsed');
     }
 }
 
