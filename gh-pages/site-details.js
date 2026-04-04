@@ -133,7 +133,9 @@ function generateSiteUrls(site) {
 }
 
 function buildAssetUrl(basePath, filename) {
-    return `${basePath}/${filename}`;
+    // Get the base URL path for GitHub Pages compatibility
+    const baseUrlPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+    return `${baseUrlPath}${basePath}/${filename}`;
 }
 
 function renderHeaderPreview({ buttonHtml, imageUrl, alt, extraClass = '', title }) {
