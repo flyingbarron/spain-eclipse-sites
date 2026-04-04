@@ -1,0 +1,62 @@
+# .gitignore for GitHub Pages Deployment
+# Copy this to .gitignore when deploying to GitHub Pages
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.venv
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test files
+sample_page.html
+test_api.py
+
+# Environment and secrets
+.env
+config.json
+
+# IMPORTANT FOR GITHUB PAGES:
+# Comment out or remove the data/ line below to include generated data
+# data/
+
+# Instead, ignore only specific large or sensitive files:
+data/*.kml
+data/*.bck
+data/test_*.csv
+data/.cache/

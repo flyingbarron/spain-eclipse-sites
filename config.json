@@ -1,0 +1,5 @@
+{
+  "google_maps_api_key": "",
+  "mapbox_api_key": "",
+  "note": "Add your API keys here for GitHub Pages deployment. Keep this file in .gitignore if keys are sensitive."
+}

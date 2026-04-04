@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spain Eclipse Site Viewer</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦕</text></svg>">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" href="static/styles.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
+    
+    <!-- GitHub Pages Version - Uses static files instead of Python backend -->
+    <script type="module" src="gh-pages/main.js"></script>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>🦕 Spain Eclipse Site Viewer</h1>
+            <nav class="header-nav">
+                <button class="nav-item" id="favoritesBtn">⭐ Favorites (<span id="favoritesCount">0</span>)</button>
+                <button class="nav-item" id="resourcesBtn">🔗 Resources</button>
+                <button class="nav-item" id="aboutBtn">ℹ️ About</button>
+                <button class="nav-item" id="helpBtn">❓ Help</button>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-controls">
+                <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search sites...">
+                
+                <div class="filter-controls">
+                    <div class="filter-section">
+                        <label class="filter-label">Quick Filters</label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="eclipseFilter" class="filter-checkbox">
+                            <span class="checkbox-text">🌑 Eclipse visible only</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="favoritesFilter" class="filter-checkbox">
+                            <span class="checkbox-text">⭐ Favorites only</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="notesFilter" class="filter-checkbox">
+                            <span class="checkbox-text">📎 Sites with attachments</span>
+                        </label>
+                    </div>
+                    
+                    <div class="filter-section">
+                        <label class="filter-label" for="sortBy">Sort By</label>
+                        <select id="sortBy" class="filter-select">
+                            <option value="code">Code (A-Z)</option>
+                            <option value="code_desc">Code (Z-A)</option>
+                            <option value="name">Name (A-Z)</option>
+                            <option value="name_desc">Name (Z-A)</option>
+                            <option value="darkness">Darkness (Darkest First)</option>
+                            <option value="darkness_asc">Darkness (Lightest First)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-section">
+                        <button class="filter-toggle-btn" id="advancedFilterToggle">
+                            🔧 Advanced Filters
+                        </button>
+                    </div>
+                    
+                    <div class="advanced-filters" id="advancedFilters" style="display: none;">
+                        <div class="filter-group">
+                            <label class="filter-label">Tourist Value</label>
+                            <div class="range-inputs">
+                                <input type="number" id="touristValueMin" min="0" max="10" step="0.1" value="0" class="range-input">
+                                <span>to</span>
+                                <input type="number" id="touristValueMax" min="0" max="10" step="0.1" value="10" class="range-input">
+                            </div>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label">Max Cloud Coverage (%)</label>
+                            <input type="range" id="cloudCoverageMax" min="0" max="100" value="100" class="range-slider">
+                            <span class="range-value" id="cloudCoverageValue">100%</span>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label">Max Bortle Scale</label>
+                            <input type="range" id="bortleMax" min="1" max="9" value="9" class="range-slider">
+                            <span class="range-value" id="bortleValue">9</span>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label">Route Difficulty</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="difficulty-checkbox" value="Low">
+                                    <span>Low</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="difficulty-checkbox" value="Medium">
+                                    <span>Medium</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="difficulty-checkbox" value="High">
+                                    <span>High</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="difficulty-checkbox" value="Very High">
+                                    <span>Very High</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button class="reset-filters-btn" id="resetFiltersBtn">Reset Filters</button>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-list-container">
+                <ul class="site-list" id="siteList">
+                    <li class="loading">Loading sites...</li>
+                </ul>
+            </div>
+            <div class="site-counter" id="siteCounter">
+                Showing <span id="visibleCount">0</span> of <span id="totalCount">0</span> sites
+            </div>
+        </aside>
+
+        <main class="content" id="content">
+            <div class="loading">
+                <p>Select a site from the list to view details and images</p>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <div class="footer-main">
+            Created by <strong>Robert Barron</strong> • Made with Bob 🤖
+        </div>
+        <button class="footer-toggle" id="footerToggle">
+            <span class="footer-toggle-icon">▶</span>
+            <span>Data Sources & Attribution</span>
+        </button>
+        <div class="footer-details" id="footerDetails">
+            <p style="font-size: 0.8rem; line-height: 1.6; margin-bottom: 0.5rem;">
+                <a href="https://info.igme.es/ielig/" target="_blank">IGME</a> (Geological sites & photos) •
+                <a href="https://visualizadores.ign.es/eclipses/2026" target="_blank">IGN</a> (Eclipse visibility) •
+                <a href="https://www.eclipsefan.org/" target="_blank">EclipseFan.org</a> (Horizon views) •
+                <a href="https://www.timeanddate.com/" target="_blank">timeanddate.com</a> (Cloud data) •
+                <a href="https://shademap.app/" target="_blank">Shademap</a> (Sun/shadow viz) •
+                <a href="https://maps.google.com/" target="_blank">Google Maps</a> (Location maps)
+            </p>
+            <p style="font-size: 0.7rem; color: #6c757d;">
+                For educational and non-commercial use only. See <a href="https://github.com/robert-at-pretension-io/spain-eclipse-sites/blob/main/CREDITS.md" target="_blank" style="color: #6c757d; text-decoration: underline;">CREDITS.md</a> for full attribution and terms.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Overlay for side panels -->
+    <div class="info-modal-overlay" id="panelOverlay"></div>
+
+    <!-- Modal for full-size images -->
+    <div class="modal" id="imageModal">
+        <span class="modal-close" id="modalClose">&times;</span>
+        <span class="modal-nav prev" id="modalPrev">&#10094;</span>
+        <span class="modal-nav next" id="modalNext">&#10095;</span>
+        <img class="modal-content" id="modalImage">
+        <div class="modal-counter" id="modalCounter"></div>
+    </div>
+
+    <!-- Resources Modal -->
+    <div class="info-modal" id="resourcesModal">
+        <div class="info-modal-content">
+            <span class="info-modal-close" data-modal="resourcesModal">&times;</span>
+            <h2>🔗 Eclipse Resources</h2>
+            <div class="resources-grid">
+                <div class="resource-category">
+                    <h3>Official Eclipse Information</h3>
+                    <ul>
+                        <li><a href="https://eclipse262728.es/en/" target="_blank">eclipse262728.es</a> - Official Spanish eclipse site</li>
+                        <li><a href="https://visualizadores.ign.es/eclipses/2026" target="_blank">IGN Eclipse Visualizer</a> - Interactive eclipse path map</li>
+                    </ul>
+                </div>
+                <div class="resource-category">
+                    <h3>Eclipse Planning & Guides</h3>
+                    <ul>
+                        <li><a href="https://eclipsophile.com/tse2026/" target="_blank">Eclipsophile TSE 2026</a> - Comprehensive eclipse guide</li>
+                        <li><a href="https://www.eclipsewise.com/pubs/Guide2026.html" target="_blank">EclipseWise Guide</a> - Detailed eclipse predictions</li>
+                        <li><a href="https://www.mreclipse.com/" target="_blank">MrEclipse.com</a> - Fred Espenak's eclipse resources</li>
+                        <li><a href="https://solareclipsetimer.com/" target="_blank">Solar Eclipse Timer</a> - The Original "Talking Timer"</li>
+                        <li><a href="https://www.besselianelements.com/" target="_blank">Besselian Elements Team</a> - IQP eclipse maps"</li>
+
+
+                    </ul>
+                </div>
+                <div class="resource-category">
+                    <h3>Site Data Sources</h3>
+                    <ul>
+                        <li><a href="https://info.igme.es/ielig/" target="_blank">IGME</a> - Spanish geological sites database</li>
+                        <li><a href="https://www.eclipsefan.org/" target="_blank">EclipseFan.org</a> - Horizon view simulations</li>
+                        <li><a href="https://www.timeanddate.com/" target="_blank">timeanddate.com</a> - Weather and cloud coverage data</li>
+                        <li><a href="https://dinosauriosdelarioja.com/" target="_blank">Dinosaurios De La Rioja</a> - Tourism website for La Rioja dinosaurs</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div class="info-modal" id="aboutModal">
+        <div class="info-modal-content">
+            <span class="info-modal-close" data-modal="aboutModal">&times;</span>
+            <h2>ℹ️ About This Viewer</h2>
+            <div class="modal-text-content">
+                <p><strong>Spain Eclipse Site Viewer</strong> is a comprehensive tool for exploring potential viewing locations for the August 12, 2026 total solar eclipse in Spain.</p>
+                
+                <h3>Features</h3>
+                <ul>
+                    <li>🗺️ Interactive map with 100+ geological sites across Spain</li>
+                    <li>🌑 Eclipse visibility information for each location</li>
+                    <li>☁️ Historical cloud coverage data to help plan your viewing</li>
+                    <li>🏞️ Horizon profile views showing local topography</li>
+                    <li>🚗 Multi-site route planning with Google Maps integration</li>
+                    <li>📊 Detailed site information including tourist value and accessibility</li>
+                </ul>
+
+                <h3>Eclipse Details</h3>
+                <p>The total solar eclipse on <strong>August 12, 2026</strong> will cross Spain from west to east. The path of totality will pass through several regions, offering spectacular viewing opportunities for eclipse chasers worldwide.</p>
+
+                <h3>Documentation</h3>
+                <div style="margin-top: 1rem;">
+                    <button class="modal-button" id="openReadmeBtn" style="margin-right: 0.5rem;">📖 Open README</button>
+                    <button class="modal-button" id="openCreditsBtn">📜 Open Credits</button>
+                </div>
+
+                <h3 style="margin-top: 1.5rem;">Project Info</h3>
+                <p>Created by <strong>Robert Barron</strong> • Made with Bob 🤖</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div class="info-modal" id="helpModal">
+        <div class="info-modal-content">
+            <span class="info-modal-close" data-modal="helpModal">&times;</span>
+            <h2>❓ Help & Usage Guide</h2>
+            <div class="modal-text-content">
+                <h3>Getting Started</h3>
+                <ul>
+                    <li><strong>Browse Sites:</strong> Click on any site in the left sidebar to view details, images, and location information</li>
+                    <li><strong>Search:</strong> Use the search box to find sites by name or code</li>
+                    <li><strong>Filter:</strong> Toggle eclipse visibility and cloud coverage filters to narrow down your options</li>
+                </ul>
+
+                <h3>Understanding Site Information</h3>
+                <ul>
+                    <li><strong>🌑 Eclipse Visible:</strong> Site is within the path of totality</li>
+                    <li><strong>☀️ Low Cloud:</strong> Less than 30% average cloud coverage in August</li>
+                    <li><strong>⛅ Medium Cloud:</strong> 30-60% average cloud coverage</li>
+                    <li><strong>☁️ High Cloud:</strong> 60% or more average cloud coverage</li>
+                    <li><strong>Tourist Value:</strong> Rating of site's general tourist appeal (1-5)</li>
+                </ul>
+
+                <h3>Using the Map</h3>
+                <ul>
+                    <li><strong>Single Site:</strong> Click a site to view it on the map</li>
+                    <li><strong>Multiple Sites:</strong> Hold Ctrl (Cmd on Mac) and click multiple sites to plan a route</li>
+                    <li><strong>Route Planning:</strong> Drag sites in the route summary to reorder your itinerary</li>
+                    <li><strong>Export:</strong> Use the Google Maps or KML export buttons to save your route</li>
+                </ul>
+
+                <h3>Viewing Images</h3>
+                <ul>
+                    <li>Click any image thumbnail to view full-size</li>
+                    <li>Use arrow keys or navigation buttons to browse through images</li>
+                    <li>Press Escape to close the image viewer</li>
+                </ul>
+
+                <h3>Tips for Eclipse Viewing</h3>
+                <ul>
+                    <li>🌤️ Choose sites with low cloud coverage for better viewing chances</li>
+                    <li>🏔️ Check horizon profiles to ensure clear views in the eclipse direction</li>
+                    <li>🚗 Plan your route in advance - roads will be busy on eclipse day</li>
+                    <li>⏰ Arrive early to secure a good viewing spot</li>
+                    <li>🕶️ Always use proper eclipse glasses or solar filters</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Favorites Modal -->
+    <div class="modal" id="favoritesModal" style="display: none;">
+        <div class="modal-content favorites-modal-content">
+            <div class="modal-header">
+                <h2>⭐ My Favorites</h2>
+                <button class="modal-close" id="closeFavoritesModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="favorites-actions">
+                    <button class="action-btn" id="exportFavoritesBtn">📥 Export</button>
+                    <button class="action-btn" id="importFavoritesBtn">📤 Import</button>
+                    <button class="action-btn" id="clearFavoritesBtn">🗑️ Clear All</button>
+                </div>
+                <div class="favorites-list" id="favoritesList">
+                    <p class="empty-message">No favorites yet. Click the ☆ icon on any site to add it to your favorites.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div class="modal" id="importModal" style="display: none;">
+        <div class="modal-content import-modal-content">
+            <div class="modal-header">
+                <h2>📤 Import Data</h2>
+                <button class="modal-close" id="closeImportModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Paste JSON data below:</p>
+                <textarea id="importDataInput" class="import-textarea" rows="10" placeholder='{"version": "1.0", ...}'></textarea>
+                <div class="import-actions">
+                    <button class="action-btn primary" id="confirmImportBtn">Import</button>
+                    <button class="action-btn" id="cancelImportBtn">Cancel</button>
+                </div>
+                <div class="import-result" id="importResult"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
