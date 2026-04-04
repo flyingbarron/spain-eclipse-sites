@@ -2,6 +2,12 @@
 
 A comprehensive data collection and visualization tool for Spanish geological sites with 2026 solar eclipse visibility information. Combines data from multiple sources including IGME (Spanish Geological Survey), IGN (National Geographic Institute), EclipseFan, timeanddate.com, Shademap, and Google Maps.
 
+## 🌐 Live Demo
+
+**View the live site:** [https://brobert.github.io/spain-eclipse-sites/](https://brobert.github.io/spain-eclipse-sites/)
+
+The site is deployed on GitHub Pages and works entirely in the browser without requiring a backend server.
+
 ## Overview
 
 This project aggregates geological site information and eclipse planning data for the August 12, 2026 total solar eclipse. It provides:
@@ -12,7 +18,25 @@ This project aggregates geological site information and eclipse planning data fo
 - **Horizon visualizations** showing eclipse path
 - **Sun/shadow maps** for lighting analysis
 - **Interactive web viewer** with search, filtering, and routing
+- **GitHub Pages deployment** - works without a backend server
 - **KML exports** for Google Earth/Maps visualization
+
+## Deployment Options
+
+This project supports two deployment modes:
+
+### 1. GitHub Pages (Static Deployment) ⭐ Recommended
+- **Live at:** [https://brobert.github.io/spain-eclipse-sites/](https://brobert.github.io/spain-eclipse-sites/)
+- **Entry point:** `index.html`
+- **No server required** - runs entirely in the browser
+- **Pre-generated data** - all images and data committed to repository
+- **See:** [GITHUB_PAGES.md](GITHUB_PAGES.md) for deployment details
+
+### 2. Local Python Server (Development)
+- **Entry point:** `viewer.html` served by `serve_viewer.py`
+- **Dynamic features** - API endpoints for image proxying and config
+- **Development mode** - for testing data pipeline changes
+- **Run:** `python3 serve_viewer.py`
 
 ## Features
 
@@ -56,12 +80,6 @@ This project aggregates geological site information and eclipse planning data fo
 - 🔢 **Site counter** showing filtered results
 - 💾 **Import/Export** - Share favorites as JSON
 - 🦕 **Dinosaur emoji** favicon (because dinosaur footprints!)
-### Standalone Viewer
-- 📦 **No server required** - Self-contained version that works offline
-- 🚀 **Easy deployment** - Can be hosted on any static file server
-- 💾 **Embedded data** - All site information and images bundled
-- 🌐 **Browser-friendly** - Open directly or serve locally
-- 📖 **Full documentation** - See [STANDALONE_VIEWER.md](STANDALONE_VIEWER.md)
 
 
 ### Output Formats
@@ -128,24 +146,6 @@ The repo is organized around a small data pipeline plus a lightweight viewer:
 - [`src/igme_image_service.py`](src/igme_image_service.py) handles IGME HTML/image caching used by the viewer server
 - [`static/js/`](static/js/) contains the modular browser viewer
 - [`tests/test_pipeline_utils.py`](tests/test_pipeline_utils.py) covers the shared pipeline helpers and IGME image service helpers
-
-### Build Standalone Viewer
-
-Create a self-contained version that works without a server:
-
-```bash
-python3 build_standalone_viewer.py
-```
-
-This creates a `standalone_viewer/` directory with:
-- All site data embedded as JavaScript
-- All cached images bundled locally
-- Modified modules that work without server APIs
-- Can be opened directly in browser or hosted anywhere
-
-See [STANDALONE_VIEWER.md](STANDALONE_VIEWER.md) for detailed documentation.
-
-```
 ## Usage
 
 ### Generate Data
@@ -286,18 +286,27 @@ The script generates:
 
 ### View Data
 
-Start the web viewer:
+#### Option 1: GitHub Pages (Recommended)
+Visit the live site: [https://brobert.github.io/spain-eclipse-sites/](https://brobert.github.io/spain-eclipse-sites/)
+
+#### Option 2: Local Development Server
+Start the Python web viewer for development:
 ```bash
 python3 serve_viewer.py
 ```
 
 The viewer server provides:
-- static file serving for the browser UI
+- Static file serving for the browser UI
 - [`/api/config`](serve_viewer.py:76) for API-key configuration
 - [`/api/horizon-files`](serve_viewer.py:79) for local horizon-file discovery under [`data/horizons/`](src/constants.py:21)
 - [`/api/images`](serve_viewer.py:82) for cached IGME image metadata
 - [`/api/proxy-image`](serve_viewer.py:85) for cached image proxying
 - [`/api/shutdown`](serve_viewer.py:73) for local shutdown convenience
+
+This will:
+- Start a local web server on port 8000
+- Automatically open the viewer in your default browser
+- Load data from `data/eclipse_site_data.csv`
 
 ### Utility Scripts
 
@@ -314,17 +323,20 @@ See documentation in `utilities/` directory for detailed usage:
 - `utilities/SHADEMAP_PLAYWRIGHT_README.md` - Shademap automation guide
 - `utilities/SCREENSHOT_README.md` - Screenshot tools documentation
 
-This will:
-- Start a local web server on port 8000
-- Automatically open the viewer in your default browser
-- Load data from `data/eclipse_site_data.csv`
-
 ## Project Structure
 
 ```
 spain-eclipse-sites/
+├── index.html                        # GitHub Pages entry point
+├── viewer.html                       # Local development entry point
+├── gh-pages/                         # GitHub Pages specific modules
+│   ├── config.js                     # Static config loader
+│   ├── main.js                       # App initialization (no API calls)
+│   ├── image-loader.js               # Static image loading with MD5 hashing
+│   ├── site-details.js               # Site details (GitHub Pages compatible)
+│   └── data-loader.js                # CSV data loader
 ├── archive/                          # Legacy scripts and old viewer experiments
-├── data/                             # Generated data (mostly gitignored)
+├── data/                             # Generated data (committed for GitHub Pages)
 │   ├── scrape/ign_profiles/          # IGN eclipse visibility diagrams
 │   ├── scrape/eclipsefan_horizons/   # EclipseFan horizon profiles
 │   ├── scrape/shademap_snapshots/    # Shademap visualizations
@@ -333,9 +345,11 @@ spain-eclipse-sites/
 │   ├── cache/igme_html/              # Cached IGME HTML + image metadata JSON
 │   ├── cache/igme_images/            # Cached IGME image binaries
 │   ├── horizons/                     # Local horizon images used directly by the viewer
-│   ├── eclipse_site_data.csv         # Main dataset
+│   ├── eclipse_site_data.csv         # Main dataset (committed)
 │   ├── sites.kml                     # Main KML output
-│   └── igme_sites_config.json        # Configured IGME and custom sites
+│   ├── igme_sites_config.json        # Configured IGME and custom sites
+│   ├── horizon_files.json            # Horizon image mappings (GitHub Pages)
+│   └── google_maps_thumbnails/       # Pre-generated map thumbnails
 ├── src/                              # Modular pipeline and viewer-support code
 │   ├── constants.py                  # Canonical schema, step names, and output paths
 │   ├── pipeline_utils.py             # Shared CSV/merge/skip/status helpers
@@ -352,22 +366,26 @@ spain-eclipse-sites/
 │   ├── logger.py                     # Logging helpers
 │   ├── cache.py                      # General cache helpers
 │   └── exceptions.py                 # Custom exception classes
-├── static/
+├── static/                           # Shared static assets
 │   ├── styles.css                    # Viewer styling
-│   └── js/                           # Modular browser viewer code
+│   └── js/                           # Modular browser viewer code (local dev)
 ├── tests/
 │   ├── test_pipeline_utils.py        # Shared helper and IGME image service tests
 │   ├── test_models.py                # Unit tests for models
 │   ├── test_config.py                # Unit tests for config
 │   └── test_cloud_integration.py     # Cloud coverage integration test
 ├── utilities/                        # One-off data utilities and helper docs
+│   ├── download_google_maps_thumbnails.py  # Pre-generate map thumbnails
+│   └── README.md                     # Utilities documentation
 ├── generate_eclipse_site_data.py     # Main data generation script
-├── serve_viewer.py                   # Viewer server + small JSON/image APIs
-├── build_standalone_viewer.py        # Offline viewer bundler
+├── serve_viewer.py                   # Local development server
 ├── run_tests.py                      # Test runner
 ├── config.yaml                       # Application configuration
+├── config.json                       # Static config for GitHub Pages
 ├── requirements.txt                  # Python dependencies
-├── README.md                         # Main documentation
+├── .env.example                      # Environment variables template
+├── README.md                         # Main documentation (this file)
+├── GITHUB_PAGES.md                   # GitHub Pages deployment guide
 └── CONFIGURATION.md                  # Configuration reference
 ```
 
@@ -627,11 +645,18 @@ Current test coverage includes:
 - Playwright Chromium browser binary (auto-installed on first Shademap use, or manually via `python3 -m playwright install chromium`)
 - ChromeDriver (for eclipse visibility checking)
 
-## Docker Deployment
+## Deployment
 
-See **[DOCKER.md](DOCKER.md)** for complete Docker deployment instructions.
+### GitHub Pages (Production)
+The site is automatically deployed to GitHub Pages when changes are pushed to the main branch.
 
-Quick start:
+**Live URL:** [https://brobert.github.io/spain-eclipse-sites/](https://brobert.github.io/spain-eclipse-sites/)
+
+See **[GITHUB_PAGES.md](GITHUB_PAGES.md)** for deployment details and **[DEPLOY_TO_GITHUB_PAGES.md](DEPLOY_TO_GITHUB_PAGES.md)** for step-by-step instructions.
+
+### Docker (Optional)
+For containerized local development, see **[DOCKER.md](DOCKER.md)** for complete Docker deployment instructions.
+
 ```bash
 # Using Docker Compose
 docker-compose up -d
