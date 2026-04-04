@@ -47,19 +47,36 @@ export let googleMapsApiKey = '';
 export let mapboxApiKey = '';
 
 /**
- * Load configuration from server
+ * Load configuration from server or static file
+ * Tries static config.json first (GitHub Pages), then falls back to API endpoint (local dev)
  */
 export async function loadConfig() {
+    // Try static config.json first (GitHub Pages mode)
+    try {
+        const response = await fetch('config.json');
+        if (response.ok) {
+            const config = await response.json();
+            googleMapsApiKey = config.google_maps_api_key || '';
+            mapboxApiKey = config.mapbox_api_key || '';
+            console.log('[Static Config] Google Maps API key loaded:', googleMapsApiKey ? 'Yes' : 'No');
+            console.log('[Static Config] Mapbox API key loaded:', mapboxApiKey ? 'Yes' : 'No');
+            return config;
+        }
+    } catch (error) {
+        console.log('Static config.json not found, trying API endpoint...');
+    }
+    
+    // Fall back to API endpoint (local development mode)
     try {
         const response = await fetch(CONFIG.API.CONFIG);
         const config = await response.json();
         googleMapsApiKey = config.google_maps_api_key || '';
         mapboxApiKey = config.mapbox_api_key || '';
-        console.log('Google Maps API key loaded:', googleMapsApiKey ? 'Yes' : 'No');
-        console.log('Mapbox API key loaded:', mapboxApiKey ? 'Yes' : 'No');
+        console.log('[API Config] Google Maps API key loaded:', googleMapsApiKey ? 'Yes' : 'No');
+        console.log('[API Config] Mapbox API key loaded:', mapboxApiKey ? 'Yes' : 'No');
         return config;
     } catch (error) {
-        console.error('Error loading config:', error);
+        console.warn('Could not load config from API or static file:', error);
         return null;
     }
 }
