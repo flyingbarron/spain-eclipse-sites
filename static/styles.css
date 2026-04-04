@@ -1828,17 +1828,19 @@ footer a:hover {
         font-size: 0.85rem;
     }
     
-    /* Site list container - ensure it's visible */
+    /* Site list container - force visibility on mobile */
     .sidebar-list-container {
-        flex: none;
-        min-height: auto;
-        max-height: 400px;
-        overflow-y: auto;
-        overflow-x: hidden;
-        padding: 0.5rem;
-        background: #fff;
+        flex: 1 1 auto !important;
+        min-height: 300px !important;
+        max-height: 500px !important;
+        height: auto !important;
+        overflow-y: scroll !important;
+        overflow-x: hidden !important;
+        padding: 0.5rem !important;
+        background: #fff !important;
         display: block !important;
         visibility: visible !important;
+        -webkit-overflow-scrolling: touch;
     }
     
     .site-counter {
@@ -1848,9 +1850,17 @@ footer a:hover {
         background: #e9ecef;
     }
     
-    /* Site list */
+    /* Site list - force visibility */
     .site-list {
         font-size: 0.9rem;
+        display: block !important;
+        visibility: visible !important;
+        min-height: 200px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    .site-item {
         display: block !important;
         visibility: visible !important;
     }
