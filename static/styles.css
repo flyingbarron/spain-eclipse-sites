@@ -1767,10 +1767,26 @@ footer a:hover {
     gap: 0.5rem;
 }
 
-/* Hide expand button on desktop */
+/* Desktop-specific styles */
 @media screen and (min-width: 769px) {
+    /* Hide expand button on desktop */
     .sidebar-expand-btn {
         display: none !important;
+    }
+    
+    /* Action buttons in detail-header should use natural width on desktop */
+    .detail-header .link-button {
+        display: inline-block;
+        width: auto;
+    }
+    
+    /* Larger thumbnails on desktop */
+    .eclipse-profile-thumbnail {
+        height: 120px;
+    }
+    
+    .eclipse-profile-thumbnail.horizon-thumbnail {
+        height: 150px;
     }
 }
 
@@ -2046,13 +2062,7 @@ footer a:hover {
         text-align: center;
     }
     
-    /* Link buttons in detail-header should stay inline on desktop */
-    .detail-header .link-button {
-        display: inline-block;
-        width: auto;
-    }
-    
-    /* Other link buttons - full width, larger touch targets on mobile */
+    /* Link buttons - full width, larger touch targets on mobile */
     .site-links .link-button,
     .modal-button {
         display: block;
