@@ -37,7 +37,6 @@ async function init() {
         setupFooterToggle();
         setupModalListeners();
         setupFavoritesListeners();
-        setupAdvancedFilterListeners();
         setupDocumentationButtons();
         
         // Update favorites count
