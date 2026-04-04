@@ -196,14 +196,17 @@ export function setupModalListeners() {
     const openReadmeBtn = document.getElementById('openReadmeBtn');
     const openCreditsBtn = document.getElementById('openCreditsBtn');
     
+    // Get the base URL (works for both local and GitHub Pages)
+    const baseUrl = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/');
+    
     if (openReadmeBtn) {
         openReadmeBtn.addEventListener('click', () => {
-            window.open('/readme.html', '_blank');
+            window.open(baseUrl + 'readme.html', '_blank');
         });
     }
     if (openCreditsBtn) {
         openCreditsBtn.addEventListener('click', () => {
-            window.open('/credits.html', '_blank');
+            window.open(baseUrl + 'credits.html', '_blank');
         });
     }
     
