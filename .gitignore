@@ -40,8 +40,9 @@ env/
 data/.cache/
 data/*.kml
 
-# Keys
+# Keys and secrets
 config.json
+.env
 
 # OS
 .DS_Store
