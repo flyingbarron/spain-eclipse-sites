@@ -1752,6 +1752,21 @@ footer a:hover {
    ============================================ */
 
 /* Tablet and below (768px) */
+/* Preview thumbnails - desktop horizontal layout */
+.preview-thumbnails-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.preview-thumbnails-grid > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
 @media screen and (max-width: 768px) {
     /* Header adjustments */
     header {
@@ -1816,34 +1831,39 @@ footer a:hover {
         visibility: hidden !important;
     }
     
-    /* Expand button - only visible when sidebar is collapsed */
+    /* Expand button - only visible on mobile when sidebar is collapsed */
     .sidebar-expand-btn {
         display: none;
-        position: fixed;
-        top: 80px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 1000;
-        background: #007bff;
-        color: white;
-        border: none;
-        border-radius: 25px;
-        padding: 12px 24px;
-        font-size: 1rem;
-        font-weight: 600;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        cursor: pointer;
-        touch-action: manipulation;
-        min-height: 44px;
     }
     
-    .sidebar.collapsed ~ .sidebar-expand-btn {
-        display: block;
-    }
-    
-    .sidebar-expand-btn:active {
-        background: #0056b3;
-        transform: translateX(-50%) scale(0.95);
+    @media screen and (max-width: 768px) {
+        .sidebar-expand-btn {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            cursor: pointer;
+            touch-action: manipulation;
+            min-height: 44px;
+        }
+        
+        .sidebar.collapsed ~ .sidebar-expand-btn {
+            display: block;
+        }
+        
+        .sidebar-expand-btn:active {
+            background: #0056b3;
+            transform: translateX(-50%) scale(0.95);
+        }
     }
     
     .sidebar-controls {
@@ -1963,7 +1983,7 @@ footer a:hover {
         font-size: 0.85rem;
     }
     
-    /* Preview thumbnails grid - organized layout */
+    /* Preview thumbnails grid - 2 column layout on mobile */
     .preview-thumbnails-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -1978,6 +1998,7 @@ footer a:hover {
     .preview-thumbnails-grid > div {
         display: flex;
         flex-direction: column;
+        align-items: center;
         gap: 0.5rem;
         min-width: 0;
         max-width: 100%;
