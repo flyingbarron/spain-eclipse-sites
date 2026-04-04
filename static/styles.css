@@ -1900,11 +1900,9 @@ footer a:hover {
         border-top: 1px solid #c3e6cb;
     }
     
-    /* Content area - collapsed state when showing list */
+    /* Content area - collapsed state when showing list - hide completely */
     .content.collapsed {
-        min-height: 20vh !important;
-        max-height: 25vh !important;
-        overflow: hidden !important;
+        display: none !important;
     }
     
     /* Site list - force visibility */
@@ -1960,6 +1958,20 @@ footer a:hover {
     .site-link {
         padding: 0.6rem;
         font-size: 0.85rem;
+    }
+    
+    /* Preview thumbnails grid - organized layout */
+    .preview-thumbnails-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+    
+    .preview-thumbnails-grid > div {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
     }
     
     /* Tabs - wrap on mobile, larger touch targets */

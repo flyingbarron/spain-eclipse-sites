@@ -241,20 +241,23 @@ function renderSiteHeader(site, urls) {
     return `
         <div class="detail-header">
             <h2>${site.denominacion || site.code}</h2>
-            <div style="display: flex; align-items: flex-start; gap: 0.5rem; flex-wrap: wrap;">
-                <div style="${HEADER_STACK_STYLE}">
-                    <a href="${igmeButtonHref}" target="_blank" class="${igmeButtonClass}"${igmeButtonTitle}>🪨 View on IGME Website</a>
-                    ${cloudButton}
-                    <a href="${urls.xavierJubier}" target="_blank" class="link-button xavier">🗺️ Xavier Jubier Eclipse Map</a>
-                    <a href="${urls.darkSkySites}" target="_blank" class="link-button darksky">🌌 Dark Sky Sites</a>
-                </div>
-
+            
+            <!-- Action Buttons -->
+            <div style="${HEADER_STACK_STYLE}">
+                <a href="${igmeButtonHref}" target="_blank" class="${igmeButtonClass}"${igmeButtonTitle}>🪨 View on IGME Website</a>
+                ${cloudButton}
+                <a href="${urls.xavierJubier}" target="_blank" class="link-button xavier">🗺️ Xavier Jubier Eclipse Map</a>
+                <a href="${urls.darkSkySites}" target="_blank" class="link-button darksky">🌌 Dark Sky Sites</a>
+            </div>
+            
+            <!-- Preview Thumbnails Grid -->
+            <div class="preview-thumbnails-grid">
                 ${renderMapsPreview(site, urls)}
                 ${renderHorizonPreview(site, horizonFile)}
                 ${renderSimplePreview({
                     linkUrl: urls.shademap,
                     buttonClass: 'link-button shademap',
-                    buttonLabel: '🌄 View on Shademap',
+                    buttonLabel: '🌄 Shademap',
                     imageUrl: shademapUrl,
                     alt: `Shademap visualization for ${site.code}`,
                     extraClass: 'shademap-thumbnail',
@@ -263,7 +266,7 @@ function renderSiteHeader(site, urls) {
                 ${renderSimplePreview({
                     linkUrl: urls.eclipseFan,
                     buttonClass: 'link-button eclipsefan',
-                    buttonLabel: '🌒 EclipseFan.org',
+                    buttonLabel: '🌒 EclipseFan',
                     imageUrl: eclipsefanUrl,
                     alt: `EclipseFan horizon profile for ${site.code}`,
                     title: 'Hover to preview, click to open full-size',
@@ -271,7 +274,7 @@ function renderSiteHeader(site, urls) {
                 ${renderSimplePreview({
                     linkUrl: urls.eclipse,
                     buttonClass: 'link-button eclipse',
-                    buttonLabel: '🌑 Eclipse 2026 View',
+                    buttonLabel: '🌑 Eclipse Profile',
                     imageUrl: ignProfileUrl,
                     alt: `Eclipse visibility profile for ${site.code}`,
                     title: 'Hover to preview, click to open full-size',
