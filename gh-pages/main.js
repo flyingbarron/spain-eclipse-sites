@@ -86,6 +86,11 @@ function setupSiteClickListeners() {
         appState.setCurrentSite(site);
         appState.selectedSites = []; // Clear multi-selection
         displaySiteDetails(site);
+        
+        // On mobile, collapse sidebar after selecting a site
+        if (window.innerWidth <= 768) {
+            collapseSidebarOnMobile();
+        }
     });
 }
 
@@ -169,6 +174,36 @@ function setupDocumentationButtons() {
     }
 }
 
+/**
+ * Collapse sidebar on mobile to show full site details
+ */
+function collapseSidebarOnMobile() {
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar && window.innerWidth <= 768) {
+        sidebar.classList.add('collapsed');
+    }
+}
+
+/**
+ * Expand sidebar on mobile to show site list
+ */
+function expandSidebarOnMobile() {
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar) {
+        sidebar.classList.remove('collapsed');
+    }
+}
+
+/**
+ * Setup mobile sidebar collapse/expand functionality
+ */
+function setupMobileSidebarToggle() {
+    const expandBtn = document.getElementById('sidebarExpandBtn');
+    if (expandBtn) {
+        expandBtn.addEventListener('click', expandSidebarOnMobile);
+    }
+}
+
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
@@ -176,7 +211,14 @@ if (document.readyState === 'loading') {
     init();
 }
 
+// Setup mobile sidebar toggle after DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupMobileSidebarToggle);
+} else {
+    setupMobileSidebarToggle();
+}
+
 // Export for use in other modules
-export { updateFavoritesCount };
+export { updateFavoritesCount, collapseSidebarOnMobile, expandSidebarOnMobile };
 
 // Made with Bob

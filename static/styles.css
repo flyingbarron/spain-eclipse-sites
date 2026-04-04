@@ -1796,6 +1796,49 @@ footer a:hover {
         display: flex !important;
         flex-direction: column !important;
         overflow: hidden !important;
+        transition: all 0.3s ease;
+    }
+    
+    /* Collapsed sidebar state on mobile */
+    .sidebar.collapsed {
+        min-height: 60px !important;
+        max-height: 60px !important;
+        height: 60px !important;
+    }
+    
+    .sidebar.collapsed .sidebar-controls,
+    .sidebar.collapsed .sidebar-list-container,
+    .sidebar.collapsed .site-counter {
+        display: none !important;
+    }
+    
+    /* Expand button - only visible when sidebar is collapsed */
+    .sidebar-expand-btn {
+        display: none;
+        position: fixed;
+        top: 70px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 10px 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        cursor: pointer;
+        touch-action: manipulation;
+    }
+    
+    .sidebar.collapsed ~ .sidebar-expand-btn {
+        display: block;
+    }
+    
+    .sidebar-expand-btn:active {
+        background: #0056b3;
+        transform: translateX(-50%) scale(0.95);
     }
     
     .sidebar-controls {
