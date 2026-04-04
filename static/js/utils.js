@@ -107,4 +107,68 @@ export function getEclipseInfo(visibility) {
     return { class: eclipseClass, text: eclipseText };
 }
 
+/**
+ * Get URL parameter value
+ * @param {string} param - Parameter name
+ * @returns {string|null} Parameter value or null
+ */
+export function getUrlParameter(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+}
+
+/**
+ * Set URL parameter without reloading page
+ * @param {string} param - Parameter name
+ * @param {string} value - Parameter value
+ */
+export function setUrlParameter(param, value) {
+    const url = new URL(window.location);
+    if (value) {
+        url.searchParams.set(param, value);
+    } else {
+        url.searchParams.delete(param);
+    }
+    window.history.pushState({}, '', url);
+}
+
+/**
+ * Generate shareable URL for a site
+ * @param {string} siteCode - Site code
+ * @returns {string} Full URL with site parameter
+ */
+export function generateShareUrl(siteCode) {
+    const url = new URL(window.location.origin + window.location.pathname);
+    url.searchParams.set('site', siteCode);
+    return url.toString();
+}
+
+/**
+ * Copy text to clipboard
+ * @param {string} text - Text to copy
+ * @returns {Promise<boolean>} True if successful
+ */
+export async function copyToClipboard(text) {
+    try {
+        await navigator.clipboard.writeText(text);
+        return true;
+    } catch (err) {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            return true;
+        } catch (err) {
+            document.body.removeChild(textArea);
+            return false;
+        }
+    }
+}
+
 // Made with Bob

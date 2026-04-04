@@ -238,12 +238,15 @@ function renderSiteHeader(site, urls) {
     const eclipsefanUrl = buildAssetUrl(ASSET_PATHS.eclipsefan, `${site.code}_horizon.png`);
     const ignProfileUrl = buildAssetUrl(ASSET_PATHS.ignProfiles, `${site.code}_profile.png`);
 
+    const shareUrl = `${window.location.origin}${window.location.pathname}?site=${site.code}`;
+    
     return `
         <div class="detail-header">
             <h2>${site.denominacion || site.code}</h2>
             
             <!-- Action Buttons -->
             <div style="${HEADER_STACK_STYLE}">
+                <button class="link-button share" onclick="navigator.clipboard.writeText('${shareUrl}').then(() => alert('Link copied to clipboard!')).catch(() => alert('Link: ${shareUrl}'))" title="Copy link to this site">🔗 Share Link</button>
                 <a href="${igmeButtonHref}" target="_blank" class="${igmeButtonClass}"${igmeButtonTitle}>🪨 View on IGME Website</a>
                 ${cloudButton}
                 <a href="${urls.xavierJubier}" target="_blank" class="link-button xavier">🗺️ Xavier Jubier Eclipse Map</a>

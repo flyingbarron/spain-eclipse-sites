@@ -11,6 +11,7 @@ import { displaySiteDetails, switchTab } from './site-details.js';
 import { setupModalListeners } from './modal-handler.js';
 import { updateMapWithMultipleSites } from './map-handler.js';
 import { favoritesManager } from './favorites-manager.js';
+import { getUrlParameter, setUrlParameter } from './utils.js';
 
 
 /**
@@ -40,6 +41,9 @@ async function init() {
         
         // Update favorites count
         updateFavoritesCount();
+        
+        // Check for site parameter in URL
+        checkUrlParameters();
 
         console.log('Application initialized successfully');
         
@@ -85,6 +89,9 @@ function setupSiteClickListeners() {
         appState.setCurrentSite(site);
         appState.selectedSites = []; // Clear multi-selection
         displaySiteDetails(site);
+        
+        // Update URL with site parameter
+        setUrlParameter('site', code);
     });
 }
 
@@ -372,6 +379,35 @@ function downloadJSON(jsonString, filename) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+}
+
+/**
+ * Check URL parameters and load site if specified
+ */
+function checkUrlParameters() {
+    const siteCode = getUrlParameter('site');
+    if (siteCode) {
+        const site = appState.getSiteByCode(siteCode.toUpperCase());
+        if (site) {
+            // Display the site
+            appState.setCurrentSite(site);
+            displaySiteDetails(site);
+            
+            // Scroll to the site in the list
+            const siteItem = document.querySelector(`.site-item[data-code="${site.code}"]`);
+            if (siteItem) {
+                siteItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                siteItem.classList.add('highlighted');
+                setTimeout(() => {
+                    siteItem.classList.remove('highlighted');
+                }, 2000);
+            }
+        } else {
+            console.warn(`Site not found: ${siteCode}`);
+            // Clear invalid parameter
+            setUrlParameter('site', null);
+        }
+    }
 }
 
 // Initialize when DOM is ready

@@ -41,6 +41,9 @@ async function init() {
         
         // Update favorites count
         updateFavoritesCount();
+        
+        // Check for site parameter in URL and load it
+        loadSiteFromURL();
 
         console.log('Application initialized successfully');
         
@@ -109,6 +112,9 @@ function setupSiteClickListeners() {
         appState.setCurrentSite(site);
         appState.selectedSites = []; // Clear multi-selection
         displaySiteDetails(site);
+        
+        // Update URL with selected site
+        updateURLWithSite(code);
         
         // On mobile, collapse sidebar after selecting a site
         if (window.innerWidth <= 768) {
@@ -248,6 +254,48 @@ function setupMobileSidebarToggle() {
     if (expandBtn) {
         expandBtn.addEventListener('click', expandSidebarOnMobile);
     }
+}
+
+/**
+ * Load site from URL parameter
+ * Supports: ?site=IB200b or ?code=IB200b
+ */
+function loadSiteFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const siteCode = urlParams.get('site') || urlParams.get('code');
+    
+    if (siteCode) {
+        console.log(`Loading site from URL: ${siteCode}`);
+        const site = appState.getSiteByCode(siteCode);
+        
+        if (site) {
+            appState.setCurrentSite(site);
+            displaySiteDetails(site);
+            
+            // On mobile, collapse sidebar after loading site from URL
+            if (window.innerWidth <= 768) {
+                collapseSidebarOnMobile();
+            }
+            
+            // Scroll to top of content
+            const content = document.querySelector('.content');
+            if (content) {
+                content.scrollTop = 0;
+            }
+        } else {
+            console.warn(`Site not found: ${siteCode}`);
+        }
+    }
+}
+
+/**
+ * Update URL with current site code without reloading page
+ * @param {string} siteCode - Site code to add to URL
+ */
+function updateURLWithSite(siteCode) {
+    const url = new URL(window.location);
+    url.searchParams.set('site', siteCode);
+    window.history.pushState({}, '', url);
 }
 
 // Initialize when DOM is ready

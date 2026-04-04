@@ -214,6 +214,22 @@ header h1 {
     border-color: #007bff;
 }
 
+.site-item.highlighted {
+    animation: highlight-pulse 2s ease-in-out;
+    border: 2px solid #28a745;
+}
+
+@keyframes highlight-pulse {
+    0%, 100% {
+        background: white;
+        border-color: #28a745;
+    }
+    50% {
+        background: #d4edda;
+        border-color: #28a745;
+    }
+}
+
 
 .site-code {
     font-weight: 600;

@@ -4,7 +4,7 @@
  */
 
 import { appState } from './state.js';
-import { decimalToDMS } from './utils.js';
+import { decimalToDMS, generateShareUrl, copyToClipboard } from './utils.js';
 import { googleMapsApiKey } from './config.js';
 import { loadSiteImages } from './image-loader.js';
 import { initializeSingleSiteMap, updateMapWithMultipleSites } from './map-handler.js';
@@ -204,7 +204,12 @@ function renderSiteHeader(site, urls) {
 
     return `
         <div class="detail-header">
-            <h2>${site.denominacion || site.code}</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <h2 style="margin: 0;">${site.denominacion || site.code}</h2>
+                <button id="shareSiteBtn" class="link-button" style="background: #28a745;" title="Copy link to this site">
+                    🔗 Share Site
+                </button>
+            </div>
             <div style="display: flex; align-items: flex-start; gap: 0.5rem; flex-wrap: wrap;">
                 <div style="${HEADER_STACK_STYLE}">
                     <a href="${igmeButtonHref}" target="_blank" class="${igmeButtonClass}"${igmeButtonTitle}>🪨 View on IGME Website</a>
@@ -501,6 +506,41 @@ export async function displaySiteDetails(site) {
     
     // Setup notes functionality
     setupNotesFunctionality(site);
+    
+    // Setup share button
+    setupShareButton(site);
+}
+
+/**
+ * Setup share button functionality
+ * @param {Object} site - Site object
+ */
+function setupShareButton(site) {
+    const shareBtn = document.getElementById('shareSiteBtn');
+    if (!shareBtn) return;
+    
+    shareBtn.addEventListener('click', async () => {
+        const shareUrl = generateShareUrl(site.code);
+        const success = await copyToClipboard(shareUrl);
+        
+        if (success) {
+            const originalText = shareBtn.innerHTML;
+            shareBtn.innerHTML = '✅ Link Copied!';
+            shareBtn.style.background = '#28a745';
+            
+            setTimeout(() => {
+                shareBtn.innerHTML = originalText;
+            }, 2000);
+        } else {
+            shareBtn.innerHTML = '❌ Copy Failed';
+            shareBtn.style.background = '#dc3545';
+            
+            setTimeout(() => {
+                shareBtn.innerHTML = '🔗 Share Site';
+                shareBtn.style.background = '#28a745';
+            }, 2000);
+        }
+    });
 }
 
 /**
