@@ -1785,7 +1785,7 @@ footer a:hover {
         flex-direction: column;
     }
     
-    /* Sidebar - full width on mobile, more space for list */
+    /* Sidebar - full width on mobile */
     .sidebar {
         width: 100%;
         min-height: 50vh !important;
@@ -1797,6 +1797,12 @@ footer a:hover {
         flex-direction: column !important;
         overflow: hidden !important;
         transition: all 0.3s ease;
+    }
+    
+    /* Expanded sidebar state - takes most of screen when content is hidden */
+    .sidebar.expanded {
+        min-height: 85vh !important;
+        max-height: 90vh !important;
     }
     
     /* Collapsed sidebar state on mobile - completely hidden */
@@ -1938,6 +1944,7 @@ footer a:hover {
         min-height: 50vh !important;
         padding: 0.75rem;
         overflow-y: auto;
+        transition: all 0.3s ease;
     }
     
     /* Site details */

@@ -207,6 +207,7 @@ function collapseSidebarOnMobile() {
     
     if (sidebar && window.innerWidth <= 768) {
         sidebar.classList.add('collapsed');
+        sidebar.classList.remove('expanded');
     }
     
     // Expand content area when sidebar is collapsed
@@ -225,6 +226,10 @@ function expandSidebarOnMobile() {
     
     if (sidebar) {
         sidebar.classList.remove('collapsed');
+        // Add expanded class to sidebar when content is collapsed
+        if (window.innerWidth <= 768) {
+            sidebar.classList.add('expanded');
+        }
     }
     
     // On mobile, collapse content area when showing list
