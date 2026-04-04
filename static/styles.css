@@ -1746,4 +1746,373 @@ footer a:hover {
     margin-left: 0.25rem;
 }
 
+
+/* ============================================
+   MOBILE RESPONSIVE STYLES
+   ============================================ */
+
+/* Tablet and below (768px) */
+@media screen and (max-width: 768px) {
+    /* Header adjustments */
+    header {
+        padding: 0.75rem 1rem;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: stretch;
+    }
+    
+    header h1 {
+        font-size: 1.25rem;
+        text-align: center;
+    }
+    
+    .header-nav {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+    }
+    
+    .nav-item {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.85rem;
+    }
+    
+    /* Container layout - stack vertically on mobile */
+    .container {
+        flex-direction: column;
+    }
+    
+    /* Sidebar - full width on mobile, allow scrolling */
+    .sidebar {
+        width: 100%;
+        height: 60vh;
+        max-height: 60vh;
+        border-right: none;
+        border-bottom: 1px solid #dee2e6;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    
+    .sidebar-controls {
+        padding: 0.5rem;
+        flex-shrink: 0;
+    }
+    
+    .search-box {
+        font-size: 0.9rem;
+    }
+    
+    .filter-controls {
+        gap: 0.4rem;
+    }
+    
+    /* Collapse advanced filters by default on mobile */
+    .advanced-filters {
+        display: none !important;
+    }
+    
+    .filter-toggle-btn {
+        font-size: 0.85rem;
+        padding: 0.5rem;
+    }
+    
+    .filter-label {
+        font-size: 0.65rem;
+    }
+    
+    .checkbox-label {
+        font-size: 0.85rem;
+    }
+    
+    /* Site list container - ensure it's visible and scrollable */
+    .sidebar-list-container {
+        flex: 1 1 auto;
+        min-height: 200px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 0.5rem;
+        background: #fff;
+    }
+    
+    .site-counter {
+        flex-shrink: 0;
+        padding: 0.5rem;
+        font-size: 0.8rem;
+        background: #e9ecef;
+    }
+    
+    /* Site list */
+    .site-list {
+        font-size: 0.9rem;
+    }
+    
+    .site-item {
+        padding: 0.6rem;
+    }
+    
+    .site-code {
+        font-size: 0.85rem;
+    }
+    
+    .site-name {
+        font-size: 0.9rem;
+    }
+    
+    /* Main content area */
+    .main-content {
+        width: 100%;
+        padding: 0.75rem;
+    }
+    
+    /* Site details */
+    .site-details h2 {
+        font-size: 1.25rem;
+    }
+    
+    .site-info-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .site-links {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .site-link {
+        padding: 0.6rem;
+        font-size: 0.85rem;
+    }
+    
+    /* Tabs */
+    .tabs {
+        gap: 0.25rem;
+    }
+    
+    .tab {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    /* Images */
+    .site-images {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 0.5rem;
+    }
+    
+    .site-image {
+        height: 120px;
+    }
+    
+    /* Map */
+    #map {
+        height: 300px;
+    }
+    
+    /* Route summary */
+    .route-summary-floating {
+        max-width: 90%;
+        font-size: 0.8rem;
+        padding: 0.75rem;
+    }
+    
+    /* Modals */
+    .modal-content {
+        width: 95%;
+        max-width: 95%;
+        margin: 1rem auto;
+        padding: 1rem;
+    }
+    
+    .modal-header h2 {
+        font-size: 1.25rem;
+    }
+    
+    /* Image carousel */
+    .carousel-image {
+        max-height: 60vh;
+    }
+    
+    .carousel-counter {
+        font-size: 0.9rem;
+    }
+    
+    /* Advanced filters */
+    #advancedFilters {
+        padding: 0.75rem;
+    }
+    
+    .filter-group {
+        margin-bottom: 0.75rem;
+    }
+    
+    /* Footer */
+    footer {
+        padding: 0.75rem;
+        font-size: 0.85rem;
+    }
+}
+
+/* Mobile phones (480px and below) */
+@media screen and (max-width: 480px) {
+    /* Even smaller header */
+    header {
+        padding: 0.5rem;
+    }
+    
+    header h1 {
+        font-size: 1.1rem;
+    }
+    
+    .nav-item {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.8rem;
+    }
+    
+    /* Sidebar */
+    .sidebar {
+        max-height: 35vh;
+    }
+    
+    .sidebar-controls {
+        padding: 0.4rem;
+    }
+    
+    /* Main content */
+    .main-content {
+        padding: 0.5rem;
+    }
+    
+    .site-details h2 {
+        font-size: 1.1rem;
+    }
+    
+    /* Smaller buttons */
+    .site-link {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    .tab {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+    }
+    
+    /* Images - 2 columns on very small screens */
+    .site-images {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.4rem;
+    }
+    
+    .site-image {
+        height: 100px;
+    }
+    
+    /* Map */
+    #map {
+        height: 250px;
+    }
+    
+    /* Route summary - even smaller */
+    .route-summary-floating {
+        font-size: 0.75rem;
+        padding: 0.5rem;
+    }
+    
+    /* Modal adjustments */
+    .modal-content {
+        width: 98%;
+        margin: 0.5rem auto;
+        padding: 0.75rem;
+    }
+    
+    .modal-header {
+        padding: 0.75rem;
+    }
+    
+    .modal-header h2 {
+        font-size: 1.1rem;
+    }
+    
+    .modal-body {
+        padding: 0.75rem;
+    }
+    
+    /* Carousel */
+    .carousel-image {
+        max-height: 50vh;
+    }
+    
+    .carousel-nav {
+        padding: 0.5rem;
+    }
+    
+    .carousel-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1.25rem;
+    }
+    
+    /* Site counter */
+    .site-counter {
+        font-size: 0.8rem;
+        padding: 0.4rem;
+    }
+}
+
+/* Landscape orientation on mobile */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+    .sidebar {
+        max-height: 50vh;
+    }
+    
+    #map {
+        height: 350px;
+    }
+    
+    .carousel-image {
+        max-height: 70vh;
+    }
+}
+
+/* Touch-friendly adjustments */
+@media (hover: none) and (pointer: coarse) {
+    /* Larger touch targets */
+    .site-item {
+        min-height: 44px;
+    }
+    
+    .favorite-btn {
+        min-width: 44px;
+        min-height: 44px;
+        padding: 0.5rem;
+    }
+    
+    .tab {
+        min-height: 44px;
+    }
+    
+    .site-link {
+        min-height: 44px;
+    }
+    
+    .nav-item {
+        min-height: 44px;
+    }
+    
+    /* Remove hover effects on touch devices */
+    .site-item:hover {
+        background: inherit;
+    }
+    
+    .site-item.active {
+        background: #e3f2fd;
+    }
+}
+
+/* Made with Bob */
 /* Made with Bob */
