@@ -19,7 +19,7 @@ import { favoritesManager } from '../static/js/favorites-manager.js';
  */
 async function init() {
     try {
-        console.log('Initializing Spain Eclipse Sites Viewer (GitHub Pages)...');
+        console.log('🚀 Initializing Spain Eclipse Sites Viewer (GitHub Pages Static Build v2)...');
         
         // Load configuration from static config.json
         await loadConfig();
