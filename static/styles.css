@@ -1785,16 +1785,16 @@ footer a:hover {
         flex-direction: column;
     }
     
-    /* Sidebar - full width on mobile, allow scrolling */
+    /* Sidebar - full width on mobile, natural height */
     .sidebar {
         width: 100%;
-        height: 60vh;
-        max-height: 60vh;
+        height: auto;
+        max-height: none;
         border-right: none;
         border-bottom: 1px solid #dee2e6;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
+        overflow: visible;
     }
     
     .sidebar-controls {
@@ -1828,14 +1828,17 @@ footer a:hover {
         font-size: 0.85rem;
     }
     
-    /* Site list container - ensure it's visible and scrollable */
+    /* Site list container - ensure it's visible */
     .sidebar-list-container {
-        flex: 1 1 auto;
-        min-height: 200px;
+        flex: none;
+        min-height: auto;
+        max-height: 400px;
         overflow-y: auto;
         overflow-x: hidden;
         padding: 0.5rem;
         background: #fff;
+        display: block !important;
+        visibility: visible !important;
     }
     
     .site-counter {
@@ -1848,6 +1851,8 @@ footer a:hover {
     /* Site list */
     .site-list {
         font-size: 0.9rem;
+        display: block !important;
+        visibility: visible !important;
     }
     
     .site-item {
