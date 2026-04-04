@@ -40,18 +40,25 @@ async function fetchHorizonFiles() {
         return horizonFilesCache;
     }
     
-    try {
-        // Try API endpoint first (for local development with Python server)
-        console.log('Trying API endpoint /api/horizon-files');
-        const response = await fetch('/api/horizon-files');
-        if (response.ok) {
-            horizonFilesCache = await response.json();
-            console.log('Loaded from API:', Object.keys(horizonFilesCache).length, 'files');
-            return horizonFilesCache;
+    // Skip API endpoint on GitHub Pages - go straight to static JSON
+    const isGitHubPages = window.location.hostname.includes('github.io');
+    
+    if (!isGitHubPages) {
+        try {
+            // Try API endpoint first (for local development with Python server)
+            console.log('Trying API endpoint /api/horizon-files');
+            const response = await fetch('/api/horizon-files');
+            if (response.ok) {
+                horizonFilesCache = await response.json();
+                console.log('Loaded from API:', Object.keys(horizonFilesCache).length, 'files');
+                return horizonFilesCache;
+            }
+            console.log('API endpoint not available, status:', response.status);
+        } catch (error) {
+            console.log('API not available, trying static JSON file. Error:', error.message);
         }
-        console.log('API endpoint not available, status:', response.status);
-    } catch (error) {
-        console.log('API not available, trying static JSON file. Error:', error.message);
+    } else {
+        console.log('GitHub Pages detected, skipping API endpoint');
     }
     
     try {
