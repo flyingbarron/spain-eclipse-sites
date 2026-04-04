@@ -5,7 +5,7 @@
 
 import { appState } from '../static/js/state.js';
 import { decimalToDMS } from '../static/js/utils.js';
-import { CONFIG } from './config.js';
+import { CONFIG, googleMapsApiKey, mapboxApiKey } from './config.js';
 import { loadSiteImages } from './image-loader.js';
 import { initializeSingleSiteMap, updateMapWithMultipleSites } from './map-handler.js';
 import { initialize3DMap, cleanup3DMap } from './terrain-3d.js';
@@ -133,8 +133,8 @@ function generateSiteUrls(site) {
     const darkSkySitesUrl = `https://www.darkskysites.com/?lat=${lat}&lng=${lon}&zoom=8`;
     
     // Google Maps Static API
-    const googleMapsStaticUrl = CONFIG.MAPS.GOOGLE_API_KEY ?
-        `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lon}&zoom=15&size=400x200&maptype=satellite&markers=color:red%7C${lat},${lon}&key=${CONFIG.MAPS.GOOGLE_API_KEY}` :
+    const googleMapsStaticUrl = googleMapsApiKey ?
+        `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lon}&zoom=15&size=400x200&maptype=satellite&markers=color:red%7C${lat},${lon}&key=${googleMapsApiKey}` :
         null;
     
     return {
