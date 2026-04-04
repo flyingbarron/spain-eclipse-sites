@@ -425,6 +425,23 @@ header h1 {
 .link-button:hover {
     background: #0056b3;
 }
+.modal-button {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.modal-button:hover {
+    background: #2980b9;
+}
+
 
 .link-button.inactive {
     background: #6c757d;

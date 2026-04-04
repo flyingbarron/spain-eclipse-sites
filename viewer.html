@@ -22,7 +22,6 @@
             <h1>🦕 Spain Eclipse Site Viewer</h1>
             <nav class="header-nav">
                 <button class="nav-item" id="resourcesBtn">🔗 Resources</button>
-                <button class="nav-item" id="readmeBtn">📖 README</button>
                 <button class="nav-item" id="aboutBtn">ℹ️ About</button>
                 <button class="nav-item" id="helpBtn">❓ Help</button>
             </nav>
@@ -149,17 +148,6 @@
         </div>
     </div>
 
-    <!-- README Modal -->
-    <div class="info-modal" id="readmeModal">
-        <div class="info-modal-content readme-modal-content">
-            <span class="info-modal-close" data-modal="readmeModal">&times;</span>
-            <h2>📖 Project README</h2>
-            <div class="modal-text-content readme-content" id="readmeContent">
-                <p class="loading">Loading README...</p>
-            </div>
-        </div>
-    </div>
-
     <!-- About Modal -->
     <div class="info-modal" id="aboutModal">
         <div class="info-modal-content">
@@ -181,9 +169,14 @@
                 <h3>Eclipse Details</h3>
                 <p>The total solar eclipse on <strong>August 12, 2026</strong> will cross Spain from west to east. The path of totality will pass through several regions, offering spectacular viewing opportunities for eclipse chasers worldwide.</p>
 
-                <h3>Credits</h3>
+                <h3>Documentation</h3>
+                <div style="margin-top: 1rem;">
+                    <button class="modal-button" id="openReadmeBtn" style="margin-right: 0.5rem;">📖 Open README</button>
+                    <button class="modal-button" id="openCreditsBtn">📜 Open Credits</button>
+                </div>
+
+                <h3 style="margin-top: 1.5rem;">Project Info</h3>
                 <p>Created by <strong>Robert Barron</strong> • Made with Bob 🤖</p>
-                <p>See <a href="https://github.com/yourusername/spain-eclipse-sites/blob/main/CREDITS.md" target="_blank">CREDITS.md</a> for full attribution and data source information.</p>
             </div>
         </div>
     </div>

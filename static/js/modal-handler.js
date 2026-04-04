@@ -84,7 +84,6 @@ export function openPanel(panelId) {
     // Update URL hash for direct linking
     const hashMap = {
         'resourcesModal': 'resources',
-        'readmeModal': 'readme',
         'aboutModal': 'about',
         'helpModal': 'help'
     };
@@ -129,7 +128,7 @@ export function closeAllPanels() {
     // Clear URL hash
     if (window.location.hash) {
         const hash = window.location.hash.substring(1);
-        if (['resources', 'readme', 'about', 'help'].includes(hash)) {
+        if (['resources', 'about', 'help'].includes(hash)) {
             window.history.pushState(null, null, window.location.pathname);
         }
     }
@@ -180,21 +179,32 @@ export function setupModalListeners() {
     
     // Info panel buttons
     const resourcesBtn = document.getElementById('resourcesBtn');
-    const readmeBtn = document.getElementById('readmeBtn');
     const aboutBtn = document.getElementById('aboutBtn');
     const helpBtn = document.getElementById('helpBtn');
 
     if (resourcesBtn) {
         resourcesBtn.addEventListener('click', () => openPanel('resourcesModal'));
     }
-    if (readmeBtn) {
-        readmeBtn.addEventListener('click', () => openPanel('readmeModal'));
-    }
     if (aboutBtn) {
         aboutBtn.addEventListener('click', () => openPanel('aboutModal'));
     }
     if (helpBtn) {
         helpBtn.addEventListener('click', () => openPanel('helpModal'));
+    }
+    
+    // Buttons inside About modal to open README and Credits in new tabs
+    const openReadmeBtn = document.getElementById('openReadmeBtn');
+    const openCreditsBtn = document.getElementById('openCreditsBtn');
+    
+    if (openReadmeBtn) {
+        openReadmeBtn.addEventListener('click', () => {
+            window.open('/readme.html', '_blank');
+        });
+    }
+    if (openCreditsBtn) {
+        openCreditsBtn.addEventListener('click', () => {
+            window.open('/credits.html', '_blank');
+        });
     }
     
     // Panel close buttons
@@ -224,8 +234,6 @@ export function setupModalListeners() {
     const hash = window.location.hash.substring(1);
     if (hash === 'resources') {
         openPanel('resourcesModal');
-    } else if (hash === 'readme') {
-        openPanel('readmeModal');
     } else if (hash === 'about') {
         openPanel('aboutModal');
     } else if (hash === 'help') {

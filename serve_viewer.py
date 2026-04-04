@@ -78,6 +78,9 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         # Handle README endpoint
         elif self.path == '/api/readme':
             self.handle_readme()
+        # Handle CREDITS endpoint
+        elif self.path == '/api/credits':
+            self.handle_credits()
         # Handle horizon files list endpoint
         elif self.path == '/api/horizon-files':
             self.handle_horizon_files()
@@ -120,6 +123,14 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self._send_json_response({'content': file.read()})
         except Exception as e:
             self.send_error(500, f"Error loading README: {str(e)}")
+    
+    def handle_credits(self):
+        """Serve CREDITS content for in-app viewing."""
+        try:
+            with open('CREDITS.md', 'r', encoding='utf-8') as file:
+                self._send_json_response({'content': file.read()})
+        except Exception as e:
+            self.send_error(500, f"Error loading CREDITS: {str(e)}")
 
     def handle_horizon_files(self):
         """Serve list of available horizon files"""

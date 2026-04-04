@@ -17,6 +17,7 @@ export const CONFIG = {
         IMAGES: '/api/images',
         PROXY_IMAGE: '/api/proxy-image',
         README: '/api/readme',
+        CREDITS: '/api/credits',
         SHUTDOWN: '/api/shutdown'
     },
     
