@@ -125,7 +125,7 @@ function setupFavoritesListeners() {
 function updateFavoritesCount() {
     const countElement = document.getElementById('favoritesCount');
     if (countElement) {
-        countElement.textContent = favoritesManager.getFavorites().length;
+        countElement.textContent = favoritesManager.favorites.length;
     }
 }
 
