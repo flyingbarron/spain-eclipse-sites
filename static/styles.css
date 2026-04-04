@@ -1938,7 +1938,9 @@ footer a:hover {
         min-height: 50vh !important;
         padding: 0.75rem;
         overflow-y: auto;
+        overflow-x: hidden;
         transition: all 0.3s ease;
+        box-sizing: border-box;
     }
     
     /* Site details */
@@ -1965,12 +1967,11 @@ footer a:hover {
     .preview-thumbnails-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
+        gap: 0.5rem;
         margin-top: 1rem;
         width: 100%;
         max-width: 100%;
         overflow: hidden;
-        padding: 0 0.5rem;
         box-sizing: border-box;
     }
     
@@ -1981,6 +1982,7 @@ footer a:hover {
         min-width: 0;
         max-width: 100%;
         overflow: hidden;
+        box-sizing: border-box;
     }
     
     /* Ensure thumbnail images don't overflow */
@@ -1989,14 +1991,15 @@ footer a:hover {
         width: 100%;
         height: auto;
         display: block;
+        box-sizing: border-box;
     }
     
     .preview-thumbnails-grid .link-button {
         width: 100%;
         max-width: 100%;
         box-sizing: border-box;
-        padding: 0.5rem;
-        font-size: 0.85rem;
+        padding: 0.5rem 0.25rem;
+        font-size: 0.8rem;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
