@@ -1970,6 +1970,8 @@ footer a:hover {
         width: 100%;
         max-width: 100%;
         overflow: hidden;
+        padding: 0 0.5rem;
+        box-sizing: border-box;
     }
     
     .preview-thumbnails-grid > div {
@@ -1977,18 +1979,27 @@ footer a:hover {
         flex-direction: column;
         gap: 0.5rem;
         min-width: 0;
+        max-width: 100%;
         overflow: hidden;
     }
     
     /* Ensure thumbnail images don't overflow */
     .preview-thumbnails-grid img {
         max-width: 100%;
+        width: 100%;
         height: auto;
+        display: block;
     }
     
     .preview-thumbnails-grid .link-button {
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
+        padding: 0.5rem;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
     /* Tabs - wrap on mobile, larger touch targets */
