@@ -10,7 +10,7 @@ import { loadCSV } from './data-loader.js';
 import { displaySites, filterSites, setupSiteListListeners } from './site-display.js';
 import { displaySiteDetails, switchTab } from './site-details.js';
 import { setupModalListeners } from '../static/js/modal-handler.js';
-import { updateMapWithMultipleSites } from '../static/js/map-handler.js';
+import { updateMapWithMultipleSites } from './map-handler.js';
 import { favoritesManager } from '../static/js/favorites-manager.js';
 
 
