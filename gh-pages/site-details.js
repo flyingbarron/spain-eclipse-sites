@@ -33,19 +33,25 @@ let horizonFilesCache = null;
  * @returns {Promise<Object>} Map of site codes to filenames
  */
 async function fetchHorizonFiles() {
+    console.log('fetchHorizonFiles called, cache status:', horizonFilesCache ? 'cached' : 'not cached');
+    
     if (horizonFilesCache) {
+        console.log('Returning cached horizon files:', Object.keys(horizonFilesCache).length, 'files');
         return horizonFilesCache;
     }
     
     try {
         // Try API endpoint first (for local development with Python server)
+        console.log('Trying API endpoint /api/horizon-files');
         const response = await fetch('/api/horizon-files');
         if (response.ok) {
             horizonFilesCache = await response.json();
+            console.log('Loaded from API:', Object.keys(horizonFilesCache).length, 'files');
             return horizonFilesCache;
         }
+        console.log('API endpoint not available, status:', response.status);
     } catch (error) {
-        console.log('API not available, trying static JSON file');
+        console.log('API not available, trying static JSON file. Error:', error.message);
     }
     
     try {
@@ -55,18 +61,22 @@ async function fetchHorizonFiles() {
         const jsonUrl = basePath + 'data/horizon_files.json';
         console.log('Trying to load horizon files from:', jsonUrl);
         const response = await fetch(jsonUrl);
+        console.log('Fetch response status:', response.status, 'OK:', response.ok);
         if (response.ok) {
-            horizonFilesCache = await response.json();
-            console.log(`Loaded ${Object.keys(horizonFilesCache).length} horizon files from static JSON`);
+            const data = await response.json();
+            horizonFilesCache = data;
+            console.log(`✓ Loaded ${Object.keys(horizonFilesCache).length} horizon files from static JSON`);
+            console.log('Sample entries:', Object.entries(horizonFilesCache).slice(0, 3));
             return horizonFilesCache;
         } else {
             console.warn('Failed to load horizon files, status:', response.status);
         }
     } catch (error) {
-        console.warn('Could not load horizon files:', error);
+        console.error('Could not load horizon files:', error);
     }
     
     // Last resort: empty cache
+    console.warn('Using empty horizon files cache');
     horizonFilesCache = {};
     return horizonFilesCache;
 }
