@@ -1800,9 +1800,12 @@ footer a:hover {
     }
     
     /* Expanded sidebar state - takes most of screen when content is hidden */
-    .sidebar.expanded {
-        min-height: 85vh !important;
-        max-height: 90vh !important;
+    @media screen and (max-width: 768px) {
+        .sidebar.expanded {
+            min-height: 85vh !important;
+            max-height: 90vh !important;
+            height: auto !important;
+        }
     }
     
     /* Collapsed sidebar state on mobile - completely hidden */
