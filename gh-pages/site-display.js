@@ -126,7 +126,7 @@ export function applyAdvancedFilters(sites) {
         }
         
         if (filters.routeDifficulty.length > 0) {
-            if (!filters.routeDifficulty.includes(site.route_difficulty)) {
+            if (!site.route_difficulty || !filters.routeDifficulty.includes(site.route_difficulty)) {
                 return false;
             }
         }
@@ -141,10 +141,10 @@ export function applyAdvancedFilters(sites) {
 export function filterSites() {
     let filtered = appState.sitesData;
     
-    const searchTerm = appState.searchTerm.toLowerCase();
+    const searchTerm = appState.searchTerm ? appState.searchTerm.toLowerCase() : '';
     if (searchTerm) {
         filtered = filtered.filter(site =>
-            site.code.toLowerCase().includes(searchTerm) ||
+            (site.code && site.code.toLowerCase().includes(searchTerm)) ||
             (site.denominacion && site.denominacion.toLowerCase().includes(searchTerm))
         );
     }
