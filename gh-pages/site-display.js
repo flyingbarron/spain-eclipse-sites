@@ -219,6 +219,28 @@ export function setupSiteListListeners() {
     
     setupAdvancedFilterListeners();
     
+    // Favorite buttons (event delegation)
+    const siteList = document.getElementById('siteList');
+    if (siteList) {
+        siteList.addEventListener('click', (e) => {
+            // Check if clicked element or its parent is the favorite button
+            const favoriteBtn = e.target.closest('[data-action="favorite"]');
+            if (favoriteBtn) {
+                e.stopPropagation(); // Prevent site selection
+                const code = favoriteBtn.dataset.code;
+                favoritesManager.toggleFavorite(code);
+                
+                // Update favorites count in header
+                import('./main.js').then(module => {
+                    module.updateFavoritesCount();
+                });
+                
+                filterSites(); // Refresh display
+                return;
+            }
+        });
+    }
+    
     document.addEventListener('favoriteToggled', () => {
         if (appState.favoritesFilter) {
             filterSites();
