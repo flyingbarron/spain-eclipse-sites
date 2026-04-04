@@ -1780,13 +1780,17 @@ footer a:hover {
         width: auto;
     }
     
-    /* Larger thumbnails on desktop */
+    /* Uniform larger thumbnails on desktop */
     .eclipse-profile-thumbnail {
         height: 120px;
     }
     
     .eclipse-profile-thumbnail.horizon-thumbnail {
-        height: 150px;
+        height: 120px;
+    }
+    
+    .eclipse-profile-thumbnail.maps-thumbnail {
+        height: 120px;
     }
 }
 

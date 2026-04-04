@@ -19,7 +19,7 @@ const ASSET_PATHS = {
 };
 
 const HEADER_COLUMN_STYLE = 'display: flex; flex-direction: column; align-items: center; gap: 0.25rem;';
-const HEADER_STACK_STYLE = 'display: flex; flex-direction: column; gap: 0.25rem;';
+const HEADER_STACK_STYLE = 'display: flex; flex-direction: column; gap: 0.25rem; align-items: flex-start;';
 const THUMBNAIL_WRAPPER_STYLE = 'position: relative; display: inline-block;';
 
 /**
