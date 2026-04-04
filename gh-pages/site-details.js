@@ -132,10 +132,8 @@ function generateSiteUrls(site) {
     // Dark Sky Sites
     const darkSkySitesUrl = `https://www.darkskysites.com/?lat=${lat}&lng=${lon}&zoom=8`;
     
-    // Google Maps Static API
-    const googleMapsStaticUrl = googleMapsApiKey ?
-        `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lon}&zoom=15&size=400x200&maptype=satellite&markers=color:red%7C${lat},${lon}&key=${googleMapsApiKey}` :
-        null;
+    // Google Maps Static - use pre-generated thumbnails for GitHub Pages
+    const googleMapsStaticUrl = `data/google_maps_thumbnails/${site.code}_map.jpg`;
     
     return {
         maps: mapsUrl,
