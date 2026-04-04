@@ -1785,11 +1785,11 @@ footer a:hover {
         flex-direction: column;
     }
     
-    /* Sidebar - full width on mobile */
+    /* Sidebar - full width on mobile, starts at maximum */
     .sidebar {
         width: 100%;
-        min-height: 50vh !important;
-        max-height: 55vh !important;
+        min-height: 85vh !important;
+        max-height: 90vh !important;
         height: auto !important;
         border-right: none;
         border-bottom: 1px solid #dee2e6;
@@ -1797,13 +1797,6 @@ footer a:hover {
         flex-direction: column !important;
         overflow: hidden !important;
         transition: all 0.3s ease;
-    }
-    
-    /* Expanded sidebar state - takes most of screen when content is hidden */
-    .sidebar.expanded {
-        min-height: 85vh !important;
-        max-height: 90vh !important;
-        height: auto !important;
     }
     
     /* Collapsed sidebar state on mobile - completely hidden */
