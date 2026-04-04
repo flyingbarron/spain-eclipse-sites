@@ -29,7 +29,7 @@ let horizonFilesCache = null;
 
 /**
  * Fetch available horizon files from server
- * Falls back to checking files directly for GitHub Pages
+ * Falls back to static JSON file for GitHub Pages
  * @returns {Promise<Object>} Map of site codes to filenames
  */
 async function fetchHorizonFiles() {
@@ -38,16 +38,29 @@ async function fetchHorizonFiles() {
     }
     
     try {
+        // Try API endpoint first (for local development with Python server)
         const response = await fetch('/api/horizon-files');
         if (response.ok) {
             horizonFilesCache = await response.json();
             return horizonFilesCache;
         }
     } catch (error) {
-        console.log('API not available, using direct file access for GitHub Pages');
+        console.log('API not available, trying static JSON file');
     }
     
-    // For GitHub Pages, we'll check files directly when needed
+    try {
+        // Fall back to static JSON file for GitHub Pages
+        const response = await fetch('data/horizon_files.json');
+        if (response.ok) {
+            horizonFilesCache = await response.json();
+            console.log(`Loaded ${Object.keys(horizonFilesCache).length} horizon files from static JSON`);
+            return horizonFilesCache;
+        }
+    } catch (error) {
+        console.warn('Could not load horizon files:', error);
+    }
+    
+    // Last resort: empty cache
     horizonFilesCache = {};
     return horizonFilesCache;
 }
