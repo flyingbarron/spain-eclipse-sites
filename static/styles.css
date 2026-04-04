@@ -1767,6 +1767,13 @@ footer a:hover {
     gap: 0.5rem;
 }
 
+/* Hide expand button on desktop */
+@media screen and (min-width: 769px) {
+    .sidebar-expand-btn {
+        display: none !important;
+    }
+}
+
 @media screen and (max-width: 768px) {
     /* Header adjustments */
     header {
@@ -1834,36 +1841,31 @@ footer a:hover {
     /* Expand button - only visible on mobile when sidebar is collapsed */
     .sidebar-expand-btn {
         display: none;
+        position: fixed;
+        top: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 25px;
+        padding: 12px 24px;
+        font-size: 1rem;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        cursor: pointer;
+        touch-action: manipulation;
+        min-height: 44px;
     }
     
-    @media screen and (max-width: 768px) {
-        .sidebar-expand-btn {
-            position: fixed;
-            top: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 12px 24px;
-            font-size: 1rem;
-            font-weight: 600;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            cursor: pointer;
-            touch-action: manipulation;
-            min-height: 44px;
-        }
-        
-        .sidebar.collapsed ~ .sidebar-expand-btn {
-            display: block;
-        }
-        
-        .sidebar-expand-btn:active {
-            background: #0056b3;
-            transform: translateX(-50%) scale(0.95);
-        }
+    .sidebar.collapsed ~ .sidebar-expand-btn {
+        display: block;
+    }
+    
+    .sidebar-expand-btn:active {
+        background: #0056b3;
+        transform: translateX(-50%) scale(0.95);
     }
     
     .sidebar-controls {
@@ -2028,9 +2030,6 @@ footer a:hover {
         box-sizing: border-box;
         padding: 0.5rem 0.25rem;
         font-size: 0.8rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
     }
     
     /* Tabs - wrap on mobile, larger touch targets */
