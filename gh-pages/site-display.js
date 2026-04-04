@@ -25,27 +25,13 @@ export function updateSiteCounter(visibleCount, totalCount) {
 /**
  * Display sites in sidebar list
  */
-// Create on-screen debug display for mobile
-function showDebugMessage(message, isError = false) {
-    console.log(message);
-    let debugDiv = document.getElementById('mobileDebug');
-    if (!debugDiv) {
-        debugDiv = document.createElement('div');
-        debugDiv.id = 'mobileDebug';
-        debugDiv.style.cssText = 'position:fixed;top:0;left:0;right:0;background:' + (isError ? '#ff0000' : '#00ff00') + ';color:#fff;padding:10px;z-index:10000;font-size:12px;max-height:100px;overflow:auto;';
-        document.body.appendChild(debugDiv);
-    }
-    debugDiv.innerHTML += '<div>' + new Date().toLocaleTimeString() + ': ' + message + '</div>';
-    debugDiv.style.background = isError ? '#ff0000' : '#00ff00';
-}
-
 export function displaySites(sites) {
     try {
-        showDebugMessage('displaySites called with ' + sites.length + ' sites');
+        console.log('displaySites called with ' + sites.length + ' sites');
         const list = document.getElementById('siteList');
         
         if (!list) {
-            showDebugMessage('ERROR: siteList element not found!', true);
+            console.error('ERROR: siteList element not found!');
             return;
         }
         

@@ -1900,6 +1900,13 @@ footer a:hover {
         border-top: 1px solid #c3e6cb;
     }
     
+    /* Content area - collapsed state when showing list */
+    .content.collapsed {
+        min-height: 20vh !important;
+        max-height: 25vh !important;
+        overflow: hidden !important;
+    }
+    
     /* Site list - force visibility */
     .site-list {
         font-size: 0.9rem;

@@ -176,21 +176,37 @@ function setupDocumentationButtons() {
 
 /**
  * Collapse sidebar on mobile to show full site details
+ * Also expand the content area to use full screen
  */
 function collapseSidebarOnMobile() {
     const sidebar = document.querySelector('.sidebar');
+    const content = document.querySelector('.content');
+    
     if (sidebar && window.innerWidth <= 768) {
         sidebar.classList.add('collapsed');
+    }
+    
+    // Expand content area when sidebar is collapsed
+    if (content && window.innerWidth <= 768) {
+        content.classList.remove('collapsed');
     }
 }
 
 /**
  * Expand sidebar on mobile to show site list
+ * Also collapse the content area to give more room for the list
  */
 function expandSidebarOnMobile() {
     const sidebar = document.querySelector('.sidebar');
+    const content = document.querySelector('.content');
+    
     if (sidebar) {
         sidebar.classList.remove('collapsed');
+    }
+    
+    // On mobile, collapse content area when showing list
+    if (content && window.innerWidth <= 768) {
+        content.classList.add('collapsed');
     }
 }
 
