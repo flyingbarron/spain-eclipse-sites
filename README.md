@@ -33,7 +33,10 @@ This project aggregates geological site information and eclipse planning data fo
 ### Web Viewer
 - 🔍 **Search** by site code or name (sticky controls)
 - 🌑 **Filter** eclipse-visible sites
-- 📊 **Sort** by code, name, tourist value, darkness, or horizon clearance
+- ⭐ **Favorites system** - Save favorite sites with localStorage persistence
+- 📝 **Personal notes** - Add notes to sites with collapsible widget
+- 🔧 **Advanced filtering** - Tourist value, cloud coverage, Bortle scale, route difficulty
+- 📊 **Sort** by code, name, or darkness
 - 📚 **Navigation panels** - Resources, About, and Help sections accessible from header
 - 🔗 **Resources panel** - Quick links to eclipse websites and planning tools
 - 🖼️ **Image gallery** with full-screen carousel (IGME photos cached locally)
@@ -51,6 +54,7 @@ This project aggregates geological site information and eclipse planning data fo
 - 🌌 **Dark Sky Sites data** - SQM values, Bortle scale, darkness percentage
 - 🔗 **Dark Sky Sites links** - Direct links to darkskysites.com for each location
 - 🔢 **Site counter** showing filtered results
+- 💾 **Import/Export** - Share favorites as JSON
 - 🦕 **Dinosaur emoji** favicon (because dinosaur footprints!)
 ### Standalone Viewer
 - 📦 **No server required** - Self-contained version that works offline

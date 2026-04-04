@@ -37,7 +37,11 @@ env/
 *~
 
 # Data directory - all generated data files
-data/
+data/.cache/
+data/*.kml
+
+# Keys
+config.json
 
 # OS
 .DS_Store

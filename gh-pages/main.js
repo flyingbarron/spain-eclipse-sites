@@ -6,8 +6,8 @@
 
 import { CONFIG, loadConfig } from './config.js';
 import { appState } from '../static/js/state.js';
-import { loadCSV } from '../static/js/data-loader.js';
-import { displaySites, filterSites, setupSiteListListeners } from '../static/js/site-display.js';
+import { loadCSV } from './data-loader.js';
+import { displaySites, filterSites, setupSiteListListeners } from './site-display.js';
 import { displaySiteDetails, switchTab } from './site-details.js';
 import { setupModalListeners } from '../static/js/modal-handler.js';
 import { updateMapWithMultipleSites } from '../static/js/map-handler.js';
