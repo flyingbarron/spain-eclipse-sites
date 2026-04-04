@@ -1967,12 +1967,28 @@ footer a:hover {
         grid-template-columns: repeat(2, 1fr);
         gap: 0.75rem;
         margin-top: 1rem;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
     }
     
     .preview-thumbnails-grid > div {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
+        min-width: 0;
+        overflow: hidden;
+    }
+    
+    /* Ensure thumbnail images don't overflow */
+    .preview-thumbnails-grid img {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    .preview-thumbnails-grid .link-button {
+        width: 100%;
+        box-sizing: border-box;
     }
     
     /* Tabs - wrap on mobile, larger touch targets */
