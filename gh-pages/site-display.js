@@ -26,16 +26,24 @@ export function updateSiteCounter(visibleCount, totalCount) {
  * Display sites in sidebar list
  */
 export function displaySites(sites) {
-    const list = document.getElementById('siteList');
-    
-    updateSiteCounter(sites.length, appState.sitesData.length);
-    
-    if (sites.length === 0) {
-        list.innerHTML = '<li class="loading">No sites found</li>';
-        return;
-    }
-    
-    list.innerHTML = sites.map(site => {
+    try {
+        console.log('displaySites called with', sites.length, 'sites');
+        const list = document.getElementById('siteList');
+        
+        if (!list) {
+            console.error('siteList element not found!');
+            return;
+        }
+        
+        updateSiteCounter(sites.length, appState.sitesData.length);
+        
+        if (sites.length === 0) {
+            list.innerHTML = '<li class="loading">No sites found</li>';
+            return;
+        }
+        
+        console.log('Rendering site list...');
+        list.innerHTML = sites.map(site => {
         const eclipseInfo = getEclipseInfo(site.eclipse_visibility);
         const eclipseLabel = eclipseInfo.text ?
             `<span class="site-eclipse ${eclipseInfo.class}">${eclipseInfo.text}</span>` : '';
@@ -96,7 +104,16 @@ export function displaySites(sites) {
                 </div>
             </li>
         `;
-    }).join('');
+        }).join('');
+        
+        console.log('Site list rendered successfully');
+    } catch (error) {
+        console.error('Error in displaySites:', error);
+        const list = document.getElementById('siteList');
+        if (list) {
+            list.innerHTML = '<li class="loading">Error loading sites. Please refresh.</li>';
+        }
+    }
 }
 
 /**
