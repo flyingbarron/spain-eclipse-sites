@@ -9,6 +9,7 @@ Usage:
 import os
 import csv
 import urllib.request
+import urllib.error
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -23,6 +24,9 @@ if not GOOGLE_MAPS_API_KEY:
     print("Please create a .env file with:")
     print("GOOGLE_MAPS_API_KEY=your_api_key_here")
     exit(1)
+
+print(f"Using API key: {GOOGLE_MAPS_API_KEY[:10]}...{GOOGLE_MAPS_API_KEY[-4:]}")
+print()
 
 # Output directory
 OUTPUT_DIR = Path("data/google_maps_thumbnails")
@@ -67,9 +71,27 @@ for site in sites:
     
     try:
         print(f"⬇ Downloading {code}...", end=" ")
-        urllib.request.urlretrieve(url, output_file)
+        
+        # Create request with User-Agent header
+        req = urllib.request.Request(
+            url,
+            headers={
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
+            }
+        )
+        
+        with urllib.request.urlopen(req) as response:
+            with open(output_file, 'wb') as out_file:
+                out_file.write(response.read())
+        
         print("✓ saved")
         downloaded += 1
+    except urllib.error.HTTPError as e:
+        print(f"✗ HTTP {e.code}: {e.reason}")
+        if e.code == 403:
+            print(f"   Check API key restrictions in Google Cloud Console")
+            print(f"   URL: {url[:100]}...")
+        failed += 1
     except Exception as e:
         print(f"✗ failed: {e}")
         failed += 1
