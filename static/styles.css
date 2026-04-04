@@ -1785,17 +1785,17 @@ footer a:hover {
         flex-direction: column;
     }
     
-    /* Sidebar - full width on mobile, tall enough to show list */
+    /* Sidebar - full width on mobile, compact to leave room for content */
     .sidebar {
         width: 100%;
-        min-height: 70vh !important;
+        min-height: 40vh !important;
+        max-height: 45vh !important;
         height: auto !important;
-        max-height: none !important;
         border-right: none;
         border-bottom: 1px solid #dee2e6;
         display: flex !important;
         flex-direction: column !important;
-        overflow: visible !important;
+        overflow: hidden !important;
     }
     
     .sidebar-controls {
@@ -1829,11 +1829,11 @@ footer a:hover {
         font-size: 0.85rem;
     }
     
-    /* Site list container - force visibility on mobile */
+    /* Site list container - scrollable, compact */
     .sidebar-list-container {
         flex: 1 1 auto !important;
-        min-height: 300px !important;
-        max-height: 500px !important;
+        min-height: 150px !important;
+        max-height: 250px !important;
         height: auto !important;
         overflow-y: scroll !important;
         overflow-x: hidden !important;
@@ -1878,10 +1878,12 @@ footer a:hover {
         font-size: 0.9rem;
     }
     
-    /* Main content area */
-    .main-content {
+    /* Main content area - takes remaining space */
+    .content {
         width: 100%;
+        min-height: 50vh !important;
         padding: 0.75rem;
+        overflow-y: auto;
     }
     
     /* Site details */
