@@ -1,0 +1,339 @@
+<!DOCTYPE html><html lang="en"><head>
+    <style data-vite-theme="" data-inject-first="">:root {
+      --background: 240 10% 3.9%;
+--foreground: 0 0% 98%;
+--muted: 240 3.7% 15.9%;
+--muted-foreground: 240 5% 64.9%;
+--popover: 240 10% 3.9%;
+--popover-foreground: 0 0% 98%;
+--card: 240 10% 3.9%;
+--card-foreground: 0 0% 98%;
+--border: 240 3.7% 15.9%;
+--input: 240 3.7% 15.9%;
+--primary: 220 60% 50%;
+--primary-foreground: 219 71% 99%;
+--secondary: 240 3.7% 15.9%;
+--secondary-foreground: 0 0% 98%;
+--accent: 240 3.7% 15.9%;
+--accent-foreground: 0 0% 98%;
+--destructive: 0 62.8% 30.6%;
+--destructive-foreground: 0 0% 98%;
+--ring: 240 4.9% 83.9%;
+--radius: 0.5rem;
+  }
+  .light {
+      --background: 0 0% 100%;
+--foreground: 20 14.3% 4.1%;
+--muted: 60 4.8% 95.9%;
+--muted-foreground: 25 5.3% 44.7%;
+--popover: 0 0% 100%;
+--popover-foreground: 20 14.3% 4.1%;
+--card: 0 0% 100%;
+--card-foreground: 20 14.3% 4.1%;
+--border: 20 5.9% 90%;
+--input: 20 5.9% 90%;
+--primary: 220 60% 50%;
+--primary-foreground: 219 71% 99%;
+--secondary: 60 4.8% 95.9%;
+--secondary-foreground: 24 9.8% 10%;
+--accent: 60 4.8% 95.9%;
+--accent-foreground: 24 9.8% 10%;
+--destructive: 0 84.2% 60.2%;
+--destructive-foreground: 60 9.1% 97.8%;
+--ring: 20 14.3% 4.1%;
+--radius: 0.5rem;
+  }</style>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="description" content="Light pollution map with skyglow simulator and imaging calculators for astronomers and astrophotographers. Compare sites and plan faster integrations. 
+">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://static.hotjar.com https://*.hotjar.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' data:; img-src 'self' data: blob: /assets/ /attached_assets/ *; connect-src 'self' https://www.google-analytics.com https://*.hotjar.com https://*.hotjar.io wss://*.hotjar.com ws: wss: *; style-src-elem 'self' 'unsafe-inline';">
+    <!-- Favicon Support -->
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="/favicon.png">
+    <!-- Google tag (gtag.js) - conditionally loaded for production only -->
+    <script>
+      // Helper to check if we're in a development environment
+      function isDevelopmentEnv() {
+        // Check for Replit-specific environment indicators
+        var isReplitDev = 
+          window.location.hostname.includes('.replit.dev') || 
+          window.location.hostname.includes('.repl.co') ||
+          window.location.hostname === 'localhost' ||
+          window.location.hostname === '0.0.0.0';
+        
+        return isReplitDev;
+      }
+
+      // Set up dummy/no-op analytics for development environments
+      if (isDevelopmentEnv()) {
+        console.log('🔍 Analytics disabled in development environment');
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function() {
+          console.debug('🔍 Analytics call (disabled in dev):', arguments);
+          window.dataLayer.push(arguments);
+        };
+      } 
+      // Load real analytics in production
+      else {
+        // Load the GA script
+        var gaScript = document.createElement('script');
+        gaScript.async = true;
+        gaScript.src = "https://www.googletagmanager.com/gtag/js?id=G-YFP8DKRLS5";
+        document.head.appendChild(gaScript);
+        
+        // Initialize dataLayer and gtag function
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        window.gtag = gtag;
+        gtag('js', new Date());
+        gtag('config', 'G-YFP8DKRLS5');
+        console.log('Analytics initialized in production mode');
+      }
+    </script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-YFP8DKRLS5"></script>
+    <title>Light Pollution Map &amp; Skyglow Simulator for Astronomy &amp; Astrophotography | DarkSkySites
+</title>
+    
+    <!-- Suppress benign OpenLayers getRenderSource errors during rapid layer transitions -->
+    <script>
+      (function() {
+        // This error occurs when OpenLayers tries to access a layer being modified
+        // It's benign and self-corrects on the next frame
+        // Must intercept before Vite's error plugin listener
+        
+        var origAddEventListener = window.addEventListener;
+        var errorListeners = [];
+        var unhandledListeners = [];
+        
+        window.addEventListener = function(type, listener, options) {
+          if (type === 'error') {
+            // Wrap error listeners to filter getRenderSource errors
+            var wrappedListener = function(evt) {
+              if (evt && evt.error && evt.error.message && evt.error.message.includes('getRenderSource')) {
+                evt.preventDefault();
+                evt.stopImmediatePropagation();
+                return;
+              }
+              if (evt && evt.message && evt.message.includes && evt.message.includes('getRenderSource')) {
+                evt.preventDefault();
+                evt.stopImmediatePropagation();
+                return;
+              }
+              return listener.call(this, evt);
+            };
+            errorListeners.push({ original: listener, wrapped: wrappedListener });
+            return origAddEventListener.call(this, type, wrappedListener, options);
+          }
+          if (type === 'unhandledrejection') {
+            var wrappedListener = function(evt) {
+              if (evt && evt.reason) {
+                var msg = evt.reason.message || String(evt.reason);
+                if (msg.includes('getRenderSource')) {
+                  evt.preventDefault();
+                  evt.stopImmediatePropagation();
+                  return;
+                }
+              }
+              return listener.call(this, evt);
+            };
+            unhandledListeners.push({ original: listener, wrapped: wrappedListener });
+            return origAddEventListener.call(this, type, wrappedListener, options);
+          }
+          return origAddEventListener.call(this, type, listener, options);
+        };
+        
+        // Also catch with window.onerror as fallback
+        var origError = window.onerror;
+        window.onerror = function(msg, url, line, col, error) {
+          if (msg && msg.includes && msg.includes('getRenderSource')) {
+            return true;
+          }
+          if (error && error.message && error.message.includes('getRenderSource')) {
+            return true;
+          }
+          if (origError) return origError.apply(this, arguments);
+          return false;
+        };
+      })();
+    </script>
+    
+    <!-- Hotjar Tracking Code - conditionally loaded for production only -->
+    <script>
+      // Use the same isDevelopmentEnv function to check environment
+      // Function already declared above
+      
+      // Only add Hotjar in production
+      if (!isDevelopmentEnv()) {
+        // Initialize Hotjar
+        (function(h,o,t,j,a,r){
+          h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+          h._hjSettings={hjid:6373871,hjsv:6};
+          a=o.getElementsByTagName('head')[0];
+          r=o.createElement('script');r.async=1;
+          r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+          a.appendChild(r);
+        })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+        
+        console.log('Hotjar initialized in production mode');
+      } else {
+        console.log('Analytics status: DISABLED (development)');
+      }
+    </script><script async="" src="https://static.hotjar.com/c/hotjar-6373871.js?sv=6"></script>
+    <script type="module" crossorigin="" src="/assets/index-DcF_uymF.js"></script>
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CFgyweY3.css">
+  <script async="" src="https://script.hotjar.com/modules.ddd41caee2adfc4aedb8.js" charset="utf-8"></script><style>
+      .site-drawer-container {
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(245, 190, 158, 0.5) transparent;
+      }
+      .site-drawer-container::-webkit-scrollbar {
+        width: 8px;
+      }
+      .site-drawer-container::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .site-drawer-container::-webkit-scrollbar-thumb {
+        background-color: rgba(245, 190, 158, 0.5);
+        border-radius: 6px;
+      }
+      .site-drawer {
+        /* Ensure consistent styling for site cards */
+        overflow: visible !important;
+      }
+      /* Safari-specific fix for floating element layout */
+      @media not all and (min-resolution:.001dpcm) { 
+        @supports (-webkit-appearance:none) {
+          /* Container fixes */
+          .site-drawer-container {
+            min-width: 300px !important;
+            width: auto !important;
+            transform-style: flat !important;
+          }
+          
+          /* Basic layout fixes */
+          .site-drawer {
+            float: right !important;
+            clear: right !important;
+            width: 308px !important;
+          }
+          
+          /* Complete z-index restructuring for Safari */
+          /* All site-drawer elements must have lower z-index than skydome modal (9999) */
+          /* Home site gets lowest z-index */
+          .site-drawer:first-child {
+            z-index: 18 !important;
+          }
+          
+          /* First compare site gets higher z-index than home */
+          .site-drawer:nth-child(2) {
+            z-index: 19 !important;
+          }
+          
+          /* Second compare site gets even higher z-index */
+          .site-drawer:nth-child(3) {
+            z-index: 20 !important;
+          }
+          
+          /* Third and beyond compare sites get progressively higher z-index */
+          .site-drawer:nth-child(4) {
+            z-index: 21 !important;
+          }
+          
+          .site-drawer:nth-child(5) {
+            z-index: 22 !important;
+          }
+          
+          .site-drawer:nth-child(6) {
+            z-index: 23 !important;
+          }
+          
+          .site-drawer:nth-child(n+7) {
+            z-index: 24 !important;
+          }
+          
+          /* Keep translucency in main cards but create a cutout at the top */
+          .site-card-backdrop {
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+            background-color: rgba(40, 40, 40, 0.7) !important;
+            box-shadow: none !important;
+            /* Remove the top section completely where the thumbnail is */
+            margin-top: 38px !important;
+          }
+          
+          /* Make the top intersection area fully transparent */
+          .site-drawer::before {
+            content: "" !important;
+            position: absolute !important;
+            top: 60px !important;
+            left: 0 !important;
+            right: 0 !important;
+            height: 38px !important; /* Only cover the area where the thumbnail intersects */
+            background-color: transparent !important; /* Completely transparent */
+            z-index: 5 !important; /* Higher z-index to block the translucent effect */
+            border-top-left-radius: 8px !important;
+            border-top-right-radius: 8px !important;
+            border-top: 1px solid #f5be9e !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+          }
+          
+          /* Ensure transparent areas are truly transparent */
+          .site-drawer .absolute.top-0.left-0.w-full.h-[60px] {
+            opacity: 0 !important;
+            z-index: -1 !important;
+          }
+          
+          /* Make weather section appear on top of other site drawer elements but below skydome modal */
+          .site-drawer .mt-0.ml-0.pt-2 {
+            position: relative !important;
+            z-index: 26 !important;
+          }
+          
+          /* Ensure all text/content elements are above backdrop but below skydome modal */
+          .site-drawer span, 
+          .site-drawer h3, 
+          .site-drawer p, 
+          .site-drawer input, 
+          .site-drawer button {
+            position: relative !important;
+            z-index: 25 !important;
+          }
+          
+          /* Move compare sites down in Safari only */
+          .site-drawer-container > div:not(:first-child) {
+            margin-top: 3px !important; /* Minimal spacing instead of overlapping */
+          }
+        }
+      }
+      /* Hover transform removed to prevent unwanted animation */
+      /* Allow text selection in input fields while preventing it elsewhere */
+      .site-drawer input, .site-drawer textarea {
+        user-select: text !important;
+      }
+      /* Improve clicking/tapping accuracy for small buttons */
+      .site-drawer button {
+        min-width: 24px;
+        min-height: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      /* Ensure scrolling events propagate correctly */
+      .site-drawer * {
+        overflow: visible;
+      }
+      /* Allow child content to flow naturally */
+      .site-drawer-container > * {
+        overflow: visible;
+      }
+    </style></head>
+  <body>
+    <div id="root"><main class="flex flex-col h-full"><div class="relative w-full h-full overflow-hidden bg-gray-900"><div class="absolute inset-0 w-full h-full bg-black" style="z-index: 1; cursor: crosshair; width: 100%; height: 100%;"><div class="ol-viewport" style="position: relative; overflow: hidden; width: 100%; height: 100%;"><div class="ol-unselectable ol-layers" style="position: absolute; width: 100%; height: 100%; z-index: 0;"><div class="ol-layer" style="position: absolute; width: 100%; height: 100%;"><canvas width="1920" height="1080" style="position: absolute; left: 0px; transform-origin: left top; transform: matrix(1, 0, 0, 1, 0, 0);"></canvas></div><div class="ol-layer-visualization" style="position: absolute; width: 100%; height: 100%;"><canvas width="1920" height="1080" style="position: absolute; left: 0px; transform-origin: left top; transform: matrix(1, 0, 0, 1, 0, 0); opacity: 0.9;"></canvas></div></div><div class="ol-overlaycontainer" style="position: absolute; z-index: 0; width: 100%; height: 100%; pointer-events: none;"></div><div class="ol-overlaycontainer-stopevent" style="position: absolute; z-index: 0; width: 100%; height: 100%; pointer-events: none;"></div></div></div><div class="absolute inset-0 z-[2] pointer-events-none bg-[#808080] opacity-10" style="mix-blend-mode: screen;"></div><div class="absolute top-4 left-4 right-4 z-50 "><div class="flex flex-row justify-between items-center sm:justify-start sm:gap-4"><div data-hide-tooltip="logo"><div class="flex items-center"><img src="/assets/dss_logo.png" alt="Dark Sky Sites" class="h-10 mr-2"><span class="text-white text-sm font-normal" style="text-shadow: rgb(0, 0, 0) 0px 0px 9px;">DarkSkySites</span></div></div><div class="flex items-center gap-2"><div class="relative flex items-center gap-2 z-[100]" data-hide-tooltip="true"><div class="relative w-[240px] md:w-[240px] sm:w-[204px] max-w-full"><div class="relative flex items-center w-full h-8"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-accent w-10 absolute left-0 h-full z-10 text-gray-400 hover:text-gray-400 transition-colors duration-200"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search h-3 w-3"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg></button><input type="text" placeholder="Search locations..." class="w-full text-sm pl-8 pr-8 py-0 h-8 bg-[rgba(30,30,30,0.6)] backdrop-blur-[9px] text-gray-100 border border-sidebar-border rounded-full shadow-md
+                      focus:outline-none focus:ring-1 focus:ring-sidebar-ring/70
+                      placeholder:text-gray-400 transition-colors duration-100" value="" style=""></div></div></div><div class="flex items-center gap-2 py-1 px-2 sm:px-3 ml-1 rounded-full border border-sidebar-border h-8 shadow-md" data-hide-tooltip="nav-controls" style="background-color: rgba(30, 30, 30, 0.6); backdrop-filter: blur(9px);"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-accent text-gray-400 hover:text-orange-400 transition-colors duration-200 h-6 w-6 p-0 cursor-help" aria-label="Enter GPS coordinates"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin h-3.5 w-3.5"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg></button><a href="/astronomy-calculators" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-orange-400 transition-colors duration-200 h-6 w-6 p-0 flex items-center justify-center" aria-label="Astronomy Calculator" data-testid="link-calculator" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calculator h-3.5 w-3.5"><rect width="16" height="20" x="4" y="2" rx="2"></rect><line x1="8" x2="16" y1="6" y2="6"></line><line x1="16" x2="16" y1="14" y2="18"></line><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 10h.01"></path><path d="M12 14h.01"></path><path d="M8 14h.01"></path><path d="M12 18h.01"></path><path d="M8 18h.01"></path></svg></a><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-accent hover:text-orange-400 transition-colors duration-200 h-6 w-6 p-0 cursor-help text-gray-400" disabled="" aria-label="Chart Sites" title="Add two or more sites to view charts"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chart-column h-3.5 w-3.5"><path d="M3 3v16a2 2 0 0 0 2 2h16"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path></svg></button></div></div><div class="flex items-center justify-center gap-2"><div class="flex items-center border border-sidebar-border rounded-full px-3 gap-2 h-8 cursor-pointer hover:bg-opacity-80 transition-colors shadow-md" data-hide-tooltip="imaging-time" style="background-color: rgba(30, 30, 30, 0.6); backdrop-filter: blur(9px);"><div class="text-[10.8px] text-gray-400">Imaging Time:</div><span class="text-[10.8px] text-orange-400 cursor-pointer hover:text-orange-300 imaging-time-pill-trigger" data-state="closed">1h</span></div></div></div></div><div class="absolute z-50 pointer-events-none" style="left: 960px; top: 540px; transform: translate(-50%, -50%); will-change: transform; backface-visibility: hidden;"><svg width="93.75" height="93.75" viewBox="0 0 93.75 93.75"><circle cx="46.875" cy="46.875" r="46.875" fill="#2196F3" opacity="0"></circle><circle cx="46.875" cy="46.875" r="46.875" fill="#2196F3" opacity="0"></circle><circle cx="46.875" cy="46.875" r="40.481249999999996" fill="#2196F3" opacity="0.062000000000000055"></circle><circle cx="46.875" cy="46.875" r="5.625" fill="#2196F3" stroke="#ffffff" stroke-width="1.5"></circle></svg><div class="absolute text-white text-xs px-2 py-1 rounded shadow-md whitespace-nowrap backdrop-blur-sm" style="left: 46.875px; bottom: 56.875px; transform: translateX(-50%); background-color: rgba(75, 85, 99, 0.7);">42.12448, -2.18794</div></div><div data-hide-tooltip="site-drawer"><div class="relative"><div class="bg-white rounded-lg p-4 mb-4 shadow-sm border"><h3 class="text-lg font-semibold mb-3">Site Thumbnails</h3><div class="text-center text-gray-500 text-sm py-4">Click on the map to create observation sites and see their thumbnails here</div></div><div class="site-drawer-container max-h-[calc(100vh+38px)] bg-transparent" data-hide-tooltip="true" style="position: absolute; top: -23px; right: 3px; z-index: 20; overflow: hidden auto; max-height: calc(38px + 100vh); height: auto; width: auto; min-width: 300px; transform-style: preserve-3d; background-color: transparent; box-shadow: none; backdrop-filter: none; border-radius: 7px; padding: 0px 0px 18px; touch-action: pan-y; will-change: transform; isolation: isolate;"></div></div></div><div class="fixed z-50 pointer-events-none" style="left: 8px; bottom: 44px; opacity: 0; transition: opacity 200ms ease-in-out;"><div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-sidebar-border shadow-md pointer-events-auto" style="background-color: rgba(30, 30, 30, 0.6); backdrop-filter: blur(9px);"><span class="w-2 h-2 rounded-full bg-transparent" style="box-shadow: none;"></span><span class="text-gray-300 text-[10.72px] leading-[16.08px]">SQM value validated 0 days ago</span></div></div><div data-hide-tooltip="footer"><div class="absolute left-2 right-2 z-50 flex gap-2 bottom-2" data-hide-tooltip="true"><button class="text-[10.72px] leading-[16.08px] text-gray-400 hover:text-white px-3 py-1.5 rounded-full border border-sidebar-border shadow-md flex items-center h-8 cursor-pointer hover:bg-black/40 transition-colors duration-200 gap-1.5 " type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="radix-:r7:" data-state="closed" style="background-color: rgba(30, 30, 30, 0.6); backdrop-filter: blur(9px); opacity: 1; pointer-events: auto;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers w-3 h-3"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"></path><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"></path><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"></path></svg>Visualisations</button><button class="text-[10.72px] leading-[16.08px] text-gray-400 hover:text-white px-3 py-1.5 rounded-full border border-sidebar-border shadow-md flex items-center h-8 cursor-pointer hover:bg-black/40 transition-colors duration-200 gap-1.5 " type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="radix-:rf:" data-state="closed" style="background-color: rgba(30, 30, 30, 0.6); backdrop-filter: blur(9px); opacity: 1;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock w-3 h-3"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>NOV. 2025</button><div class="text-[10.72px] leading-[16.08px] text-gray-400 hover:text-white px-3 py-1.5 rounded-full border border-sidebar-border shadow-md flex items-center h-8 cursor-pointer hover:bg-black/40 transition-colors duration-200" style="background-color: rgba(30, 30, 30, 0.6); backdrop-filter: blur(9px);"><span class="text-gray-400 text-[10px] mr-2 cursor-help" data-state="closed">Opacity</span><span dir="ltr" data-orientation="horizontal" aria-disabled="false" class="relative flex touch-none select-none items-center w-24 h-3 cursor-pointer" style="--radix-slider-thumb-transform: translateX(-50%);"><span data-orientation="horizontal" class="relative h-2 w-full grow overflow-hidden rounded-full bg-secondary cursor-pointer"><span data-orientation="horizontal" class="absolute h-full bg-primary cursor-pointer" style="left: 0%; right: 10%;"></span></span><span style="transform: var(--radix-slider-thumb-transform); position: absolute; left: calc(90% - 8px);"><span role="slider" aria-valuemin="0" aria-valuemax="100" aria-orientation="horizontal" data-orientation="horizontal" tabindex="0" class="block h-5 w-5 rounded-full border-2 border-primary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-grab active:cursor-grabbing" data-radix-collection-item="" aria-valuenow="90" style=""></span></span></span><span class="text-gray-400 text-[10px] ml-1 min-w-[20px] cursor-default">90%</span></div><button class="text-[10.72px] leading-[16.08px] text-gray-400 hover:text-white px-3 py-1.5 rounded-full border border-sidebar-border shadow-md flex items-center h-8 cursor-pointer hover:bg-black/40 transition-colors duration-200" data-state="closed" style="background-color: rgba(30, 30, 30, 0.6); backdrop-filter: blur(9px);"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings w-3 h-3 mr-1.5"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg><span>Settings</span></button><a href="/about" class="text-[10.72px] leading-[16.08px] text-gray-400 hover:text-white px-3 py-1.5 rounded-full border border-sidebar-border shadow-md flex items-center h-8 cursor-pointer hover:bg-black/40 transition-colors duration-200" style="background-color: rgba(30, 30, 30, 0.6); backdrop-filter: blur(9px);"><span>About</span></a><a href="/blog" class="text-[10.72px] leading-[16.08px] text-gray-400 hover:text-white px-3 py-1.5 rounded-full border border-sidebar-border shadow-md flex items-center h-8 cursor-pointer hover:bg-black/40 transition-colors duration-200 no-underline pointer-events-auto" data-hide-tooltip="true" data-testid="link-devblog" style="background-color: rgba(30, 30, 30, 0.6); backdrop-filter: blur(9px);"><span>World's Tiniest Dev Blog</span></a><div class="fixed top-0 left-0 h-full w-[500px] z-[100001] transform transition-transform duration-300 ease-in-out -translate-x-full" style="background-color: rgba(30, 30, 30, 0.7); backdrop-filter: blur(9px);"><div class="flex items-center justify-between p-6 border-b border-sidebar-border"><div class="flex items-center gap-3"><img src="/assets/dss_logo.png" alt="Dark Sky Sites" class="w-6 h-6"><h2 class="text-xl font-semibold text-white">World's Tiniest Dev Blog</h2></div><button class="text-gray-400 hover:text-white transition-colors p-1 rounded-md hover:bg-black/40"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div><div class="p-6 h-full overflow-y-auto pb-24"><div class="space-y-6"><article class="border-b border-gray-500/40 pb-6 last:border-b-0"><div class="mb-2"><time class="text-xs text-gray-500 font-mono">January 27, 2026</time></div><h3 class="text-lg font-medium text-white mb-3">Time Warp Implementation</h3><div class="text-gray-300 text-sm leading-relaxed"><p class="mb-3 last:mb-0">The longest-standing goal of the platform was to implement a method where the user can warp back and forwards through time to see the Earth and its anthropogenic lights changing over months and years. </p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">Today this feature was delivered! </p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">I invested heavily over the last few months to build a robust data pipeline that automates retrieval of VIIRS datasets (can be annual, monthly, daily) directly from NASA, performs all the calibration, normalization, and physics, then loads the data to the site for browsing. That pipeline is now fully operational. </p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">You can click the current date in the footer, which opens a shuttle where you can advance or rewind through time, or simply use the arrow keys on your keyboard. </p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">What's interesting is that you can observe the changing Earth. See fishing fleets moving seasonally in the Pacific, watch cities develop in India, see Iraq rebuild after conflict, note Ukraine sadly going dark, watch the expansion of Dubai, observe France's shift to low-emission lighting, see gas platforms switch on and off, watch the coming and going of mining operations in remote areas... All super cool. </p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">Currently the data is relatively sparse, most of 2025, and Januaries for preceding years. But I'll continually compute and load the intermediate data over the coming weeks. There's a lot - tens of gigabytes, and the compute takes time to process. The pipeline is robust now, so it's a mostly automated endeavour from this point on. </p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">I hope you enjoy this new development. </p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">Clear skies!</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">Barrington</p></div></article><article class="border-b border-gray-500/40 pb-6 last:border-b-0"><div class="mb-2"><time class="text-xs text-gray-500 font-mono">December 28, 2025</time></div><h3 class="text-lg font-medium text-white mb-3">Major new model updates - LUMIX + LFCC</h3><div class="text-gray-300 text-sm leading-relaxed"><p class="mb-3 last:mb-0">Over the past few months I’ve been rebuilding the light pollution physics engine behind DarkSkySites from the ground up. This post documents where it landed, why the rewrite was necessary, and what problems the new model is explicitly designed to solve.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">This is not a blur-based visualization, nor a reskin of VIIRS or legacy atlases. It is a Garstang-class atmospheric light propagation model, implementing radiative-transfer–based scattering physics in a form that remains computationally viable at global scale.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">**Why the original model hit a ceiling**</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">The previous engine formulated the problem in an observer-centric framework, explicitly integrating atmospheric scattering toward each output location. That formulation is physically valid, and it works well at small scales.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">However, it reaches a ceiling when modeling:</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">- extended sources</p><p class="mb-3 last:mb-0">- integrated flux</p><p class="mb-3 last:mb-0">- horizon-scale emission geometry</p><p class="mb-3 last:mb-0">- second-order scattering across large domains</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">Once realistic horizon glow and secondary scattering are introduced, the formulation becomes increasingly constrained. Preserving physical consistency across regional and continental scales becomes difficult, not because the physics is wrong, but because the structure of the solver cannot represent those effects cleanly.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">The rewrite was not motivated by performance alone. It was motivated by model accuracy.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">**Design goals**</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">The new engine was built around a small set of non-negotiable goals:</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">- preserve physically meaningful scattering behavior</p><p class="mb-3 last:mb-0">- preserve long-range horizon glow</p><p class="mb-3 last:mb-0">- preserve altitude and atmospheric structure</p><p class="mb-3 last:mb-0">- enable physically consistent behavior at global scale</p><p class="mb-3 last:mb-0">- remain stable under iterative calibration</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">**The new approach**</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">The new model reformulates light propagation in a source-centric, spatially invariant framework, enabling integrated source flux, emission geometry, and horizon-scale scattering behavior to be represented explicitly within the radiative transfer formulation.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">Instead of asking “what does each observer see?”, the model asks “how does light physically spread across the surface?”</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">At its core is a zenith-integrated Garstang-class scattering kernel that explicitly models:</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">- Rayleigh and Mie scattering</p><p class="mb-3 last:mb-0">- forward-peaked aerosol phase functions</p><p class="mb-3 last:mb-0">- vertical atmospheric density profiles</p><p class="mb-3 last:mb-0">- altitude via a global digital elevation model, with functional (but currently basic) terrain shielding</p><p class="mb-3 last:mb-0">- Earth curvature, which becomes significant beyond ~150 km</p><p class="mb-3 last:mb-0">- non-isotropic urban emission (sideways leakage vs vertical emission)</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">The engine implementing this formulation is called LUMIX.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">**What this fixes**</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">Early testing of the previous engine revealed two persistent issues when compared against ground-based measurements:</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">- light from small settlements propagated too far</p><p class="mb-3 last:mb-0">- light from large cities failed to build sufficiently extended domes</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">This was not a tuning problem. It was a structural limitation of the propagation model.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">The earlier formulation treated all sources too similarly in how they spread light horizontally. That assumption breaks down once source extent and total flux matter.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">In LUMIX, integrated source flux and spatial extent are intrinsic to propagation.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">As a result:</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">- small settlements naturally produce compact, rapidly decaying glows</p><p class="mb-3 last:mb-0">- large urban regions produce broad, layered domes with realistic far-field behavior</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">This behavior is not imposed heuristically and does not rely on thresholds. It emerges directly from:</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">- flux-aware source integration</p><p class="mb-3 last:mb-0">- sideways emission profiling</p><p class="mb-3 last:mb-0">- geometry-aware scattering and extinction</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">The earlier “small towns glow too much” failure mode disappears because the physics no longer permits it.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">**Additional physics upgrades**</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">Beyond the new propagation formulation, LUMIX incorporates several major upgrades:</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">**Earth curvature**</p><p class="mb-3 last:mb-0">Flat-Earth assumptions quietly fail at long range. The kernel integration now includes curvature-induced horizon drop and terrain shadowing, significantly improving distant glow realism.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">**DEM-aware altitude attenuation**</p><p class="mb-3 last:mb-0">High-altitude sources propagate differently, and high-altitude observers see less low-level glow. Altitude attenuation is applied both before and after propagation using a DEM aligned to the VIIRS grid.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">**Rayleigh + Mie balance**</p><p class="mb-3 last:mb-0">Scattering integrals explicitly include Rayleigh and Henyey–Greenstein Mie terms with tunable scale heights and asymmetry. This is not a generic blur kernel.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">**Controlled second-order scattering**</p><p class="mb-3 last:mb-0">Instead of a full second radiative transfer solve (physically appealing but numerically unstable), secondary scattering is modeled as a constrained, low-frequency energy reinjection based on single-scatter albedo and zenith probability. This produces realistic skyglow buildup without runaway amplification.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">**Aerosol coupling**</p><p class="mb-3 last:mb-0">The model can interpolate between “clear” and “murky” atmospheric kernels using CAMS aerosol optical depth data, allowing regional atmospheric conditions to influence glow extent and shape. CAMS datasets can be reintegrated on demand.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">**Stability and repeatability**</p><p class="mb-3 last:mb-0">The propagation model remains stable and physically consistent at local, continental, and global scales, enabling frequent recomputation and time-resolved sky brightness analysis rather than reliance on static atlases.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">**Performance and update cadence**</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">Because the physics has been reformulated, the system is operational rather than academic.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">In practice:</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">- global recomputation completes in ~3–4 hours on desktop-class hardware</p><p class="mb-3 last:mb-0">- VIIRS data can be ingested automatically every 24 hours-</p><p class="mb-3 last:mb-0">- the pipeline is fully automated end-to-end</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">Daily global maps are therefore technically trivial to produce.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">However, accuracy matters more than frequency.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">The current rollout plan is:</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">- monthly updates initially</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">- weekly updates once calibration stabilizes</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">- daily updates later if confidence and community appetite justify it</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">**LLFC: Local Light Field Calibration**</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">The most important system-level addition is LLFC (Local Light Field Calibration).</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">Most light pollution maps are static. Once published, their assumptions are frozen. If they are locally wrong, they cannot learn.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">LLFC changes that.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">It allows a physically based scattering model to be continuously constrained using empirical sky brightness measurements, without overriding the underlying radiative transfer physics. To my knowledge, no existing global light pollution map operates this way.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">At present, LLFC ingests SQM (Sky Quality Meter) measurements only, from both fixed stations and handheld devices. This choice is deliberate: SQM provides a well-characterized, instrument-based, quantitatively comparable measurement regime.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">SQM data is used to locally and regionally constrain:</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">- effective scattering strength</p><p class="mb-3 last:mb-0">- aerosol influence</p><p class="mb-3 last:mb-0">- secondary scattering contribution</p><p class="mb-3 last:mb-0">- near-horizon glow behavior via terrain shielding</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">No single site can rewrite the map. Repeated, independent measurements allow convergence where global assumptions break down.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">Users can also provide location-specific qualitative feedback (thumbs-up / thumbs-down with context). These signals do not directly modify the physics, but flag regions requiring closer evaluation.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">Support for real-time SQM sensor feeds is planned.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">The division of responsibility is explicit:</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">LUMIX defines physical propagation behavior</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">LLFC anchors that behavior empirically</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">Together, they form a living, community-calibrated physical model.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">**Current status**</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">The model is currently in beta and undergoing active calibration.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">Discrepancies between modeled and observed sky brightness are expected at this stage and are valuable. Submitting SQM data via the “Submit SQM” function directly improves the model locally and regionally.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">This is not a finished static product. It is a physically grounded system designed to improve through real observation and frequent recomputation.</p></div></article><article class="border-b border-gray-500/40 pb-6 last:border-b-0"><div class="mb-2"><time class="text-xs text-gray-500 font-mono">July 8, 2025</time></div><h3 class="text-lg font-medium text-white mb-3">An update on new models</h3><div class="text-gray-300 text-sm leading-relaxed"><p class="mb-3 last:mb-0">A huge thank-you to everyone who's submitted SQM readings and brightness anomalies recently. As mentioned previously, these discrepancies arise from limitations in the current propagation model.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">The good news is that I've made substantial progress on a new volumetric simulation that produces more accurate results, correctly integrating total flux over spatially extended urban areas. </p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">The current model relies on Fast Fourier Transforms to estimate scattering. While efficient, this approach is not sufficient to fully capture the complexity of atmospheric radiative transfer. As a result, I rebuilt the core propagation system from scratch. The next release will include a significantly more advanced framework with the following properties:</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">- Physically accurate molecular and aerosol treatment for Rayleigh and Mie scattering.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">- Full radiative transfer computation over a multi-layer 50km volumetric atmosphere. </p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">- Phase-dependent directional extinction based on Garstang models. </p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">- Integrated flux computation at both local and regional scales.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">- Observer-centric, two-bounce, double-integration model for realistic sky rendering.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">I am currently in the final stages of testing the new pipeline and expect to ship a test update within the next two weeks. The daily map update is paused until the upgraded system is ready.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">Thank you for your continued support.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">Barrington</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">@baz_astra</p></div></article><article class="border-b border-gray-500/40 pb-6 last:border-b-0"><div class="mb-2"><time class="text-xs text-gray-500 font-mono">June 19, 2025</time></div><h3 class="text-lg font-medium text-white mb-3">Notes on DarkSkySites 2.0</h3><div class="text-gray-300 text-sm leading-relaxed"><p class="mb-3 last:mb-0">DSS version 2 has generated far more interest than I anticipated since launching yesterday. I am genuinely overwhelmed by the support, feedback, and calibration data many of you have already shared. I am deeply grateful for every message and contribution.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">DarkSkySites is a one-person project, squeezed between my day job, and time spent pondering the correct backfocus for my EdgeHD. As you might imagine, there aren't enough hours in the day!</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">A few notes about the v2 release today:</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">1. Converting absolute radiance to SQM and Bortle scales is non-trivial. The mapping must remain valid across a wide range of environmental conditions, and I'm working to refine the mapping using real-world calibration.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">2. DSS uses a custom light propagation algorithm that scatters ground-based VIIRS radiance into the atmosphere. This is the physics that produces skyglow around cities. Based on community feedback and photometric validation, it is clear that the current model over-propagates light from small settlements and under-propagates light from major metropolitan areas. This explains, for example, why the Midwestern United States appears too bright and why Europe, especially the Netherlands, is under-reported.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">I have traced the issue to an overly aggressive convolution kernel within the radiative transfer pipeline that computes skyglow from the VIIRS upward radiance. I will continue to fine-tune this kernel so the propagation more accurately reflects measured reality.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">All light propagation models are ultimately approximations, and I expect to converge on a robust general solution in the coming weeks. </p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">3. The All-Sky LP Simulator is still in its infancy. To the best of my knowledge it's a world-first, so there was no precedent to follow. Even so, I hope you find it both useful and exciting. There are a few issues with the sliders that I am resolving, since the rendering engine has been temperamental following the 2.0 upgrade.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">In the longer term, the simulator will be replaced by APEX, an experimental atmospheric physics engine. APEX uses a more accurate scattering shader and will generate physically realistic skyglow that accounts for horizon extinction, beyond-horizon scattering, Earth curvature, lunar contamination, and other atmospheric effects.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">Finally, special thanks to my good friends Rene Fonteijn, without whose pub brainstorming sessions, this project likely wouldn't exist - and to my almost-CTO, Ashik Salahudeen, to whom I dedicate this website as a monument to his indolent magnificence. </p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">Clear skies,</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">Barrington</p></div></article><article class="border-b border-gray-500/40 pb-6 last:border-b-0"><div class="mb-2"><time class="text-xs text-gray-500 font-mono">June 18, 2025</time></div><h3 class="text-lg font-medium text-white mb-3">Where does the data come from?</h3><div class="text-gray-300 text-sm leading-relaxed"><p class="mb-3 last:mb-0">A common question I receive is about the origin of the data used on DarkSkySites and how it is applied throughout the platform.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">DSS currently relies on the VNP46A1 Daily Gridded DNB Band dataset, providing VIIRS nighttime radiance at 500 meter resolution. </p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">This data is downloadable from NASA every 24 hours. Once retrieved, the data is processed through a custom geospatial pipeline, that also reprojects the map to WebMercator using GDAL. </p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">After reprojection, light sources are propagated through a virtual atmosphere using a set of multi-scale halo convolution kernels that compute zenith radiance for every map pixel as a consequence of atmospheric scattering.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">These kernels approximate the radiative transfer physics in Garstang's work, and build upon refinements described by Cinzano and Falchi. Radiative transfer modelling underpins all attempts at realistic light pollution simulation, so finding an accurate and efficient implementation has been central to the development of DSS. </p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">The current scattering algorithm is a high-performance Fast Fourier Transform written in Python. It's computationally intensive; taking around 80 hours to model the whole world.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">Optimizing these models has taken significant time, and I continue to refine the solution as I learn more about the behavior and limitations of the output.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">VIIRS data comes with instrinsic constraints. The sensor cannot reliably distinguish between artificial light and certain natural albedo features, including snow, ice, frost, and wildfire activity. As a result, seasonal snow cover may produce bright artefacts at high latitudes, and wildfires can appear as isolated glowing regions in areas with little or no permanent population.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">If necessary, DSS may transition to the VIIRS monthly composite products, which include more effective masking for snow and fire contamination.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">On a broader note, it was important to me not to simply copy existing light pollution maps, as most websites do. </p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">Building my own data pipeline and propagation model was a core goal of this project. Rather than duplicating the work of LightPollutionMap or Lorenz, I wanted DSS to perform real physics and implement data architectures capable of calculating these phenomena natively and on demand. </p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">The models are still evolving, but I believe that the long-term investment in mathematical rigor, once fully calibrated, will be worth it.</p><p class="mb-3 last:mb-0"></p><p class="mb-3 last:mb-0">Thank you for your patience as the models continue to mature.</p></div></article></div></div></div></div></div><div class="fixed pointer-events-none z-[30] rounded-lg" style="left: 975px; top: 555px; background-color: rgba(30, 30, 30, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(100, 100, 100, 0.3); padding: 8px 10px; font-size: 11px; display: block;"><div class="flex flex-col gap-0.5"><div class="flex items-center"><span class="text-gray-400 w-[70px]">SQM:</span><span class="text-white font-medium">21.56</span><span class="ml-1.5 w-1.5 h-1.5 rounded-full bg-transparent" data-testid="indicator-verified-tooltip" style="opacity: 0; transition: opacity 300ms ease-in-out; box-shadow: none;"></span></div><div class="flex"><span class="text-gray-400 w-[70px]">Bortle:</span><span class="text-white">3~</span></div><div class="flex"><span class="text-gray-400 w-[70px]">Darkness:</span><span class="text-white">85.0%</span></div><div class="mt-1"><div class="flex items-center mb-0.5"><span class="text-gray-400" style="font-size: 10px;">Observing Quality</span></div><div class="w-full h-1.5 bg-gray-700 rounded-sm overflow-hidden"><div class="h-full rounded-sm" style="background-color: rgb(16, 185, 129); width: 85.0348%;"></div></div></div><div class="my-1" style="height: 1px; background-color: rgba(156, 163, 175, 0.3);"></div><div class="text-center text-gray-400" style="font-size: 10px;">42.12°N, 2.19°W</div></div></div></div></main><div role="region" aria-label="Notifications (F8)" tabindex="-1" style="pointer-events: none;"><ol tabindex="-1" class="fixed bottom-[9%] left-1/2 -translate-x-1/2 z-[100] flex max-h-screen flex-col-reverse p-4"></ol></div></div>
+  
+<iframe id="_hjSafeContext_99386068" title="_hjSafeContext" tabindex="-1" aria-hidden="true" src="about:blank" style="display: none !important; width: 1px !important; height: 1px !important; opacity: 0 !important; pointer-events: none !important;"></iframe></body></html>

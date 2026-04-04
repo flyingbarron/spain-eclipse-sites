@@ -1,0 +1,4 @@
+code,denominacion,url,valor_turistico,confidencialidad,route_difficulty,latitude,longitude,eclipse_visibility,status,cloud_coverage,cloud_status,cloud_url,horizon_status,shademap_status,darksky_sqm,darksky_bortle,darksky_darkness,darksky_status
+IB200B,La Magdalena,https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200B,3.5,Public,Medium,42.124479,-2.187944,unknown,success,,not_checked,,success,not_checked,21.56,3,85.0,success
+IB200C,Los Cayos A,https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200C,6,Public,Low,42.084398,-2.088449,not_visible,success,32,success,"https://www.timeanddate.com/eclipse/in/@42.084398,-2.088449?iso=20260812",success,success,21.52,3,83.8,success
+IB200D,Los Cayos B,https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200D,3.1,Public,Medium,42.083378,-2.085237,,success,32,success,"https://www.timeanddate.com/eclipse/in/@42.083378,-2.085237?iso=20260812",,success,21.45,3,81.7,success

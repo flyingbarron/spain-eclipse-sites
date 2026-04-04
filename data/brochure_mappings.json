@@ -1,0 +1,47 @@
+{
+  "source_site": "https://dinosauriosdelarioja.com/",
+  "download_dir": "data/brochures",
+  "brochures": [
+    {
+      "site_codes": ["IB200i"],
+      "title": "Valdecevillo",
+      "source_url": "http://dinosauriosdelarioja.com/wp-content/uploads/2022/09/VALDECEVILLO.pdf",
+      "filename": "IB200i_valdecevillo.pdf"
+    },
+    {
+      "site_codes": ["IB200j"],
+      "title": "Virgen del Campo",
+      "source_url": "http://dinosauriosdelarioja.com/wp-content/uploads/2022/09/VIRGEN-DEL-CAMPO.pdf",
+      "filename": "IB200j_virgen-del-campo.pdf"
+    },
+    {
+      "site_codes": ["IB200k"],
+      "title": "El Villar-Poyales",
+      "source_url": "http://dinosauriosdelarioja.com/wp-content/uploads/2022/09/EL-VILLAR-POYALES.pdf",
+      "filename": "IB200k_el-villar-poyales.pdf"
+    },
+    {
+      "site_codes": ["IB200l", "IB200m"],
+      "title": "Peñaportillo y La Canal",
+      "source_url": "http://dinosauriosdelarioja.com/wp-content/uploads/2022/09/PEN%CC%83APORTILLO-Y-LA-CANAL.pdf",
+      "filename": "IB200l-IB200m_penaportillo-y-la-canal.pdf"
+    },
+    {
+      "site_codes": ["IB200t"],
+      "title": "La Senoba",
+      "source_url": "http://dinosauriosdelarioja.com/wp-content/uploads/2022/09/LA-SENOBA.pdf",
+      "filename": "IB200t_la-senoba.pdf"
+    },
+    {
+      "site_codes": ["IB200u"],
+      "title": "Navalsaz",
+      "source_url": "http://dinosauriosdelarioja.com/wp-content/uploads/2022/09/NAVALSAZ.pdf",
+      "filename": "IB200u_navalsaz.pdf"
+    },
+    {
+      "site_codes": ["IB257"],
+      "title": "Cuesta de Andorra",
+      "source_url": "http://dinosauriosdelarioja.com/wp-content/uploads/2022/09/LA-CUESTA-DE-ANDORRA.pdf",
+      "filename": "IB257_la-cuesta-de-andorra.pdf"
+    }  ]
+}

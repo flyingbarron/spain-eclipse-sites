@@ -22,6 +22,23 @@ export class AppState {
         this.currentRouteControl = null;
         this.routeSegments = [];
         
+        // Favorites state
+        this.favorites = [];
+        this.showFavoritesOnly = false;
+        
+        // Clean up old trip data from localStorage
+        this.cleanupTripData();
+        
+        // Advanced filter state
+        this.advancedFilters = {
+            touristValueMin: 0,
+            touristValueMax: 10,
+            cloudCoverageMax: 100,
+            bortleMax: 9,
+            distanceMax: null,
+            routeDifficulty: []
+        };
+        
         // Subscribers for state changes
         this.subscribers = [];
     }
@@ -139,6 +156,39 @@ export class AppState {
     }
     
     /**
+     * Set favorites filter
+     * @param {boolean} value - Whether to show favorites only
+     */
+    setShowFavoritesOnly(value) {
+        this.showFavoritesOnly = value;
+        this.notify('showFavoritesOnly', value);
+    }
+    
+    /**
+     * Set advanced filters
+     * @param {Object} filters - Filter values
+     */
+    setAdvancedFilters(filters) {
+        this.advancedFilters = { ...this.advancedFilters, ...filters };
+        this.notify('advancedFilters', this.advancedFilters);
+    }
+    
+    /**
+     * Reset advanced filters to defaults
+     */
+    resetAdvancedFilters() {
+        this.advancedFilters = {
+            touristValueMin: 0,
+            touristValueMax: 10,
+            cloudCoverageMax: 100,
+            bortleMax: 9,
+            distanceMax: null,
+            routeDifficulty: []
+        };
+        this.notify('advancedFilters', this.advancedFilters);
+    }
+    
+    /**
      * Get site by code
      * @param {string} code - Site code
      * @returns {Object|null} Site object or null
@@ -154,6 +204,18 @@ export class AppState {
      */
     isSiteSelected(code) {
         return this.selectedSites.includes(code);
+    }
+    
+    /**
+     * Clean up old trip data from localStorage
+     */
+    cleanupTripData() {
+        try {
+            localStorage.removeItem('eclipse-trips');
+            console.log('Cleaned up old trip data from localStorage');
+        } catch (error) {
+            console.warn('Could not clean up trip data:', error);
+        }
     }
 }
 

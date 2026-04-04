@@ -1,0 +1,388 @@
+
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <head><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="author" content="Instituto Geológico y Minero de España" /><meta name="keywords" content="IGME, Instituto Geológico y Minero de España, Spanish Geological Survey, cartografía,  mapas, maps, wms, servicios, services, bases de datos, databases, documentos, documents, metadatos, metadata, geología, geology, hidrogeología, hydrogeology, recursos minerales, mineral resources, riesgos geológicos, procesos activos, cambio global, geología del subsuelo, almacenamiento geológico de CO2, geodiversidad, patrimonio geológico, patrimonio minero, cultura científica, terremotos, earthquakes" /><title>
+	IELIG - IB200k: Icnitas de dinosaurio del Weald de Cameros (La Rioja). Yacimiento de El Villar-Poyales
+</title><link href="./images/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+    <meta property="og:type" content="website" />
+
+
+
+       <style>
+        #myBtn {
+          display: none;
+          position: fixed;
+          bottom: 20px;
+          right: 30px;
+          z-index: 99;
+          border: 1px solid #ddd;
+          border-radius: 10px;
+          outline: none;
+          color: white;
+          cursor: pointer;
+          padding: 15px;
+          background-color: #ffffff;
+          color: #f5f5f5;
+        }
+
+        #myBtn:hover {
+          background-color: #f5f5f5;
+        }
+
+    </style>
+
+
+
+     
+     <!-- Google tag (gtag.js) -->
+     <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZX5SY9EZH2"></script>
+     <script> 
+         window.dataLayer = window.dataLayer || [];
+         function gtag() { dataLayer.push(arguments); }
+         gtag('js', new Date());
+         gtag('config', 'G-ZX5SY9EZH2');
+     </script>
+
+
+    <link rel="stylesheet" href="https://info.igme.es/bootstrap/4.1.3-dist/css/bootstrap.min.css" />
+    <!--<link rel="stylesheet" href="https://info.igme.es/bootstrap/4.1.3-dist/css/docs.css" />    -->
+
+    <!-- Fuentes -->
+    <link href="https://fonts.googleapis.com/css?family=BenchNine" rel="stylesheet" /><link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" /><link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300" rel="stylesheet" />
+
+    <!-- Scrollbar Custom CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css" /><link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin="" /><link rel="stylesheet" href="https://unpkg.com/leaflet.pm@latest/dist/leaflet.pm.css" />
+   
+
+     <style>
+
+        body {
+		  font-family: 'Roboto', sans-serif;
+		}
+
+
+		h1, h2, h3, h4, h5, h6 {
+		    font-family: 'BenchNine', sans-serif;
+		}
+
+         #map {
+            max-height: 500px;
+            height: 100vh;
+            width: 100%;
+            padding: 0px;
+            margin: 0px;
+        }
+
+        .breadcrumb {
+           padding: 2px 0px !important;
+           background-color: transparent;
+        }
+
+        .breadcrumb-item +.breadcrumb-item::before {
+                display: inline-block;
+                padding-right: .5rem;
+                padding-left: .5rem;
+                color: #868e96;
+                content: "»";
+        }
+
+        .carousel .carousel-indicators li {background-color: darkgray;}
+        .carousel .carousel-indicators li.active {background-color: black;}
+
+       .cabecera {
+            /*margin-top: -20px;*/
+            background: gray;
+        }
+        .recortarCenefa {
+            margin-top: -56px;
+            margin-left: 382px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .InfoCabecera {
+            margin-top: -50px;
+            margin-left: 63%;
+            width: 35%;
+            float: left;
+            position: relative;
+            z-index: 4;
+        }
+
+        @font-face{font-family:'Almagro';src:url('./fonts/Almagro.eot');src:url('./fonts/Almagro.eot?#iefix')format('embedded-opentype'),url('./fonts/Almagro.woff2')format('woff2'),url('./fonts/Almagro.woff')format('woff'),url('./fonts/Almagro.ttf')format('truetype'),url('./fonts/Almagro.svg#Almagro')format('svg');font-weight:100;font-style:normal;}
+
+        .imglogo {
+            max-height: 20px!important;
+            width: auto;
+            /*margin-top: -7px;
+            margin-left: 15px;*/
+            display: inline;
+        }
+
+        .logoPeque {
+	        display: none;
+        }
+
+        .logoInfoIGME {
+            font-family: 'Almagro';
+            font-size: xx-large;
+            color: #fff;
+            float: right;
+        }
+     </style>
+
+<meta name="twitter:card" content="summary_large_image" /><meta name="twitter:site" content="@ApadrinaUnaRoca" /><meta name="twitter:url" content="http://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200k" /><meta name="twitter:title" content="IELIG - IB200k: Icnitas de dinosaurio del Weald de Cameros (La Rioja). Yacimiento de El Villar-Poyales" /><meta name="twitter:description" content="Este afloramiento es de los primeros que se descubrió y publicó desde el ámbito científico (Casanovas y Santafé, 1974; Brancas et al., 1979), motivo por el cual tiene un alto valor histórico. Dentro de la denominación de El Villar-Poyales se agrupan seis niveles icnológicos que se localizan en dos áreas próximas separadas apenas 50 m una de otra. El yacimiento de El Villar (1EVP en la nomenclatura) es un yacimiento que contiene unas 21 huellas que forman tres rastros principales (Viera y Torres, 1979) en el techo de un estrato de calizas tipo mudstone organógena masiva, con grietas de desecación y presencia de ostrácodos (Hernán, 2018). Los rastros corresponden a dinosaurios terópodos de talla media (30-35 cm de longitud). En la sección 2EVP hay otro par de icnitas de terópodos de pequeño tamaño, en torno a los 18-20 cm de longitud y algunas otras icnitas aisladas.En el yacimiento a 50 m de este en la misma carretera, mas próximo a Poyales, se han contabilizado 103 icnitas que forman 15 rastros, más otras 20 icnitas aisladas (Casanovas te al., 1998). Estas icnitas están en un estrato de calizas micríticas muy bioturbadas, con abundantes ostrácodos y un alto contenido en materia orgánica (Hernán, 2018). La serie, en conjunto, se ha interpretado como un ambiente litoral en un sistema lacustre siliciclástico, próximo a la desembocadura de un delta, con retrabajamiento por el oleaje y un gran aporte de materia orgánica. " /><meta name="twitter:image" content="https://info.igme.es/ielig/documentacion/ib/ib200k/fotos/f-ib200k-01_web.jpg" /></head>
+
+<body>
+
+    <A id="Arriba" />
+
+
+     <!-- Fixed navbar -->
+      
+   
+    <form name="aspnetForm" method="post" action="./LIGInfo.aspx?codigo=IB200k" id="aspnetForm">
+<div>
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwUJNDQyNTM3NDcyZGRiFj4FqZn2Jf7jomVVFN/6DN2bnq9fBiRJqUXZbXbg0A==" />
+</div>
+
+<div>
+
+	<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="95CB9F6C" />
+</div>
+    <div>
+        
+    
+    <div id="myBtn"><a href="#top" title="Ir a arriba">Arriba</a></div>
+
+    <div class="container">
+        <?xml version="1.0" encoding="utf-8"?><a name="top"></a><h3 class="mb-0 mt-2">Inventario Español de Lugares de Interés Geológico</h3><ol class="breadcrumb"><li class="breadcrumb-item pl-0"><a href="http://www.igme.es">IGME</a></li><li class="breadcrumb-item pl-0"><a href="https://info.igme.es" title="Información Geocientífica del IGME">InfoIGME</a></li><li class="breadcrumb-item pl-0"><a target="_blank" href="default.aspx" title="Inventario de Lugares de Interés Geológico">IELIG</a></li><li class="breadcrumb-item pl-0 active">IB200k</li></ol><div class="jumbotron py-3"><h1 class="mb-0">IB200k</h1><p class="lead mb-0">Icnitas de dinosaurio del Weald de Cameros (La Rioja). Yacimiento de El Villar-Poyales</p></div><nav><div class="nav nav-tabs" id="nav-tab" role="tablist"><a class="nav-item nav-link active" id="ficha-tab" data-toggle="tab" href="#ficha" role="tab" aria-controls="nav-apadrinamientos" aria-selected="true">Ficha LIG</a><a class="nav-item nav-link" id="apadrina-tab" data-toggle="tab" href="#apadrina" role="tab" aria-controls="nav-datos" aria-selected="false">Apadrina este LIG</a></div></nav><div class="tab-content border border-top-0 p-3 mb-4"><div role="tabpanel" class="tab-pane active" id="ficha"><ul id="markdown-toc"><li><a href="#generales">Datos generales del LIG</a></li><li><a href="#localizacion">Localización</a></li><li><a href="#fisiografia">Fisiografía</a></li><li><a href="#situaciongeologica">Situación geológica</a></li><li><a href="#interes">Interés</a></li><li><a href="#proteccion">Protección</a></li><li><a href="#usoseguimiento">Uso y seguimiento</a></li><li><a href="#visitas">Visitas</a></li><li><a href="#documentacion">Documentación</a></li><li><a href="#autores">Autores</a></li><li><a href="#yacimientospaleontologicos">Yacimientos Paleontológicos</a></li><li><a href="#valoraciones">Valoraciones</a></li></ul><a name="generales"></a><h2>Datos generales</h2><dl class="dl-horizontal"><dt>Código LIG :</dt><dd>IB200k.
+      </dd><dt>Código Geosite :</dt><dd>FC001k.
+      </dd><dt>Denominación :</dt><dd>Icnitas de dinosaurio del Weald de Cameros (La Rioja). Yacimiento de El Villar-Poyales.
+      </dd><dt>Descripción :</dt><dd class="text-justify"><DATA>Este afloramiento es de los primeros que se descubrió y publicó desde el ámbito científico (Casanovas y Santafé, 1974; Brancas et al., 1979), motivo por el cual tiene un alto valor histórico. Dentro de la denominación de El Villar-Poyales se agrupan seis niveles icnológicos que se localizan en dos áreas próximas separadas apenas 50 m una de otra. <br/>El yacimiento de El Villar (1EVP en la nomenclatura) es un yacimiento que contiene unas 21 huellas que forman tres rastros principales (Viera y Torres, 1979) en el techo de un estrato de calizas tipo mudstone organógena masiva, con grietas de desecación y presencia de ostrácodos (Hernán, 2018). Los rastros corresponden a dinosaurios terópodos de talla media (30-35 cm de longitud). En la sección 2EVP hay otro par de icnitas de terópodos de pequeño tamaño, en torno a los 18-20 cm de longitud y algunas otras icnitas aisladas.<br/>En el yacimiento a 50 m de este en la misma carretera, mas próximo a Poyales, se han contabilizado 103 icnitas que forman 15 rastros, más otras 20 icnitas aisladas (Casanovas te al., 1998). Estas icnitas están en un estrato de calizas micríticas muy bioturbadas, con abundantes ostrácodos y un alto contenido en materia orgánica (Hernán, 2018). <br/>La serie, en conjunto, se ha interpretado como un ambiente litoral en un sistema lacustre siliciclástico, próximo a la desembocadura de un delta, con retrabajamiento por el oleaje y un gran aporte de materia orgánica. </DATA></dd><dt>Origen LIG :</dt><dd>Proyecto Global Geosites</dd><dt title="Fecha de creacion de la ficha">Fecha de creación de la ficha :</dt><dd>31/12/2007</dd><dt>Confidencialidad :</dt><dd>Público.
+      </dd><dt title="Usos, costumbres y conocimientos tradicionales del entorno">Usos y costumbres :</dt><dd>Arquitectura popular<br />Ganadero<br /></dd></dl><a name="localizacion"></a><br /><h2>Localización</h2><div id="map" class="col-12"></div><br /><dl class="dl-horizontal"><dt>Hojas 1:50.000 :</dt><dd><div class="table-responsive"><table class="table table-condensed"><tr style="background-color: #D7D7D7"><th> Nombre </th><th> Numero </th><th> Hoja 1:200.000 </th></tr><tr><td>
+                   ENCISO 
+                </td><td>
+                   280   
+                </td><td>
+                   21 - LOGRONO 
+                </td></tr></table></div></dd><dt>Paraje :</dt><dd>Barranco de la Fuente de Abajo.
+      </dd><dt>Municipios :</dt><dd><div class="table-responsive"><table class="table table-condensed"><tr style="background-color: #D7D7D7"><th> Núcleo </th><th> Municipio </th><th> Provincia </th><th> CCAA </th></tr><tr><td class="NumberRecord">
+                   El Villar-Poyales 
+                </td><td class="NumberRecord">
+                   ENCISO 
+                </td><td class="NumberRecord">
+                   La Rioja 
+                </td><td class="NumberRecord">
+                   La Rioja 
+                </td></tr></table></div></dd><tr><dt>Itinerario de acceso :</dt><dd class="text-justify"><DATA>El yacimiento está ubicado en la misma carretera LR-286 entre las localidades del El Villar y Poyales, en el km 4,5. Está señalizado. Está dentro del GR93 de la Ruta de los dinosaurios de La Rioja.</DATA></dd></tr></dl><a name="fisiografia"></a><br /><h2>Fisiografía</h2><dl class="dl-horizontal"><dt>Cota máxima :</dt><dd>893 m.
+              </dd><dt>Cota mínima :</dt><dd>897 m.
+              </dd><dt>Cota media :</dt><dd>895 m.
+              </dd><dt Title="Superficie aproximada">Superficie :</dt><dd>0.19 hectáreas.
+                </dd><dt>Tipo/s de superficie :</dt><dd>Rocosa.<br />Matorral.<br /></dd></dl><a name="situaciongeologica"></a><br /><h2>Situación geológica</h2><dl class="dl-horizontal"><dt title="Dominio geológico (GEODE)">Dominio geológico (GEODE) :</dt><dd>Cordillera Ibérica.
+      </dd><dt title="Unidad geotectónica 2º orden">Unidad geotectónica 2º orden :</dt><dd>Rama Aragonesa (Cameros).
+      </dd><dt title="Contexto Ley 42/2007">Contexto Ley 42/2007 :</dt><dd>Fósiles e icnofósiles del Mesozoico continental de la Península Ibérica.
+      </dd><dt title="Unidad geológica Ley 42/2007">Unidad geológica Ley 42/2007 :</dt><dd>Estructuras y formaciones del basamento, unidades alóctonas y cobertera de las Cordilleras Alpinas.
+      </dd><dt title="Edad rasgo inferior">Edad rasgo inferior :</dt><dd>Aptiense.
+      </dd><dt title="Edad encajante inferior">Edad encajante inferior :</dt><dd>Aptiense.
+      </dd></dl><a name="interes"></a><br /><h2>Interés</h2><dl class="dl-horizontal"><dt>Geológico principal :</dt><dd>Paleontológico.
+          <br /><p class="text-muted text-justify"><DATA>Forma parte del conjunto de yacimientos paleoicnológicos de la Cuenca de Cameros del Geosite de relevancia internacional FC001. Su relevancia también se debe a su interés en la historia de la Paleoicnología, ya que es el primero descrito en la literatura científica española (Casanovas & Santafé, 1971). En conjunto el yacimiento de El Villar-Poyales contiene unas 140 icnitas, con 18 rastros reconocidos.</DATA></p></dd><dt title="Geológico secundario">Geológico secundario :</dt><dd>Sedimentológico. 
+          Estratigráfico. 
+          Historia de la Geología. 
+          <br /><p class="text-muted text-justify"><DATA>El interés para la Historia de la Gología se debe a que es el primer yacimiento de icnitas del Mesozoico descrito en la literatura científica española para la Cuenca de Cameros. El interés estratigráfico y sedimentológico radica en la secuencia en la que está el yacimiento que ha permitido interpretar el hábitat y la paleoecología de los grandes vertebrados.</DATA></p></dd><dt title="Interés no geológico">Interés no geológico :</dt><dd>Histórico o cultural. 
+          Paisajístico. 
+          <br /><p class="text-muted text-justify"><DATA>Paisaje rural</DATA></p></dd></dl><a name="proteccion"></a><br /><h2>Protección</h2><dl class="dl-horizontal"><dt title="Instrumentos jurídicos de protección existentes">Instrumentos jurídicos :</dt><dd><a href="https://web.larioja.org/normativa?n=00216 ">Resolución de 23 de febrero de 1999, de la Consejería de Educación, Cultura, Juventud y Deportes, por la que se incoa expediente para la declaración de bienes de interés cultural, con la categoría de sitio histórico, de 40 yacimientos paleontológicos de icnitas en la Comunidad Autónoma de La Rioja.
+Decreto 34/2000, de 23 de junio, para la declaración de "sitio histórico" de 40 yacimientos paleontológicos de icnitas de dinosaurio en la Comunidad Autónoma de La Rioja.
+</a></dd></dl><a name="usoseguimiento"></a><br /><h2>Uso y seguimiento</h2><dl class="dl-horizontal"><dt Title="Incidencias de uso didáctico">Incidencias de uso didáctico :</dt><dd>Está en el mismo borde de la carretera y con grupos grandes puede ser peligroso por el paso de vehículos.
+            </dd><dt Title="¿Es compatible la recogida de fósiles con al conservación del lugar?">Recogida de fósiles :</dt><dd>Incompatible con la conservación del lugar o sin ejemplares.
+            </dd><dt Title="¿Es compatible la recogida de minerales con al conservación del lugar?">Recogida de minerales :</dt><dd>Admisible para fines de investigación.
+            </dd><dt title="Fecha de última actualización">Fecha de última actualización:</dt><dd>25/11/2021</dd></dl><a name="visitas"></a><br /><h2>Visitas</h2><dl class="dl-horizontal"><dt>Equipamiento :</dt><dd><i>Mirador</i>: Sí.<br /><i>Mesas, bancos, etc.</i>: No.<br /><i>Señalización</i>: Sí.<br /><i>Fuente de agua potable en las inmediaciones</i>: No.<br /></dd><dt>Peligro para el visitante :</dt><dd>En grupos grandes puede ser peligroso porque está en el mismo borde de la carretera.
+            </dd><dt Title="Dificultad física del itinerario">Dificultad itinerario :</dt><dd>Baja.
+            </dd><dt Title="Duración aproximada del itinerario para un recorrido normal">Duración itinerario :</dt><dd>1 hora/s.
+            </dd><dt>Tipo de acceso :</dt><dd>Carretera asfaltada aparcamiento turismo.
+                <br /></dd><dt Title="¿Accesos adaptados a discapacitados?">Acceso discapacitados :</dt><dd>No.
+            </dd><dt>Infraestructura logística :</dt><dd>Alojamiento y restaurante para 40 personas a menos de 25 km.
+            </dd></dl><a name="documentacion"></a><br /><h2>Documentación</h2><dl class="dl-horizontal"><dt>Fotografías :</dt><dd><table cellpadding="0" cellspacing="0" border="0"><div id="myCarousel" class="carousel slide" data-ride="carousel" style="max-width:800"><ol class="carousel-indicators"><li data-target="#myCarousel" data-slide-to="0" class="active"></li><li data-target="#myCarousel" data-slide-to="1"></li><li data-target="#myCarousel" data-slide-to="2"></li><li data-target="#myCarousel" data-slide-to="3"></li><li data-target="#myCarousel" data-slide-to="4"></li><li data-target="#myCarousel" data-slide-to="5"></li></ol><div class="carousel-inner"><div class="carousel-item active"><div class="d-flex justify-content-center"><img class="d-block" src="https://info.igme.es/ielig/documentacion/ib/ib200k/fotos/f-ib200k-01_web.jpg" alt="Foto: F. Pérez Lorente"></img></div><div class="carousel-caption" style=" position: relative; left: auto; right: auto;;bottom:0px;background:#fff;padding:10px 10px 70px 10px;"><div class="text-dark" style="position:relative;top:10px;">Foto: F. Pérez Lorente</div></div></div><div class="carousel-item"><div class="d-flex justify-content-center"><img class="d-block" src="https://info.igme.es/ielig/documentacion/ib/ib200k/fotos/f-ib200k-02_web.jpg" alt="Parte del yacimiento cubierto de El Villar. Año 2021. Foto: J. Vegas"></img></div><div class="carousel-caption" style=" position: relative; left: auto; right: auto;;bottom:0px;background:#fff;padding:10px 10px 70px 10px;"><div class="text-dark" style="position:relative;top:10px;">Parte del yacimiento cubierto de El Villar. Año 2021. Foto: J. Vegas</div></div></div><div class="carousel-item"><div class="d-flex justify-content-center"><img class="d-block" src="https://info.igme.es/ielig/documentacion/ib/ib200k/fotos/f-ib200k-03_web.jpg" alt="Icnitas que han recibido la denominación de 'Theroplantígrada encisensis' de la sección de El Villar. Año 2021. Foto: J. Vegas"></img></div><div class="carousel-caption" style=" position: relative; left: auto; right: auto;;bottom:0px;background:#fff;padding:10px 10px 70px 10px;"><div class="text-dark" style="position:relative;top:10px;">Icnitas que han recibido la denominación de 'Theroplantígrada encisensis' de la sección de El Villar. Año 2021. Foto: J. Vegas</div></div></div><div class="carousel-item"><div class="d-flex justify-content-center"><img class="d-block" src="https://info.igme.es/ielig/documentacion/ib/ib200k/fotos/f-ib200k-04_web.jpg" alt="Superficie mayor del yacimiento de El Villar-Poyales que contiene hasta 15 rastros. Año 2021. Foto: J. Vegas"></img></div><div class="carousel-caption" style=" position: relative; left: auto; right: auto;;bottom:0px;background:#fff;padding:10px 10px 70px 10px;"><div class="text-dark" style="position:relative;top:10px;">Superficie mayor del yacimiento de El Villar-Poyales que contiene hasta 15 rastros. Año 2021. Foto: J. Vegas</div></div></div><div class="carousel-item"><div class="d-flex justify-content-center"><img class="d-block" src="https://info.igme.es/ielig/documentacion/ib/ib200k/fotos/f-ib200k-05_web.jpg" alt="Detalle de las pisadas del yacimiento de El Villar-Poyales. Año 2021. Foto: J. Vegas"></img></div><div class="carousel-caption" style=" position: relative; left: auto; right: auto;;bottom:0px;background:#fff;padding:10px 10px 70px 10px;"><div class="text-dark" style="position:relative;top:10px;">Detalle de las pisadas del yacimiento de El Villar-Poyales. Año 2021. Foto: J. Vegas</div></div></div><div class="carousel-item"><div class="d-flex justify-content-center"><img class="d-block" src="https://info.igme.es/ielig/documentacion/ib/ib200k/fotos/f-ib200k-06_web.jpg" alt="Detalle de los rastros. Año 2021. Foto: J. Vegas"></img></div><div class="carousel-caption" style=" position: relative; left: auto; right: auto;;bottom:0px;background:#fff;padding:10px 10px 70px 10px;"><div class="text-dark" style="position:relative;top:10px;">Detalle de los rastros. Año 2021. Foto: J. Vegas</div></div></div></div><a class="carousel-control-prev" href="#myCarousel" data-slide="prev"><span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="sr-only">Previous</span></a><a class="carousel-control-next" href="#myCarousel" data-slide="next"><span class="carousel-control-next-icon" aria-hidden="true"></span><span class="sr-only">Next</span></a></div></table></dd><dt>Mapas, ortofotos, etc :</dt><dd><table cellpadding="0" cellspacing="0" border="0"><tr><td><a target="_blank" href="https://info.igme.es/ielig/documentacion/ib/ib200k/mapas y ortofotos/o-ib200k-01.pdf">Ortofoto</a></td></tr><tr><td></td></tr><tr><td style="height: 5px;"></td></tr></table></dd></dl><a name="autores"></a><br /><h2>Autores</h2><dl class="dl-horizontal"><dt>Autores :</dt><dd>J. Moratalla<br /></dd><dt>Proponentes :</dt><dd>J.E. Ortiz Menéndez<br />T. de Torres Pérezhidalgo<br />H. Mansilla<br />M. Aurell<br />B. Bádenas<br />R. Tejero<br />F. López Olmedo<br />F. Pérez Lorente<br />J.J. Gómez<br />J.B. Díez Ferrer<br />A. Díez Herrero<br />A. García de Domingo<br />J.L. Barco<br />M. Tena<br />E. Peñalver Mollá<br /></dd><dt>Referencias :</dt><dd><p>Brancas, R., Martínez J. &amp; Blaschke J. (1979). Huellas de dinosaurio de Enciso. Ed. Gonzalo de Berceo. Diputación de Logroño. 96 pp.</p><p>Casanovas, M.L. &amp; Santafé, J.V. (1974). Dos nuevos yacimientos de icnitas de dinosaurios. Acta Geológica Hispánica, 9(3): 88-91.</p><p>Casanovas, M. L., R. Ezquerra, A. Fernández, F. Pérez-Lorente, J. V. Santafé, and F. Torcida. (1993). Icnitas digitígradas y plantígradas de dinosaurios en el afloramiento de El Villar–Poyales (La Rioja, España). Zubía monográfico 5:135–163.</p><p>GEOMARE (2007): Inventario de recursos Geológico Mineros de carácter singular de la Comunidad Autónoma de La Rioja. Consejería de Turismo, Medio Ambiente y Política Territorial – Dirección General de Política Territorial, Gobierno de La Rioja. 225 pp</p><p>Hernán, F. (2018). Estratigrafía y sedimentología de las formaciones con icnitas de dinosaurios del Grupo Enciso (Cameros, La Rioja, Aptiense). Tesis Doctoral. Universidad Politécnica de Madrid. Memoria 420 pp. + Anexos 167 pp.</p><p>Pérez-Lorente, F. (2015). Dinosaur Footprints &amp; Trackways of La Rioja. Life of the past. Indiana University Press, Bloomington, 363 pp. </p><p>Viera L. I., Torres J. A. (1979) El Weáldico de la zona de Enciso (Sierra de los Cameros) y su fauna de grandes reptiles. Munibe 31 1–2, 141-157</p><p>Casanovas, M.L. &amp; Santafé, J.V. (1971). Icnitas de reptiles mesozoicos en la provincia de Logroño. Acta Geológica Hispánica, 5: 139-142.</p></dd></dl><a name="sedimentarias"></a><br /><h2>Rocas Sedimentarias</h2><dl class="dl-horizontal"><dt>Medios continentales :</dt><dd>Lacustre.<br />Palustre.<br /></dd><dt>Medios mixtos-transición :</dt><dd>Deltaico.<br /></dd><dt Title="Observaciones sobre medios sedimentarios">Observaciones medios :</dt><dd>Sistema lacustre siliciclástico, en el litoral de la desembocadura de un delta, con procesos de avulsión y abundante materia orgánica. Retrabajamiento por oleaje de los niveles de arena</dd><dt class="TablaCampo" Title="Geometría de las capas">Geometria capas :</dt><dd>Tabulares.<br /></dd><dt>Polaridad positiva :</dt><dd>
+              Sí.
+            </dd><dt>Continuidad :</dt><dd>Conformidad.<br /></dd><dt>Sucesion litológica :</dt><dd>Repetitiva aleatoria.<br /></dd><dt>Estructuras :</dt><dd>Bioturbación-bioerosión.<br />Laminación cruzada.<br />Laminación paralela.<br />Cantos blandos.<br />Retoque de olas.<br /></dd><dt Title="Origen de las estructuras">Origen estructuras :</dt><dd>Corrientes.<br />Decantación.<br />Oleaje.<br />Origen biológico.<br /></dd><dt class="TablaCampo" Title="Observaciones sobre la estructura y su origen">Observaciones estructura :</dt><dd>Estructuras de laminación paralela y cruzada de ambiente de desembocadura deltaica en un sistema lacustre. Retoques de oleaje a techo de algunas capas.</dd><dt>Litologías :</dt><dd>Grauvaca.<br />Caliza.<br />Limolita.<br /></dd><dt>Observaciones litologías :</dt><dd>Caliza tipo mudstone organógena, con bioturbaciones y grietas de retracción. Laminación paralela.
+Limolitas y areniscas de grano muy fino cementadas por carbonato. Grauvacas (cuarzosas) que alternan con lutitas.</dd></dl><a name="yacimientospaleontologicos"></a><br /><h2>Yacimientos Paleontológicos</h2><dt>Interés :</dt><dd>Yacimiento con abundancia local de fósiles poco comunes.<br />Yacimiento con fósiles que presentan rasgos de importancia científica.<br /></dd><dt class="TablaCampo" Title="Dimensión del afloramiento">Dimensión :</dt><dd>30 m².
+          </dd><dt>Macrofauna :</dt><dd>Huellas de vertebrados .<br /></dd><a name="valoraciones"></a><br /><h2>Valoraciones</h2><div class="row"><div class="col-md-4"><dt>Valor científico (VC) :</dt><dd>5.4 (Alto)</dd></div><div class="col-md-4"><dt>Valor didáctico (VD) :</dt><dd>6.4 (Medio)</dd></div><div class="col-md-4"><dt>Valor turístico (VT) :</dt><dd>5.3 (Medio)</dd></div></div><div class="row mt-3"><div class="col-md-4"><dt>Susceptibilidad degradación natural (SDN) :</dt><dd>0.1 (Baja)
+              </dd></div><div class="col-md-4"><dt>Susceptibilidad degradación antrópica (SDA) :</dt><dd>4.6 (Muy alta)
+              </dd></div><div class="col-md-4"></div></div><div class="row mt-3"><div class="col-md-4"><dt>Riesgo degradación natural (RDN) :</dt><dd>0.08 (Bajo)
+              </dd></div><div class="col-md-4"><dt>Riesgo degradación antrópica (RDA) :</dt><dd>2.95 (Muy alto)
+              </dd></div><div class="col-md-4"><dt>Prioridad de protección (PP) :</dt><dd>Muy alta</dd></div></div></div><div role="tabpanel" class="tab-pane" id="apadrina"><br /><br /><div class="alert alert-success" role="alert"><strong>Este LIG es apadrinable.</strong> Pincha <a href="apadrina.aspx?codigo=IB200k">aquí</a> si quieres ser padrino/madrina de este LIG.<br /><a target="_blank" href="./Apadrinamiento/Encuesta.aspx?codigo=IB200k">Reportar una incidencia</a></div> 
+              
+                Este LIG tiene <strong>1 voluntarios</strong>, de los cuales han decidido mostrar su nombre:
+                  <ul><li>Nacho Da Rocha</li></ul><br /><br /><p><a data-toggle="collapse" href="#confirmacion" aria-expanded="false" aria-controls="confirmacion">¿Por qué no aparece mi nombre tras apadrinar este LIG?</a></p><div class="collapse" id="confirmacion"><p>Puede deberse a que no has marcado la opción para que se muestre tu nombre  en el formulario de apadrinamiento en el formulario de apadrinamiento o a que no has confirmado el apadrinamiento (el sistema te envía un correo electrónico con un enlace sobre el que tienes que pinchar). Puedes entrar en <a href="./Apadrinamiento/login.aspx" target="_blank">tu cuenta de padrino/madrina</a> para solucionarlo.</p></div><p><a href="https://web.igme.es/patrimonio/apadrinaunaroca.htm" target="_blank">¿No conoces el programa <em>Apadrina una Roca</em>?</a></p></div></div>
+    </div>
+
+            <script>
+                // When the user scrolls down 20px from the top of the document, show the button
+                window.onscroll = function () { scrollFunction() };
+
+                function scrollFunction() {
+                    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                        document.getElementById("myBtn").style.display = "block";
+                    } else {
+                        document.getElementById("myBtn").style.display = "none";
+                    }
+                }
+
+                // When the user clicks on the button, scroll to the top of the document
+                function topFunction() {
+                    $('html, body').animate({ scrollTop: 0 }, 'fast');
+
+                    //document.body.scrollTop = 0;
+                    //document.documentElement.scrollTop = 0;
+                    //return false;
+                }
+
+                window.onload = function () {
+                    zoom2feature2('IB200k');
+                };
+
+        </script>
+
+
+    </div>
+    </form>
+
+    <div class="container-fluid" style="background-color:#DEDEDE">
+      <footer class="bd-footer text-muted" >      
+          <div class="container">
+            <div class="row py-3">
+                <div class="col-md-auto col-12">
+                    <div style="align:top;display: inline-block;" class="align-top">
+                        <img style="margin-top:5px" border="0" src="https://info.igme.es/cartografiadigital/img/bocetoGris.gif" width="60" height="73" alt="Imagen Boceto IGME">
+                        
+                    </div>                    
+                    <div class="align-bottom ml-2" style="align:bottom;line-height:100%;display:inline-block;min-width:140px;">                    
+                        <small>
+                        <strong>IGME</strong><br>
+                        Ríos Rosas, 23<br>
+                        28003 Madrid<br>
+                        Teléfono + 34 913 495 700<br>
+                        </small>
+                    </div>
+                </div>
+                <div class="col-12 col-md-auto">
+                    <br/>                    
+                    <ul class="list-inline">
+                       <li class="list-inline-item"><a href="http://www.igme.es/Ayuda/guia.htm">Guía de navegación</a></li>
+                       <li class="list-inline-item"><a href="http://www.igme.es/Ayuda/mapa_web.htm">Mapa web</a></li>
+                       <li class="list-inline-item"><a href="http://www.igme.es/Ayuda/accesibilidad.htm">Accesibilidad</a></li>
+                        <li class="list-inline-item"><a href="http://www.igme.es/Ayuda/CondiUso.htm">Condiciones de uso</a></li>
+                    </ul>
+                </div>
+                <div class="col-12 col-md-auto">
+                    <br>
+                    <img height="22" alt="Icono de conformidad con el Nivel A, de las Directrices de Accesibilidad para el Contenido Web 1.0 del W3C-WAI" src="http://www.igme.es/Ayuda/wcag1A_P.gif" width="65" border="0">         
+                    <br>
+                 </div> 
+            </div>    
+        </div>                
+    </footer>
+</div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://info.igme.es/jquery/1.12.4/jquery.min.js"></script>
+
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    
+    <script src="https://info.igme.es/bootstrap/4.1.3-dist/js/bootstrap.min.js"></script>
+
+     <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
+            integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
+            crossorigin=""></script>
+
+    <script src="https://unpkg.com/esri-leaflet@2.2.3/dist/esri-leaflet.js"
+            integrity="sha512-YZ6b5bXRVwipfqul5krehD9qlbJzc6KOGXYsDjU9HHXW2gK57xmWl2gU6nAegiErAqFXhygKIsWPKbjLPXVb2g=="
+            crossorigin=""></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@2.2.13/dist/esri-leaflet-geocoder.css"
+          integrity="sha512-v5YmWLm8KqAAmg5808pETiccEohtt8rPVMGQ1jA6jqkWVydV5Cuz3nJ9fQ7ittSxvuqsvI9RSGfVoKPaAJZ/AQ=="
+          crossorigin="">
+
+    <script src="https://unpkg.com/esri-leaflet-geocoder@2.2.13/dist/esri-leaflet-geocoder.js"
+            integrity="sha512-zdT4Pc2tIrc6uoYly2Wp8jh6EPEWaveqqD3sT0lf5yei19BC1WulGuh5CesB0ldBKZieKGD7Qyf/G0jdSe016A=="
+            crossorigin=""></script>
+
+     
+    <script src="https://info.igme.es/spatialunits/js/IGME.Leaflet.Map.min.js"></script>
+
+    <script src="IELIG_Leaflet.js"></script>
+
+
+    <script>
+        //function arcgisToGeoJSON$1 (arcgis, idAttribute) {
+        //    var geojson = {};
+
+        //    if (typeof arcgis.x === 'number' && typeof arcgis.y === 'number') {
+        //      geojson.type = 'Point';
+        //      geojson.coordinates = [arcgis.x, arcgis.y];
+        //    }
+
+        //    if (arcgis.points) {
+        //      geojson.type = 'MultiPoint';
+        //      geojson.coordinates = arcgis.points.slice(0);
+        //    }
+
+        //    if (arcgis.paths) {
+        //      if (arcgis.paths.length === 1) {
+        //        geojson.type = 'LineString';
+        //        geojson.coordinates = arcgis.paths[0].slice(0);
+        //      } else {
+        //        geojson.type = 'MultiLineString';
+        //        geojson.coordinates = arcgis.paths.slice(0);
+        //      }
+        //    }
+
+        //    if (arcgis.rings) {
+        //      geojson = convertRingsToGeoJSON(arcgis.rings.slice(0));
+        //    }
+
+        //    if (arcgis.geometry || arcgis.attributes) {
+        //      geojson.type = 'Feature';
+        //      geojson.geometry = (arcgis.geometry) ? arcgisToGeoJSON$1(arcgis.geometry) : null;
+        //      geojson.properties = (arcgis.attributes) ? shallowClone$1(arcgis.attributes) : null;
+        //      if (arcgis.attributes) {
+        //        geojson.id = arcgis.attributes[idAttribute] || arcgis.attributes.OBJECTID || arcgis.attributes.FID;
+        //      }
+        //    }
+
+        //    return geojson;
+        //  }
+
+    </script>
+    <script>
+
+            var mapConfig = null;
+
+        let jsonConfig = (document.domain == 'localhost' ? '/IGME.Map.IELIG.json' : '/spatialunits/json/IGME.Map.IELIG.json');
+
+            // Gets map configuration from JSON config file
+            $.ajax({
+                dataType: "json",
+                async: false,
+                //url: "/spatialunits/json/IGME.Map.IELIG.json",
+                url: jsonConfig,
+                data: null,
+                success: function (data) {
+                    mapConfig = data;
+                }
+            });
+
+            // Map inizialization
+            var igmeMap = new IGMEMap("map", mapConfig);
+
+
+        //zoom2feature('IB085');
+
+
+     </script>
+
+</body>
+</html>

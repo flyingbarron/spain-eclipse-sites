@@ -1,0 +1,2 @@
+code,denominacion,url,valor_turistico,confidencialidad,route_difficulty,latitude,longitude,eclipse_visibility,status,cloud_coverage,cloud_status,cloud_url,bortle_scale,bortle_status,horizon_status,shademap_status,darksky_sqm,darksky_bortle,darksky_darkness,darksky_status
+IB200B,La Magdalena,https://info.igme.es/ielig/LIGInfo.aspx?codigo=IB200B,3.5,Public,Medium,42.124479,-2.187944,unknown,success,,not_checked,,,,success,not_checked,21.56,3,85.0,success

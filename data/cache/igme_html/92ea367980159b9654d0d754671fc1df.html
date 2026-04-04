@@ -1,0 +1,441 @@
+
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1"><title>
+	Base de Datos del Inventario Español de Lugares de Interes geológico
+</title><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta http-equiv="X-UA-Compatible" content="IE=edge" /><meta name="description" content="Esta aplicación permite acceder a la base de datos del Inventario Español de Lugares de Interés Geológico (IELIG) que, de acuerdo con la Ley 42/2007, debe elaborar y actualizar el Ministerio de Agricultura, Alimentación y Medio Ambiente, con la colaboración de las Comunidades Autónomas y de las instituciones de carácter científico. El Real Decreto 1274/2011, encomienda al IGME la finalización de este inventario." vocab="/" /><meta name="keywords" content="IELIG, Lugares de Interés Geológico, LIG, Geosite, Patrimonio geológico, Apadrina una roca, España, Spain, WMS, IGME, InfoIGME" /><meta property="og:title" content="IGME | InfoIGME | IELIG - Inventario Español de Lugares de Interes geológico" /><meta property="og:description" content="Esta aplicación permite acceder a la base de datos del Inventario Español de Lugares de Interés Geológico (IELIG) que, de acuerdo con la Ley 42/2007, debe elaborar y actualizar el Ministerio de Agricultura, Alimentación y Medio Ambiente, con la colaboración de las Comunidades Autónomas y de las instituciones de carácter científico. El Real Decreto 1274/2011, encomienda al IGME la finalización de este inventario." /><meta property="og:type" content="website" /><meta property="og:image" content="https://info.igme.es/ielig/images/ielig.jpg" /><meta property="og:image:type" content="image/jpeg" /><meta property="og:image:width" content="1024" /><meta property="og:image:height" content="768" /><meta property="og:image:alt" content="Aplicación web de acceso a la base de datos del Inventario Español de Lugares de Interes geológico" /><meta property="og:site_name" content="IELIG" /><meta property="og:url" content="https://info.igme.es/ielig" /><meta name="twitter:title" content="IGME | InfoIGME | IELIG - Inventario Español de Lugares de Interes geológico" /><meta name="twitter:description" content="Esta aplicación permite acceder a la base de datos del Inventario Español de Lugares de Interés Geológico (IELIG) que, de acuerdo con la Ley 42/2007, debe elaborar y actualizar el Ministerio de Agricultura, Alimentación y Medio Ambiente, con la colaboración de las Comunidades Autónomas y de las instituciones de carácter científico. El Real Decreto 1274/2011, encomienda al IGME la finalización de este inventario." /><meta name="twitter:image" content="https://info.igme.es/ielig/images/ielig.jpg" />
+
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous" />
+
+    <!-- Scrollbar Custom CSS -->
+    
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" /><link rel="stylesheet" href="https://unpkg.com/leaflet.pm@latest/dist/leaflet.pm.css" />
+
+    <!-- Leaflet.Locate to center on  users' location -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.79.0/dist/L.Control.Locate.min.css" />
+
+    <!-- Our Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="site.css" /><link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css" />
+
+    <script src="./js/ielig.js"></script>
+
+    <!-- Google Analytics -->
+     <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZX5SY9EZH2"></script>
+     <script> 
+         window.dataLayer = window.dataLayer || [];
+         function gtag() { dataLayer.push(arguments); }
+         gtag('js', new Date());
+         gtag('config', 'G-ZX5SY9EZH2');
+     </script>
+
+    <script type="text/javascript">
+
+        // Abre en una ventana una página y pone el foco en dicha ventana
+        //function createWindow(cUrl, cName, cFeatures) {
+        //    var xWin = window.open(cUrl, cName, cFeatures);
+        //    xWin.focus();
+        //}
+
+        var lang = "es";
+
+    </script>
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src=" https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+
+    <script src="IELIG_Leaflet.js"></script>
+
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark py-0" style="background-color: #999;">
+        <div class="container-fluid">
+            <a class="navbar-brand page-scroll logoPeque pt-0" href="https://www.igme.es">
+                <img src="./images/logoIGME_blanco.png" alt="IGME-CSIC" class="imglogo" />
+            </a>
+            <span class="navbar-brand Roboto mb-0 h1" title="Inventario Español de Lugares de Interes geológico">IELIG</span>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <!--<a class="nav-link active" target="_blank" href="#" onclick="openURLInDialog('leyenda.html','pageDialog', 'Leyenda', true);return false;">Leyenda</a>-->
+                    <a class="nav-link active" target="_blank" href="#" onclick="openURLInDialog('lista-de-lig.html','listDialog', 'Listado de LIG', false);return false;">Listado de LIG</a>
+                    <a class="nav-link active" target="_blank" href="#" onclick="openURLInDialog('apadrina-una-roca.html','pageDialog', 'Apadrina una roca', true);return false;">Apadrina una roca</a>
+                    <a class="nav-link active" target="_blank" href="#" onclick="openURLInDialog('acerca-de.html','pageDialog', 'Acerca del IELIG', true);return false;">Acerca del IELIG</a>
+                </div>
+                <div class="flex-fill">
+                    <div class="float-start float-md-end">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">InfoIGME
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" style="z-index: 9999;" aria-labelledby="navbarDropdown">
+                                    <li><a class="dropdown-item" target="_blank" href="https://info.igme.es/catalogo/catalog.aspx?catalog=2&amp;shim=true&amp;shdt=false&amp;shtb=true&amp;shtp=false&amp;shfp=false&amp;shsf=false&amp;shfo=false&amp;master=infoigme&amp;lang=spa">Sitios web geocientíficos</a></li>
+                                    <li><a class="dropdown-item" target="_blank" href="https://info.igme.es/catalogo/catalog.aspx?catalog=3&amp;shfo=false&amp;shdt=false&amp;master=infoigme&amp;lang=spa">Catálogo de datos</a></li>
+                                    <li><a class="dropdown-item" target="_blank" href="https://info.igme.es/ise">Sistema de búsqueda avanzada (ISE)</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider" />
+                                    </li>
+                                    <li><a class="dropdown-item" target="_blank" href="https://info.igme.es/visor">Visor de mapas</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider" />
+                                    </li>
+                                    <li><a class="dropdown-item" target="_blank" href="https://mapas.igme.es/servicios/default.aspx?lang=eng">Servicios de mapas</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="MapContainer">
+        <div id="map" class="col-12"></div>
+    </div>
+
+    <div class="modal fade" id="listDialog" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+                <div class="modal-header py-2">
+                    <h5 class="modal-title" id="listDialogTitle">IELIG</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body vh-100" id="listDialogBody"></div>
+                <div class="modal-footer py-1">
+                    <div class="d-flex justify-content-between w-100">
+                        <div>
+                            <small class="text-muted">IELIG - Inventario Español de Lugares de Interés Geológico</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="pageDialog" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+                <div class="modal-header py-2">
+                    <h5 class="modal-title" id="pageDialogTitle">IELIG</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="pageDialogBody">
+                </div>
+                <div class="modal-footer py-1">
+                    <div class="d-flex justify-content-between w-100">
+                        <div>
+                            <small class="text-muted">IELIG - Inventario Español de Lugares de Interés Geológico</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form name="form1" method="post" action="./default.aspx" id="form1">
+<div>
+<input type="hidden" name="__EVENTTARGET" id="__EVENTTARGET" value="" />
+<input type="hidden" name="__EVENTARGUMENT" id="__EVENTARGUMENT" value="" />
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwULLTE0ODYyNDM3OTVkZMRLkTA2PBW8twNxeFYThII/YDg7Yr3iJijCp9F8VaOf" />
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+var theForm = document.forms['form1'];
+if (!theForm) {
+    theForm = document.form1;
+}
+function __doPostBack(eventTarget, eventArgument) {
+    if (!theForm.onsubmit || (theForm.onsubmit() != false)) {
+        theForm.__EVENTTARGET.value = eventTarget;
+        theForm.__EVENTARGUMENT.value = eventArgument;
+        theForm.submit();
+    }
+}
+//]]>
+</script>
+
+
+<script src="/ielig/WebResource.axd?d=OOm_2suvxl2cCQp2YP7vtCBrU33nWawzYut9uLRcxv1wuDAMv6FQ404Lhg8o7CDELQdzR2WRy3lCGZOZ8ZjGaCMEfWDhVlMtTax_b9CCzaY1&amp;t=638901608248157332" type="text/javascript"></script>
+
+<script language='javascript'> blnIntranet=false; strLanguage='es';</script>
+<script src="/ielig/ScriptResource.axd?d=E5oijQDDL308R0ZoPR7EdQWhwChMJZ7kFkrONcQZd7DHpjKxhg6C6Zdsrk1KGXLYOWJ4UkbDRWfjlUa_9PYNIVwJ2-5goV6E6Am14efJnlCSNwcZ6XKHGUTFfIdT3TLztipcgtlRfV_6ZinTEzgIHxbCbN_ikkH_wjbX-DidvNs1FicUiq63ZEAMQEtFSubF0&amp;t=5c0e0825" type="text/javascript"></script>
+<script type="text/javascript">
+//<![CDATA[
+if (typeof(Sys) === 'undefined') throw new Error('ASP.NET Ajax client-side framework failed to load.');
+//]]>
+</script>
+
+<script src="/ielig/ScriptResource.axd?d=mVXVWM0Kf9fN0RY3_aIz5annd79WP9ljE_pBriZV5VO1dZS4iRdC7lESFpdvYt58J-LwUGfmEebLkBaT3raBvY5jHZo0kO6h1S2PoxMZfoefFXhYlmc0OSMCCyKYkuKYek_aWyhdEp4Z0JLx1OiRxG2SpYmCiOC-hR9rGGvD_bRdtCendxflIf5AUr-Gy5ct0&amp;t=5c0e0825" type="text/javascript"></script>
+<div>
+
+	<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="A7E41B5A" />
+</div>
+
+        <script type="text/javascript">
+//<![CDATA[
+Sys.WebForms.PageRequestManager._initialize('ScriptManager1', 'form1', [], [], [], 90, '');
+//]]>
+</script>
+
+
+    </form>
+
+
+    <div class="offcanvas offcanvas-end" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasFilter" aria-labelledby="offcanvasFilterLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasFilterLabel">Filtrar Lugares de Interés Geológico</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body pt-0">
+            <div class="row">
+
+
+                <div class="col-12 mb-3">
+                    <div title="Lugares de interés geológico de relevancia mundial"><strong>Geosites</strong></div>
+                    <div class="form-check form-switch form-control-sm mb-0 pb-0">
+                        <input class="form-check-input" type="checkbox" onclick="setDefinitionQuery();" id="chkGeosite" />
+                        <label class="form-check-label" for="chkGeosite">Mostrar sólo Geosites</label>
+                    </div>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <div><strong>Interés principal</strong></div>
+                    <div id="interes">
+                        <div id="interes_check_uncheck">
+                            <small>Seleccionar:</small> <button class="btn btn-link text-decoration-none pt-1 px-0" onclick="filterCheckUnckeckedAll(true, 'interes');"><small>Todos</small></button> | <button class="btn btn-link text-decoration-none pt-1 px-0" onclick="filterCheckUnckeckedAll(false,'interes');"><small>Ninguno</small></button>
+                        </div>
+                        <div class="alert alert-danger small alert-dismissible fade show py-2 mb-2" id="alert-interes" style="display:none;" role="alert">
+                          Selecciona al menos un interés para ver resultados
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <div><strong>Apadrina una roca</strong></div>
+                    <div class="alert alert-danger small alert-dismissible fade show py-2 my-1" id="alert-apadrina" style="display:none;" role="alert">
+                          Selecciona al menos una de las opciones para ver resultados
+                    </div>
+                    <div class="form-check form-switch form-control-sm mb-0 pb-0">
+                        <input class="form-check-input" type="checkbox" checked onclick="setDefinitionQuery();" id="chkApadrinado" />
+                        <label class="form-check-label" for="chkApadrinado">Apadrinados</label>
+                    </div>
+                    <div class="form-check form-switch form-control-sm mb-0 pb-0">
+                        <input class="form-check-input" type="checkbox" checked onclick="setDefinitionQuery();" id="chkNoApadrinado" />
+                        <label class="form-check-label" for="chkNoApadrinado">No apadrinados</label>
+                    </div>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <div><strong>Contexto Geológico (Ley 42/2007):</strong></div>
+                    <div id="contextos">
+                        <div id="contextos_check_uncheck">
+                            <small>Seleccionar:</small> <button class="btn btn-link text-decoration-none pt-1 px-0" onclick="filterCheckUnckeckedAll(true,'contextos');"><small>Todos</small></button> | <button class="btn btn-link text-decoration-none pt-1 px-0" onclick="filterCheckUnckeckedAll(false,'contextos');"><small>Ninguno</small></button>
+                        </div>
+                        <div class="alert alert-danger small alert-dismissible fade show py-2 mb-2" id="alert-contextos" style="display:none;" role="alert">
+                          Selecciona al menos un contexto para ver resultados
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row fixed-bottom justify-content-center text-center pb-4 px-4">
+        <div class="col-12 col-sm-8 col-md-6 col-lg-4 col-xl-3">
+            <div class="row px-1 pt-1 rounded-top" style="background-color: rgba(60, 60, 60, 0.3)">
+                <div class="col-6 p-0">
+                    <div class="bg-white border rounded m-1" style="opacity: 0.8;">
+                        <div><strong>LIG</strong></div>
+                        <div class="display-6" id="count-lig"></div>
+                        <div class="d-flex justify-content-center"><div id="count-ligapadrinados" class="me-2"></div> apadrinados</div>
+                    </div>
+                </div>
+                <div class="col-6 p-0">
+                    <div class="bg-white border rounded m-1" style="opacity: 0.8;">
+                        <div title="Lugares de interés geológico de relevancia mundial"><strong>Geosites</strong></div>
+                        <div class="display-6" id="count-geosite"></div>
+                        <div class="d-flex justify-content-center"><div id="count-geositeapadrinados" class="me-2"></div> apadrinados</div>
+                    </div>
+                </div>
+            </div>
+            <div style="background-color: rgba(60, 60, 60, 0.3)" class="row px-0 pt-0 pb-1 text-start rounded-bottom">
+                <small><small>Números para la extensión actual de mapa y filtros activos</small></small>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
+
+    <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
+        integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
+        crossorigin=""></script>
+
+    <script src="https://unpkg.com/esri-leaflet@2.2.3/dist/esri-leaflet.js"
+        integrity="sha512-YZ6b5bXRVwipfqul5krehD9qlbJzc6KOGXYsDjU9HHXW2gK57xmWl2gU6nAegiErAqFXhygKIsWPKbjLPXVb2g=="
+        crossorigin=""></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@2.2.13/dist/esri-leaflet-geocoder.css"
+        integrity="sha512-v5YmWLm8KqAAmg5808pETiccEohtt8rPVMGQ1jA6jqkWVydV5Cuz3nJ9fQ7ittSxvuqsvI9RSGfVoKPaAJZ/AQ=="
+        crossorigin="" />
+
+    <script src="https://unpkg.com/esri-leaflet-geocoder@2.2.13/dist/esri-leaflet-geocoder.js"
+        integrity="sha512-zdT4Pc2tIrc6uoYly2Wp8jh6EPEWaveqqD3sT0lf5yei19BC1WulGuh5CesB0ldBKZieKGD7Qyf/G0jdSe016A=="
+        crossorigin=""></script>
+
+    <!-- Leaflet.Locate (to center map on user location) -->
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.79.0/dist/L.Control.Locate.min.js" charset="utf-8"></script>
+
+    <script src="https://info.igme.es/spatialunits/js/IGME.Leaflet.Map.min.js"></script>
+
+    <script>
+
+        var mapConfig = null;
+
+        let jsonConfig = (document.domain == 'localhost' ? '/IGME.Map.IELIG.json' : '/spatialunits/json/IGME.Map.IELIG.json');
+
+
+        // Gets map configuration from JSON config file
+        $.ajax({
+            dataType: "json",
+            async: false,
+            url: jsonConfig,
+            data: null,
+            success: function (data) {
+                mapConfig = data;
+            }
+        });
+
+        // Map inizialization
+        var igmeMap = new IGMEMap("map", mapConfig);
+
+        var miCapa = L.esri.dynamicMapLayer({
+            url: 'https://mapas.igme.es/gis/rest/services/BasesDatos/IGME_IELIG/MapServer'
+        });
+
+        //var miCapa = L.esri.dynamicMapLayer({
+        //    url: 'https://mapas.igme.es/gis/rest/services/BasesDatos/IGME_IELIG/MapServer',
+        //    opacity: 0.7
+        //}).addTo(igmeMap.map);
+
+        // Mouse pointer used on map
+        $('.leaflet-container').css('cursor', 'crosshair');
+
+        var popup = L.popup({ maxHeight: 400, maxWidth: 800 });
+        //var popup = L.popup({ maxHeight: '400', 'classname': 'ielig-popup' });
+        //var popup = L.popup({ maxHeight: '400'});
+
+        igmeMap.map.on('click', onMapClick);
+
+        // Filter control
+        L.Control.DefinitionQuery = L.Control.extend({
+            onAdd: function (map) {
+                var container = L.DomUtil.create('div', 'leaflet-control-layers leaflet-control');
+                container.innerHTML = "<a href='#' onclick='return false;' data-bs-toggle='offcanvas' data-bs-target='#offcanvasFilter' aria-controls='offcanvasFilter'><img src='./images/filter.png' alt='Filtrar LIG en el mapa' title='Filtrar LIG en el mapa' style='width:42px;'/></a>";
+                return container;
+            },
+
+            onRemove: function (map) {
+                // Nothing to do here
+            }
+        });
+
+        L.control.definitionquery = function (options) {
+            return new L.Control.DefinitionQuery(options);
+        };
+
+        L.control.definitionquery({ position: 'topright' }).addTo(igmeMap.map);
+
+
+        // Legend control
+        L.Control.Legend = L.Control.extend({
+            onAdd: function (map) {
+                var container = L.DomUtil.create('div', 'leaflet-control-layers leaflet-control');
+                container.innerHTML = "<a href='#' onclick='openURLInDialog(`leyenda.html`,`pageDialog`, `Leyenda`, true);return false;'><img src='./images/legend.png' alt='Mostrar leyenda IELIG' title='Mostrar leyenda IELIG' style='width:42px;'/></a>";
+                return container;
+            },
+
+            onRemove: function (map) {
+                // Nothing to do here
+            }
+        });
+
+        L.control.legend = function (options) {
+            return new L.Control.Legend(options);
+        };
+
+        L.control.legend({ position: 'topright' }).addTo(igmeMap.map);
+
+
+
+        // User location control
+        L.control.locate({
+            position: "topleft",
+            flyTo: true,
+            drawCircle: false,
+            strings: {
+                title: "Centrar mapa en mi posición"
+            }
+        })
+            .addTo(igmeMap.map);
+
+        igmeMap.map.on('moveend', function (e) {
+            let layerDefString = getDefinitionString();
+            updateDashboard(layerDefString);
+        });
+
+        // Populating filter checkboxes
+        populateFilterCheckBoxes();
+
+    </script>
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            //$("#sidebar").mCustomScrollbar({
+            //    theme: "minimal"
+            //});
+
+            //$('#dismiss, .overlay').on('click', function () {
+            //    $('#sidebar').removeClass('active');
+            //    $('.overlay').fadeOut();
+            //});
+
+            //$('#sidebarCollapse').on('click', function () {
+            //    $('#sidebar').addClass('active');
+            //    $('.overlay').fadeIn();
+            //    $('.collapse.in').toggleClass('in');
+            //    $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+            //});
+
+            // Dashboard initialization
+            setTimeout(updateDashboard(undefined), 1000);
+
+
+            // Zoom to a specific LIG
+            if (strCodigo != null) {
+                zoom2feature2(strCodigo);
+            }
+
+
+
+        });
+    </script>
+
+
+</body>
+</html>

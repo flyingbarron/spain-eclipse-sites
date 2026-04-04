@@ -1,0 +1,397 @@
+
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <head><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="author" content="Instituto Geológico y Minero de España" /><meta name="keywords" content="IGME, Instituto Geológico y Minero de España, Spanish Geological Survey, cartografía,  mapas, maps, wms, servicios, services, bases de datos, databases, documentos, documents, metadatos, metadata, geología, geology, hidrogeología, hydrogeology, recursos minerales, mineral resources, riesgos geológicos, procesos activos, cambio global, geología del subsuelo, almacenamiento geológico de CO2, geodiversidad, patrimonio geológico, patrimonio minero, cultura científica, terremotos, earthquakes" /><title>
+	IELIG - IB207: Yacimientos de dinosaurios del Jurásico-Cretácico en Galve
+</title><link href="./images/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+    <meta property="og:type" content="website" />
+
+
+
+       <style>
+        #myBtn {
+          display: none;
+          position: fixed;
+          bottom: 20px;
+          right: 30px;
+          z-index: 99;
+          border: 1px solid #ddd;
+          border-radius: 10px;
+          outline: none;
+          color: white;
+          cursor: pointer;
+          padding: 15px;
+          background-color: #ffffff;
+          color: #f5f5f5;
+        }
+
+        #myBtn:hover {
+          background-color: #f5f5f5;
+        }
+
+    </style>
+
+
+
+     
+     <!-- Google tag (gtag.js) -->
+     <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZX5SY9EZH2"></script>
+     <script> 
+         window.dataLayer = window.dataLayer || [];
+         function gtag() { dataLayer.push(arguments); }
+         gtag('js', new Date());
+         gtag('config', 'G-ZX5SY9EZH2');
+     </script>
+
+
+    <link rel="stylesheet" href="https://info.igme.es/bootstrap/4.1.3-dist/css/bootstrap.min.css" />
+    <!--<link rel="stylesheet" href="https://info.igme.es/bootstrap/4.1.3-dist/css/docs.css" />    -->
+
+    <!-- Fuentes -->
+    <link href="https://fonts.googleapis.com/css?family=BenchNine" rel="stylesheet" /><link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" /><link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300" rel="stylesheet" />
+
+    <!-- Scrollbar Custom CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css" /><link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin="" /><link rel="stylesheet" href="https://unpkg.com/leaflet.pm@latest/dist/leaflet.pm.css" />
+   
+
+     <style>
+
+        body {
+		  font-family: 'Roboto', sans-serif;
+		}
+
+
+		h1, h2, h3, h4, h5, h6 {
+		    font-family: 'BenchNine', sans-serif;
+		}
+
+         #map {
+            max-height: 500px;
+            height: 100vh;
+            width: 100%;
+            padding: 0px;
+            margin: 0px;
+        }
+
+        .breadcrumb {
+           padding: 2px 0px !important;
+           background-color: transparent;
+        }
+
+        .breadcrumb-item +.breadcrumb-item::before {
+                display: inline-block;
+                padding-right: .5rem;
+                padding-left: .5rem;
+                color: #868e96;
+                content: "»";
+        }
+
+        .carousel .carousel-indicators li {background-color: darkgray;}
+        .carousel .carousel-indicators li.active {background-color: black;}
+
+       .cabecera {
+            /*margin-top: -20px;*/
+            background: gray;
+        }
+        .recortarCenefa {
+            margin-top: -56px;
+            margin-left: 382px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .InfoCabecera {
+            margin-top: -50px;
+            margin-left: 63%;
+            width: 35%;
+            float: left;
+            position: relative;
+            z-index: 4;
+        }
+
+        @font-face{font-family:'Almagro';src:url('./fonts/Almagro.eot');src:url('./fonts/Almagro.eot?#iefix')format('embedded-opentype'),url('./fonts/Almagro.woff2')format('woff2'),url('./fonts/Almagro.woff')format('woff'),url('./fonts/Almagro.ttf')format('truetype'),url('./fonts/Almagro.svg#Almagro')format('svg');font-weight:100;font-style:normal;}
+
+        .imglogo {
+            max-height: 20px!important;
+            width: auto;
+            /*margin-top: -7px;
+            margin-left: 15px;*/
+            display: inline;
+        }
+
+        .logoPeque {
+	        display: none;
+        }
+
+        .logoInfoIGME {
+            font-family: 'Almagro';
+            font-size: xx-large;
+            color: #fff;
+            float: right;
+        }
+     </style>
+
+<meta name="twitter:card" content="summary_large_image" /><meta name="twitter:site" content="@ApadrinaUnaRoca" /><meta name="twitter:url" content="http://info.igme.es/ielig/LIGInfo.aspx?codigo=IB207" /><meta name="twitter:title" content="IELIG - IB207: Yacimientos de dinosaurios del Jurásico-Cretácico en Galve" /><meta name="twitter:description" content="En el sinclinal de Galve se conocen más de 65 yacimientos con restos de vertebrados fósiles mesozoicos, entre los que destacan dos nuevas especies de dinosaurios (Aragosaurus y Galvesaurus), seis nuevas especies de mamíferos y restos de cocodrilos, pterosaurios, escamosos, peces y tiburones. Es uno de los yacimientos de reptiles mesozoicos emblemático por tanto por su historia como por el conocimiento paleontológico aportado. También existen yacimientos de icnitas, siendo el más importante de estos últimos el  de las Cerradicas. Las Cerradicas:Es un pequeño afloramiento de la Fm. Villar del Arzobispo que  se encuentra al lado de la carretera de entrada a la localidad de Galve. Su acceso es sencillo y se encuentra preparado para la vista. Se pueden observar más de 40 icnitas distribuidas en cuatro rastros de dos tipos diferentes, unas fueron realizadas por tres dinosaurios carnívoros y otra por un herbívoro. La edad del yacimiento es del Berriasiense (Cretácico Inferior). Otros yacimientos de icnitas, como El Cantalar, Ríos Bajos, Barranco Luca y Corrales del Pelejón, están en estudio.Cuesta Lonsal:Ubicado geológicamente en la Formación Villar del Arzobispo, Berriasiense (Cretácico Inferior).La Maca:El yacimiento de La Maca se sitúa estratigráficamente en la parte media de Formación Camarillas, que tiene una edad Barremiense inferior. Todo el material se depositó en el Museo Provincial de Teruel. Estos restos fueron descritos por el paleontólogo francés Lapparent, del Instituto Católico de París.Las Zabacheras:En este yacimiento se encontraron en 1958 los primeros restos de Aragosaurus. Estos restos fósiles se depositaron en el Museo de Teruel y fueron estudiados por el paleontólogo francés Lapparent en 1960, quien los clasificó como pertenecientes a un nuevo camarasáurido nuevo al que no dio nombre (Lapparent, 1960). El estudio estratigráfico ha permitido fijar su posición estratigráfica en una unidad que ahora conocemos como Formación Castellar (Hauteriviense superior – Barremiense basal).Poyales:El yacimiento Poyales Barranco Canales estaba situado estratigráficamente en las arcillas rojas de la Fm. Camarillas (Barremiense inferior), Parte de un esqueleto postcraneal parcialmente articulado se encuentra expuesto en la Sala de Exposición Paleontológica del Ayuntamiento de Galve. La explotación minera de arcillas en Galve hizo desaparecer este yacimiento." /><meta name="twitter:image" content="https://info.igme.es/ielig/documentacion/ib/ib207/fotos/f-ib207-01_web.jpg" /></head>
+
+<body>
+
+    <A id="Arriba" />
+
+
+     <!-- Fixed navbar -->
+      
+   
+    <form name="aspnetForm" method="post" action="./LIGInfo.aspx?codigo=IB207" id="aspnetForm">
+<div>
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwUJNDQyNTM3NDcyZGRiFj4FqZn2Jf7jomVVFN/6DN2bnq9fBiRJqUXZbXbg0A==" />
+</div>
+
+<div>
+
+	<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="95CB9F6C" />
+</div>
+    <div>
+        
+    
+    <div id="myBtn"><a href="#top" title="Ir a arriba">Arriba</a></div>
+
+    <div class="container">
+        <?xml version="1.0" encoding="utf-8"?><a name="top"></a><h3 class="mb-0 mt-2">Inventario Español de Lugares de Interés Geológico</h3><ol class="breadcrumb"><li class="breadcrumb-item pl-0"><a href="http://www.igme.es">IGME</a></li><li class="breadcrumb-item pl-0"><a href="https://info.igme.es" title="Información Geocientífica del IGME">InfoIGME</a></li><li class="breadcrumb-item pl-0"><a target="_blank" href="default.aspx" title="Inventario de Lugares de Interés Geológico">IELIG</a></li><li class="breadcrumb-item pl-0 active">IB207</li></ol><div class="jumbotron py-3"><h1 class="mb-0">IB207</h1><p class="lead mb-0">Yacimientos de dinosaurios del Jurásico-Cretácico en Galve</p></div><nav><div class="nav nav-tabs" id="nav-tab" role="tablist"><a class="nav-item nav-link active" id="ficha-tab" data-toggle="tab" href="#ficha" role="tab" aria-controls="nav-apadrinamientos" aria-selected="true">Ficha LIG</a><a class="nav-item nav-link" id="apadrina-tab" data-toggle="tab" href="#apadrina" role="tab" aria-controls="nav-datos" aria-selected="false">Apadrina este LIG</a></div></nav><div class="tab-content border border-top-0 p-3 mb-4"><div role="tabpanel" class="tab-pane active" id="ficha"><ul id="markdown-toc"><li><a href="#generales">Datos generales del LIG</a></li><li><a href="#localizacion">Localización</a></li><li><a href="#fisiografia">Fisiografía</a></li><li><a href="#situaciongeologica">Situación geológica</a></li><li><a href="#interes">Interés</a></li><li><a href="#proteccion">Protección</a></li><li><a href="#usoseguimiento">Uso y seguimiento</a></li><li><a href="#visitas">Visitas</a></li><li><a href="#documentacion">Documentación</a></li><li><a href="#autores">Autores</a></li><li><a href="#yacimientospaleontologicos">Yacimientos Paleontológicos</a></li><li><a href="#valoraciones">Valoraciones</a></li></ul><a name="generales"></a><h2>Datos generales</h2><dl class="dl-horizontal"><dt>Código LIG :</dt><dd>IB207.
+      </dd><dt>Código Geosite :</dt><dd>FC006.
+      </dd><dt>Denominación :</dt><dd>Yacimientos de dinosaurios del Jurásico-Cretácico en Galve.
+      </dd><dt>Descripción :</dt><dd class="text-justify"><DATA>En el sinclinal de Galve se conocen más de 65 yacimientos con restos de vertebrados fósiles mesozoicos, entre los que destacan dos nuevas especies de dinosaurios (Aragosaurus y Galvesaurus), seis nuevas especies de mamíferos y restos de cocodrilos, pterosaurios, escamosos, peces y tiburones. Es uno de los yacimientos de reptiles mesozoicos emblemático por tanto por su historia como por el conocimiento paleontológico aportado. También existen yacimientos de icnitas, siendo el más importante de estos últimos el  de las Cerradicas. <br/>Las Cerradicas:<br/>Es un pequeño afloramiento de la Fm. Villar del Arzobispo que  se encuentra al lado de la carretera de entrada a la localidad de Galve. Su acceso es sencillo y se encuentra preparado para la vista. Se pueden observar más de 40 icnitas distribuidas en cuatro rastros de dos tipos diferentes, unas fueron realizadas por tres dinosaurios carnívoros y otra por un herbívoro. La edad del yacimiento es del Berriasiense (Cretácico Inferior). Otros yacimientos de icnitas, como El Cantalar, Ríos Bajos, Barranco Luca y Corrales del Pelejón, están en estudio.<br/>Cuesta Lonsal:<br/>Ubicado geológicamente en la Formación Villar del Arzobispo, Berriasiense (Cretácico Inferior).<br/>La Maca:<br/>El yacimiento de La Maca se sitúa estratigráficamente en la parte media de Formación Camarillas, que tiene una edad Barremiense inferior. Todo el material se depositó en el Museo Provincial de Teruel. Estos restos fueron descritos por el paleontólogo francés Lapparent, del Instituto Católico de París.<br/>Las Zabacheras:<br/>En este yacimiento se encontraron en 1958 los primeros restos de Aragosaurus. Estos restos fósiles se depositaron en el Museo de Teruel y fueron estudiados por el paleontólogo francés Lapparent en 1960, quien los clasificó como pertenecientes a un nuevo camarasáurido nuevo al que no dio nombre (Lapparent, 1960). El estudio estratigráfico ha permitido fijar su posición estratigráfica en una unidad que ahora conocemos como Formación Castellar (Hauteriviense superior – Barremiense basal).<br/>Poyales:<br/>El yacimiento Poyales Barranco Canales estaba situado estratigráficamente en las arcillas rojas de la Fm. Camarillas (Barremiense inferior), Parte de un esqueleto postcraneal parcialmente articulado se encuentra expuesto en la Sala de Exposición Paleontológica del Ayuntamiento de Galve. La explotación minera de arcillas en Galve hizo desaparecer este yacimiento.</DATA></dd><dt>Origen LIG :</dt><dd>Proyecto Global Geosites</dd><dt title="Fecha de creacion de la ficha">Fecha de creación de la ficha :</dt><dd>31/12/2007</dd><dt>Confidencialidad :</dt><dd>Público.
+      </dd></dl><a name="localizacion"></a><br /><h2>Localización</h2><div id="map" class="col-12"></div><br /><dl class="dl-horizontal"><dt>Hojas 1:50.000 :</dt><dd><div class="table-responsive"><table class="table table-condensed"><tr style="background-color: #D7D7D7"><th> Nombre </th><th> Numero </th><th> Hoja 1:200.000 </th></tr><tr><td>
+                   ALFAMBRA 
+                </td><td>
+                   542   
+                </td><td>
+                   47 - TERUEL 
+                </td></tr><tr><td>
+                   VILLARLUENGO 
+                </td><td>
+                   543   
+                </td><td>
+                   47 - TERUEL 
+                </td></tr><tr><td>
+                   ARGENTE 
+                </td><td>
+                   517   
+                </td><td>
+                   40 - DAROCA 
+                </td></tr></table></div></dd><dt>Paraje :</dt><dd>Las Cerradicas, Cuesta Lonsal, La Maca, Las Zabacheras, El Cantalar, Ríos Bajos, Barranco Luca y Coorrales del Pelejón..
+      </dd><dt>Municipios :</dt><dd><div class="table-responsive"><table class="table table-condensed"><tr style="background-color: #D7D7D7"><th> Núcleo </th><th> Municipio </th><th> Provincia </th><th> CCAA </th></tr><tr><td class="NumberRecord">
+                    
+                </td><td class="NumberRecord">
+                   GALVE 
+                </td><td class="NumberRecord">
+                   Teruel 
+                </td><td class="NumberRecord">
+                   Aragón 
+                </td></tr></table></div></dd><tr><dt>Itinerario de acceso :</dt><dd class="text-justify"><DATA>Las Cerradicas se encuentran al borde de la carretera TE-V-8201, unos 500 m al NNE de Galve. Al resto de yacimientos se accede por pistas y caminos.</DATA></dd></tr></dl><a name="fisiografia"></a><br /><h2>Fisiografía</h2><dl class="dl-horizontal"><dt>Cota máxima :</dt><dd>1394 m.
+              </dd><dt>Cota mínima :</dt><dd>1160 m.
+              </dd><dt>Cota media :</dt><dd>1220 m.
+              </dd><dt Title="Superficie aproximada">Superficie :</dt><dd>1109.41 hectáreas.
+                </dd><dt>Tipo/s de superficie :</dt><dd>Matorral.<br /></dd></dl><a name="situaciongeologica"></a><br /><h2>Situación geológica</h2><dl class="dl-horizontal"><dt title="Dominio geológico (GEODE)">Dominio geológico (GEODE) :</dt><dd>Cordillera Ibérica.
+      </dd><dt title="Unidad geotectónica 2º orden">Unidad geotectónica 2º orden :</dt><dd>Maestrazgo.
+      </dd><dt title="Contexto Ley 42/2007">Contexto Ley 42/2007 :</dt><dd>Fósiles e icnofósiles del Mesozoico continental de la Península Ibérica.
+      </dd><dt title="Unidad geológica Ley 42/2007">Unidad geológica Ley 42/2007 :</dt><dd>Estructuras y formaciones del basamento, unidades alóctonas y cobertera de las Cordilleras Alpinas.
+      </dd><dt title="Edad rasgo inferior">Edad rasgo inferior :</dt><dd>Tithoniense.
+      </dd><dt title="Edad rasgo superior">Edad rasgo superior :</dt><dd>Berriasiense.
+      </dd></dl><a name="interes"></a><br /><h2>Interés</h2><dl class="dl-horizontal"><dt>Geológico principal :</dt><dd>Paleontológico.
+          <br /><p class="text-muted text-justify"><DATA>Las Cerradicas: La importancia de este yacimiento es que los dos tipos diferentes de rastros son singulares en la literatura científica: por una parte, tres rastros de pequeños dinosaurios carnívoros, que bien podrían ser ejemplares juveniles o bien adultos de pequeño tamaño. Estos tres rastros son paralelos y se han formado al mismo tiempo, por lo cual representan un interesante caso de gregarismo en dinosaurios carnívoros. El otro rastro es de un dinosaurio herbívoro de pequeño tamaño. Su interés radica en que el productor era un dinosaurio ornitópodo apoyando las "patas" delanteras. Ello se deduce de la presencia, delante de algunas de las improntas traseras, de impresiones de pequeño tamaño subcirculares, claramente producidas por el apoyo de las manos del dinosaurio productor. Aunque la conservación del rastro no es especialmente buena, el patrón de la pista hace de ella un hallazgo significativo debido a la escasez de este tipo  de rastros en el registro fósil. En el registro español, sólo tenemos los casos del yacimiento Valdemayor (Cabezón de Cameros) y El Frontal (Regumiel de la Sierra). Además de los rastros descritos, existen una serie de icnitas aisladas que forman un conjunto de 63 icnitas de dinosaurios, tanto terópodos como ornitópodos.<br/>Cuesta Lonsal:<br/>La singularidad del yacimiento de Cuesta Lonsal radica en que en él se han encontrado y recuperado los restos fósiles que, hasta la fecha, constituyen los más completos de un dinosaurio Jurásico español. Se trata de un nuevo saurópodo denominado Galvesaurus herreroi (Barco et al., 2005). Se trata de un neosaurópodo basal (Barco et al. 2004) cuyo estudio completo aportará interesantes conclusiones sobre las relaciones filogenéticas que rodean al origen de los neosaurópodos y las radiaciones evolutivas que les afectaron. Otro aspecto destacable es el hallazgo en ésta misma localidad fosilífera de un diente de cocodrilo (Barco, 2005) y otro de dinosaurios terópodo (Barco y Ruiz-Omeñaca, 2001), ambos mudados. <br/>Las Zabacheras:<br/>Sanz et al (1987) definieron el género y especie Aragosaurus ischiaticus. Usaron para la descripción el material depositado en el Museo de Teruel, colección particular de José María Herrero y colección de la Universidad Autónoma de Madrid. Posteriormente se ha propuesto que la forma del fémur y su tamaño relativo respecto al húmero indican que no es un camarasáurido sino un titanosauriforme (Canudo et al., 2001). Todos los restos parecen corresponder a un único ejemplar ya que no hay elementos repetidos. <br/>La Maca:<br/>Los dinosaurios estudiados por Lapparent (Iguanodon bernissartensis del yacimiento La Maca, y el saurópodo del yacimiento de Las Zabacheras, posteriormente bautizado como Aragosaurus ischiaticus) constituyen la primera monografía sobre dinosaurios publicada en España. La presencia de I. bernissartensis en Galve ha sido mencionada en muchos trabajos de difusión internacional, sobre todo citando a Lapparent. El reestudio del material de La Maca permite confirmar que los restos no pertenecen a I. bernissartensis, y que pertenecen a un nuevo género y especie de Iguanodontoidea.<br/>Poyales:<br/>En total se identificaron 104 restos de la columna vertebral, cadera izquierda y extremidades posteriores, pertenecientes todos a un único individuo, lo que hace que sea uno de los esqueletos de dinosaurio más completos encontrados en España. Ruiz-Omeñaca (1996) estudió el esqueleto completo, que representa un género y especie de hipsilofodóntido nuevo, aún no descrito</DATA></p></dd><dt title="Geológico secundario">Geológico secundario :</dt><dd>Sedimentológico. 
+          <br /><p class="text-muted text-justify"><DATA>Sedimentológico. Pisadas de dinosaurio en Ríos Bajos en capas marinas. En las Cerradicas, los estratos en los que se han encontrado las huellas se formaron en una llanura mareal y por tanto muy cercanos a la línea de costa. Por la posición de los rastros respecto a las rizaduras fosilizadas en la superficie de la roca, podemos saber que el ornitópodo se desplazaba aproximadamente paralelo a la línea de costa. Sin embargo los carnívoros lo hacían perpendicular a ella y en dirección hacía el agua.</DATA></p></dd><dt title="Interés no geológico">Interés no geológico :</dt><dd>Arquitectónico. 
+          Histórico o cultural. 
+          <br /><p class="text-muted text-justify"><DATA>Localidad incluida dentro del Parque Cultural del Maestrazgo. Tiene un museo con restos de dinosaurios y otros vertebrados del intervalo Titónico-Hauteriviense. Puente medieval.</DATA></p></dd></dl><a name="proteccion"></a><br /><h2>Protección</h2><dl class="dl-horizontal"><dt>Inventario/catálogo :</dt><dd>Las Cerradicas es Global Geosite y BIC declarado por el Gobierno de Aragón.
+            </dd><dt title="Instrumentos jurídicos de protección existentes">Instrumentos jurídicos :</dt><dd>BIC (parcial).
+              </dd></dl><a name="usoseguimiento"></a><br /><h2>Uso y seguimiento</h2><dl class="dl-horizontal"><dt Title="¿Es compatible la recogida de fósiles con al conservación del lugar?">Recogida de fósiles :</dt><dd>Incompatible con la conservación del lugar o sin ejemplares.
+            </dd><dt Title="¿Es compatible la recogida de minerales con al conservación del lugar?">Recogida de minerales :</dt><dd>Incompatible con la conservación del lugar o sin ejemplares.
+            </dd></dl><a name="visitas"></a><br /><h2>Visitas</h2><dl class="dl-horizontal"><dt>Equipamiento :</dt><dd><i>Mirador</i>: No.<br /><i>Mesas, bancos, etc.</i>: No.<br /><i>Señalización</i>: No.<br /><i>Fuente de agua potable en las inmediaciones</i>: No.<br /></dd><dt Title="Dificultad física del itinerario">Dificultad itinerario :</dt><dd>Media.
+            </dd><dt Title="Duración aproximada del itinerario para un recorrido normal">Duración itinerario :</dt><dd>5 hora/s.
+            </dd><dt>Tipo de acceso :</dt><dd>Carretera asfaltada aparcamiento turismo.
+                <br />Pista sin asfaltar acceso todo terreno.
+                <br /></dd><dt Title="Distancia a carretera asfaltada">Distancia carretera :</dt><dd>0 km.
+            </dd><dt Title="¿Accesos adaptados a discapacitados?">Acceso discapacitados :</dt><dd>No.
+            </dd><dt>Infraestructura logística :</dt><dd>Alojamiento y restaurante para 40 personas a menos de 25 km.
+            </dd></dl><a name="documentacion"></a><br /><h2>Documentación</h2><dl class="dl-horizontal"><dt>Fotografías :</dt><dd><table cellpadding="0" cellspacing="0" border="0"><div id="myCarousel" class="carousel slide" data-ride="carousel" style="max-width:800"><ol class="carousel-indicators"><li data-target="#myCarousel" data-slide-to="0" class="active"></li><li data-target="#myCarousel" data-slide-to="1"></li><li data-target="#myCarousel" data-slide-to="2"></li></ol><div class="carousel-inner"><div class="carousel-item active"><div class="d-flex justify-content-center"><img class="d-block" src="https://info.igme.es/ielig/documentacion/ib/ib207/fotos/f-ib207-01_web.jpg" alt="Huellas de saurópodos en el Barranco Luca. Foto Pérez Lorente"></img></div><div class="carousel-caption" style=" position: relative; left: auto; right: auto;;bottom:0px;background:#fff;padding:10px 10px 70px 10px;"><div class="text-dark" style="position:relative;top:10px;">Huellas de saurópodos en el Barranco Luca. Foto Pérez Lorente</div></div></div><div class="carousel-item"><div class="d-flex justify-content-center"><img class="d-block" src="https://info.igme.es/ielig/documentacion/ib/ib207/fotos/f-ib207-02_web.jpg" alt="Las Cerradicas"></img></div><div class="carousel-caption" style=" position: relative; left: auto; right: auto;;bottom:0px;background:#fff;padding:10px 10px 70px 10px;"><div class="text-dark" style="position:relative;top:10px;">Las Cerradicas</div></div></div><div class="carousel-item"><div class="d-flex justify-content-center"><img class="d-block" src="https://info.igme.es/ielig/documentacion/ib/ib207/fotos/f-ib207-03_web.jpg" alt="Las Cerradicas"></img></div><div class="carousel-caption" style=" position: relative; left: auto; right: auto;;bottom:0px;background:#fff;padding:10px 10px 70px 10px;"><div class="text-dark" style="position:relative;top:10px;">Las Cerradicas</div></div></div></div><a class="carousel-control-prev" href="#myCarousel" data-slide="prev"><span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="sr-only">Previous</span></a><a class="carousel-control-next" href="#myCarousel" data-slide="next"><span class="carousel-control-next-icon" aria-hidden="true"></span><span class="sr-only">Next</span></a></div></table></dd><dt>Croquis, cortes geológicos, columnas, etc :</dt><dd><table cellpadding="0" cellspacing="0" border="0"><tr><td><a target="_blank" href="https://info.igme.es/ielig/documentacion/ib/ib207/croquis/e-ib207-01.jpg">Esquema</a></td></tr><tr><td><font class="TablaValorLeftMini">Planimetría del rastro de Las Cerradicas, producido por un ornitópodo iguanodóntido en una clara progresión cuadrúpeda.</font></td></tr><tr><td style="height: 5px;"></td></tr><tr><td><a target="_blank" href="https://info.igme.es/ielig/documentacion/ib/ib207/croquis/c-ib207-01.jpg">Columna</a></td></tr><tr><td><font class="TablaValorLeftMini">Columna de Galve según Canudo et al. 2005</font></td></tr><tr><td style="height: 5px;"></td></tr></table></dd><dt>Mapas, ortofotos, etc :</dt><dd><table cellpadding="0" cellspacing="0" border="0"><tr><td><a target="_blank" href="https://info.igme.es/ielig/documentacion/ib/ib207/mapas y ortofotos/o-ib207-01.pdf">Ortofoto</a></td></tr><tr><td><font class="TablaValorLeftMini">Las Cerradicas</font></td></tr><tr><td style="height: 5px;"></td></tr><tr><td><a target="_blank" href="https://info.igme.es/ielig/documentacion/ib/ib207/mapas y ortofotos/m-ib207-01.jpg">Mapa topográfico</a></td></tr><tr><td><font class="TablaValorLeftMini">Delimitación del LIG</font></td></tr><tr><td style="height: 5px;"></td></tr><tr><td><a target="_blank" href="https://info.igme.es/ielig/documentacion/ib/ib207/mapas y ortofotos/m-ib207-02.jpg">Mapa Geológico</a></td></tr><tr><td><font class="TablaValorLeftMini">Esquema geológico segín Canudo et al. 2005</font></td></tr><tr><td style="height: 5px;"></td></tr></table></dd><dt>Otros documentos :</dt><dd><table cellpadding="0" cellspacing="0" border="0"><tr><td><a target="_blank" href="https://info.igme.es/ielig/documentacion/ib/ib207/documentos/d-ib207-01.pdf">Bibliografía sobre Galve</a> (Bibliografía)</td></tr><tr><td><font class="TablaValorLeftMini">J. Moratalla</font></td></tr><tr><td style="height: 5px;"></td></tr></table></dd></dl><a name="autores"></a><br /><h2>Autores</h2><dl class="dl-horizontal"><dt>Autores :</dt><dd>J. Moratalla<br />Á. García Cortés<br /></dd><dt>Proponentes :</dt><dd>L. Alcalá<br />M. Aurell<br />B. Bádenas<br />J.B. Díez Ferrer<br />A. Díez Herrero<br />J.L. Barco<br />Á. Paradas<br /></dd><dt>Referencias :</dt><dd><p>Pérez-Lorente, F.; Cuenca, G.; Aurell, M.; Canudo, J.I.; Soria, A.R. &amp; Ruiz-Omeñaca, J.I. (1997). Las Cerradicas tracksite (Berriasian, Galve, Spain): growing evidence for quadrupedal ornithopods. Ichnos, 5: 109-120.</p></dd></dl><a name="sedimentarias"></a><br /><h2>Rocas Sedimentarias</h2><dl class="dl-horizontal"><dt>Medios continentales :</dt><dd>Lacustre.<br />Palustre.<br /></dd><dt>Medios mixtos-transición :</dt><dd>Llanura mareal.<br /></dd><dt class="TablaCampo" Title="Geometría de las capas">Geometria capas :</dt><dd>Tabulares.<br /></dd><dt>Polaridad positiva :</dt><dd>
+              Sí.
+            </dd><dt>Continuidad :</dt><dd>Paraconformidad.<br /></dd><dt>Sucesion litológica :</dt><dd>Heterogénea.<br /></dd><dt>Estructuras :</dt><dd>Canales.<br />Laminación paralela.<br />Ripple marks .<br />Bioturbación-bioerosión.<br /></dd><dt Title="Origen de las estructuras">Origen estructuras :</dt><dd>Corrientes.<br />Origen biológico.<br /></dd><dt>Litologías :</dt><dd>Marga.<br />Arcilla.<br />Arenisca.<br />Conglomerado.<br />Caliza.<br />Arenisca calcárea.<br /></dd><dt>Contenido fósil :</dt><dd>Reptiles.<br />Icnitas.<br /></dd></dl><a name="yacimientospaleontologicos"></a><br /><h2>Yacimientos Paleontológicos</h2><dt>Interés :</dt><dd>Existencia de fósiles de facies.<br />Existencia de nuevos taxones.<br />Yacimiento con abundancia local de fósiles poco comunes.<br />Yacimiento con fósiles que presentan rasgos de importancia científica.<br /></dd><dt class="TablaCampo" Title="Dimensión del afloramiento">Dimensión :</dt><dd>1000 m².
+          </dd><dt>Macrofauna :</dt><dd>Huellas de vertebrados .<br />Reptiles.<br /></dd><a name="valoraciones"></a><br /><h2>Valoraciones</h2><div class="row"><div class="col-md-4"><dt>Valor científico (VC) :</dt><dd>4.6 (Alto)</dd></div><div class="col-md-4"><dt>Valor didáctico (VD) :</dt><dd>3.9 (Medio)</dd></div><div class="col-md-4"><dt>Valor turístico (VT) :</dt><dd>2.9 (Bajo)</dd></div></div><div class="row mt-3"><div class="col-md-4"><dt>Susceptibilidad degradación natural (SDN) :</dt><dd>1.3 (Media)
+              </dd></div><div class="col-md-4"><dt>Susceptibilidad degradación antrópica (SDA) :</dt><dd>5.3 (Muy alta)
+              </dd></div><div class="col-md-4"></div></div><div class="row mt-3"><div class="col-md-4"><dt>Riesgo degradación natural (RDN) :</dt><dd>0.58 (Medio)
+              </dd></div><div class="col-md-4"><dt>Riesgo degradación antrópica (RDA) :</dt><dd>2.43 (Alto)
+              </dd></div><div class="col-md-4"><dt>Prioridad de protección (PP) :</dt><dd>Alta</dd></div></div></div><div role="tabpanel" class="tab-pane" id="apadrina"><br /><br /><div class="alert alert-success" role="alert"><strong>Este LIG es apadrinable.</strong> Pincha <a href="apadrina.aspx?codigo=IB207">aquí</a> si quieres ser padrino/madrina de este LIG.<br /><a target="_blank" href="./Apadrinamiento/Encuesta.aspx?codigo=IB207">Reportar una incidencia</a></div> 
+              
+                Este LIG tiene <strong>3 voluntarios</strong>, de los cuales han decidido mostrar su nombre:
+                  <ul><li>Roxhelys Olivar</li><li>Miguel Ferrer Navarro</li><li>Andrea Acosta Ruiz</li></ul><br /><br /><p><a data-toggle="collapse" href="#confirmacion" aria-expanded="false" aria-controls="confirmacion">¿Por qué no aparece mi nombre tras apadrinar este LIG?</a></p><div class="collapse" id="confirmacion"><p>Puede deberse a que no has marcado la opción para que se muestre tu nombre  en el formulario de apadrinamiento en el formulario de apadrinamiento o a que no has confirmado el apadrinamiento (el sistema te envía un correo electrónico con un enlace sobre el que tienes que pinchar). Puedes entrar en <a href="./Apadrinamiento/login.aspx" target="_blank">tu cuenta de padrino/madrina</a> para solucionarlo.</p></div><p><a href="https://web.igme.es/patrimonio/apadrinaunaroca.htm" target="_blank">¿No conoces el programa <em>Apadrina una Roca</em>?</a></p></div></div>
+    </div>
+
+            <script>
+                // When the user scrolls down 20px from the top of the document, show the button
+                window.onscroll = function () { scrollFunction() };
+
+                function scrollFunction() {
+                    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                        document.getElementById("myBtn").style.display = "block";
+                    } else {
+                        document.getElementById("myBtn").style.display = "none";
+                    }
+                }
+
+                // When the user clicks on the button, scroll to the top of the document
+                function topFunction() {
+                    $('html, body').animate({ scrollTop: 0 }, 'fast');
+
+                    //document.body.scrollTop = 0;
+                    //document.documentElement.scrollTop = 0;
+                    //return false;
+                }
+
+                window.onload = function () {
+                    zoom2feature2('IB207');
+                };
+
+        </script>
+
+
+    </div>
+    </form>
+
+    <div class="container-fluid" style="background-color:#DEDEDE">
+      <footer class="bd-footer text-muted" >      
+          <div class="container">
+            <div class="row py-3">
+                <div class="col-md-auto col-12">
+                    <div style="align:top;display: inline-block;" class="align-top">
+                        <img style="margin-top:5px" border="0" src="https://info.igme.es/cartografiadigital/img/bocetoGris.gif" width="60" height="73" alt="Imagen Boceto IGME">
+                        
+                    </div>                    
+                    <div class="align-bottom ml-2" style="align:bottom;line-height:100%;display:inline-block;min-width:140px;">                    
+                        <small>
+                        <strong>IGME</strong><br>
+                        Ríos Rosas, 23<br>
+                        28003 Madrid<br>
+                        Teléfono + 34 913 495 700<br>
+                        </small>
+                    </div>
+                </div>
+                <div class="col-12 col-md-auto">
+                    <br/>                    
+                    <ul class="list-inline">
+                       <li class="list-inline-item"><a href="http://www.igme.es/Ayuda/guia.htm">Guía de navegación</a></li>
+                       <li class="list-inline-item"><a href="http://www.igme.es/Ayuda/mapa_web.htm">Mapa web</a></li>
+                       <li class="list-inline-item"><a href="http://www.igme.es/Ayuda/accesibilidad.htm">Accesibilidad</a></li>
+                        <li class="list-inline-item"><a href="http://www.igme.es/Ayuda/CondiUso.htm">Condiciones de uso</a></li>
+                    </ul>
+                </div>
+                <div class="col-12 col-md-auto">
+                    <br>
+                    <img height="22" alt="Icono de conformidad con el Nivel A, de las Directrices de Accesibilidad para el Contenido Web 1.0 del W3C-WAI" src="http://www.igme.es/Ayuda/wcag1A_P.gif" width="65" border="0">         
+                    <br>
+                 </div> 
+            </div>    
+        </div>                
+    </footer>
+</div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://info.igme.es/jquery/1.12.4/jquery.min.js"></script>
+
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    
+    <script src="https://info.igme.es/bootstrap/4.1.3-dist/js/bootstrap.min.js"></script>
+
+     <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
+            integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
+            crossorigin=""></script>
+
+    <script src="https://unpkg.com/esri-leaflet@2.2.3/dist/esri-leaflet.js"
+            integrity="sha512-YZ6b5bXRVwipfqul5krehD9qlbJzc6KOGXYsDjU9HHXW2gK57xmWl2gU6nAegiErAqFXhygKIsWPKbjLPXVb2g=="
+            crossorigin=""></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@2.2.13/dist/esri-leaflet-geocoder.css"
+          integrity="sha512-v5YmWLm8KqAAmg5808pETiccEohtt8rPVMGQ1jA6jqkWVydV5Cuz3nJ9fQ7ittSxvuqsvI9RSGfVoKPaAJZ/AQ=="
+          crossorigin="">
+
+    <script src="https://unpkg.com/esri-leaflet-geocoder@2.2.13/dist/esri-leaflet-geocoder.js"
+            integrity="sha512-zdT4Pc2tIrc6uoYly2Wp8jh6EPEWaveqqD3sT0lf5yei19BC1WulGuh5CesB0ldBKZieKGD7Qyf/G0jdSe016A=="
+            crossorigin=""></script>
+
+     
+    <script src="https://info.igme.es/spatialunits/js/IGME.Leaflet.Map.min.js"></script>
+
+    <script src="IELIG_Leaflet.js"></script>
+
+
+    <script>
+        //function arcgisToGeoJSON$1 (arcgis, idAttribute) {
+        //    var geojson = {};
+
+        //    if (typeof arcgis.x === 'number' && typeof arcgis.y === 'number') {
+        //      geojson.type = 'Point';
+        //      geojson.coordinates = [arcgis.x, arcgis.y];
+        //    }
+
+        //    if (arcgis.points) {
+        //      geojson.type = 'MultiPoint';
+        //      geojson.coordinates = arcgis.points.slice(0);
+        //    }
+
+        //    if (arcgis.paths) {
+        //      if (arcgis.paths.length === 1) {
+        //        geojson.type = 'LineString';
+        //        geojson.coordinates = arcgis.paths[0].slice(0);
+        //      } else {
+        //        geojson.type = 'MultiLineString';
+        //        geojson.coordinates = arcgis.paths.slice(0);
+        //      }
+        //    }
+
+        //    if (arcgis.rings) {
+        //      geojson = convertRingsToGeoJSON(arcgis.rings.slice(0));
+        //    }
+
+        //    if (arcgis.geometry || arcgis.attributes) {
+        //      geojson.type = 'Feature';
+        //      geojson.geometry = (arcgis.geometry) ? arcgisToGeoJSON$1(arcgis.geometry) : null;
+        //      geojson.properties = (arcgis.attributes) ? shallowClone$1(arcgis.attributes) : null;
+        //      if (arcgis.attributes) {
+        //        geojson.id = arcgis.attributes[idAttribute] || arcgis.attributes.OBJECTID || arcgis.attributes.FID;
+        //      }
+        //    }
+
+        //    return geojson;
+        //  }
+
+    </script>
+    <script>
+
+            var mapConfig = null;
+
+        let jsonConfig = (document.domain == 'localhost' ? '/IGME.Map.IELIG.json' : '/spatialunits/json/IGME.Map.IELIG.json');
+
+            // Gets map configuration from JSON config file
+            $.ajax({
+                dataType: "json",
+                async: false,
+                //url: "/spatialunits/json/IGME.Map.IELIG.json",
+                url: jsonConfig,
+                data: null,
+                success: function (data) {
+                    mapConfig = data;
+                }
+            });
+
+            // Map inizialization
+            var igmeMap = new IGMEMap("map", mapConfig);
+
+
+        //zoom2feature('IB085');
+
+
+     </script>
+
+</body>
+</html>
