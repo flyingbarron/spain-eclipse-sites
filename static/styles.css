@@ -2046,8 +2046,14 @@ footer a:hover {
         text-align: center;
     }
     
-    /* Link buttons - full width, larger touch targets */
-    .link-button,
+    /* Link buttons in detail-header should stay inline on desktop */
+    .detail-header .link-button {
+        display: inline-block;
+        width: auto;
+    }
+    
+    /* Other link buttons - full width, larger touch targets on mobile */
+    .site-links .link-button,
     .modal-button {
         display: block;
         width: 100%;
