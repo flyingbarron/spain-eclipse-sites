@@ -130,7 +130,7 @@ function generateSiteUrls(site) {
     const xavierJubierUrl = `http://xjubier.free.fr/en/site_pages/solar_eclipses/TSE_2026_GoogleMapFull.html?Lat=${lat}&Lng=${lon}&Zoom=8&LC=1`;
     
     // Heliora
-    const helioraUrl = `https://heliora.app/?lat=${lat}&lng=${lon}&date=2026-08-12&t=1065`;
+    const helioraUrl = `https://heliora.app/?lat=${lat}&lng=${lon}&date=2026-08-12&t=1290`;
     
     // Dark Sky Sites
     const darkSkySitesUrl = `https://www.darkskysites.com/?lat=${lat}&lng=${lon}&zoom=8`;
