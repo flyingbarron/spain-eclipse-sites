@@ -93,6 +93,9 @@ function generateSiteUrls(site) {
     // Xavier Jubier Eclipse Map
     const xavierJubierUrl = `http://xjubier.free.fr/en/site_pages/solar_eclipses/TSE_2026_GoogleMapFull.html?Lat=${lat}&Lng=${lon}&Zoom=8&LC=1`;
     
+    // Heliora
+    const helioraUrl = `https://heliora.app/?lat=${lat}&lng=${lon}&date=2026-08-12&t=1065`;
+    
     // Dark Sky Sites
     const darkSkySitesUrl = `https://www.darkskysites.com/?lat=${lat}&lng=${lon}&zoom=8`;
     
@@ -107,6 +110,7 @@ function generateSiteUrls(site) {
         eclipse: eclipseUrl,
         eclipseFan: eclipseFanUrl,
         xavierJubier: xavierJubierUrl,
+        heliora: helioraUrl,
         darkSkySites: darkSkySitesUrl,
         googleStatic: googleMapsStaticUrl,
         cloud: site.cloud_url
@@ -215,6 +219,7 @@ function renderSiteHeader(site, urls) {
                     <a href="${igmeButtonHref}" target="_blank" class="${igmeButtonClass}"${igmeButtonTitle}>🪨 View on IGME Website</a>
                     ${cloudButton}
                     <a href="${urls.xavierJubier}" target="_blank" class="link-button xavier">🗺️ Xavier Jubier Eclipse Map</a>
+                    <a href="${urls.heliora}" target="_blank" class="link-button heliora">☀️ Heliora</a>
                     <a href="${urls.darkSkySites}" target="_blank" class="link-button darksky">🌌 Dark Sky Sites</a>
                 </div>
 
