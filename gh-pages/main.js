@@ -12,6 +12,7 @@ import { displaySiteDetails, switchTab } from './site-details.js';
 import { setupModalListeners } from '../static/js/modal-handler.js';
 import { updateMapWithMultipleSites } from './map-handler.js';
 import { favoritesManager } from '../static/js/favorites-manager.js';
+import { initializeMapView, updateMapView, cleanupMapView, closeSiteDetailsPanel } from './map-view.js';
 
 
 /**
@@ -38,6 +39,7 @@ async function init() {
         setupModalListeners();
         setupFavoritesListeners();
         setupDocumentationButtons();
+        setupViewModeListeners();
         
         // Update favorites count
         updateFavoritesCount();
@@ -201,6 +203,67 @@ function setupDocumentationButtons() {
             window.open(baseUrl + 'credits.html', '_blank');
         });
     }
+
+/**
+ * Setup view mode toggle listeners
+ */
+function setupViewModeListeners() {
+    const listViewBtn = document.getElementById('listViewBtn');
+    const mapViewBtn = document.getElementById('mapViewBtn');
+    const content = document.getElementById('content');
+    const mapViewContainer = document.getElementById('mapViewContainer');
+    const mapDetailPanel = document.getElementById('mapDetailPanel');
+    const mapDetailClose = document.getElementById('mapDetailClose');
+    
+    if (!listViewBtn || !mapViewBtn || !content || !mapViewContainer) return;
+    
+    // List view button
+    listViewBtn.addEventListener('click', () => {
+        // Switch to list view
+        listViewBtn.classList.add('active');
+        mapViewBtn.classList.remove('active');
+        content.style.display = 'block';
+        mapViewContainer.style.display = 'none';
+        
+        // Cleanup map
+        cleanupMapView();
+        
+        // Update app state
+        appState.viewMode = 'list';
+    });
+    
+    // Map view button
+    mapViewBtn.addEventListener('click', () => {
+        // Switch to map view
+        mapViewBtn.classList.add('active');
+        listViewBtn.classList.remove('active');
+        content.style.display = 'none';
+        mapViewContainer.style.display = 'flex';
+        
+        // Initialize map with current filtered sites
+        const filteredSites = appState.getFilteredSites();
+        initializeMapView(filteredSites);
+        
+        // Update app state
+        appState.viewMode = 'map';
+    });
+    
+    // Close detail panel button
+    if (mapDetailClose) {
+        mapDetailClose.addEventListener('click', () => {
+            closeSiteDetailsPanel();
+        });
+    }
+    
+    // Close panel when clicking outside
+    if (mapDetailPanel) {
+        mapDetailPanel.addEventListener('click', (e) => {
+            if (e.target === mapDetailPanel) {
+                closeSiteDetailsPanel();
+            }
+        });
+    }
+}
 }
 
 /**
