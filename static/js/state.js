@@ -7,6 +7,7 @@ export class AppState {
     constructor() {
         // Site data
         this.sitesData = [];
+        this.filteredSites = [];
         this.currentSite = null;
         
         // Image carousel state
@@ -15,6 +16,7 @@ export class AppState {
         
         // UI state
         this.activeTab = 'details';
+        this.viewMode = 'list'; // 'list' or 'map'
         this.selectedSites = []; // Array to maintain order for multi-select
         this.returnToHotel = false;
         
@@ -66,7 +68,25 @@ export class AppState {
      */
     setSitesData(sites) {
         this.sitesData = sites;
+        this.filteredSites = sites;
         this.notify('sitesData', sites);
+    }
+    
+    /**
+     * Set filtered sites
+     * @param {Array} sites - Array of filtered site objects
+     */
+    setFilteredSites(sites) {
+        this.filteredSites = sites;
+        this.notify('filteredSites', sites);
+    }
+    
+    /**
+     * Get filtered sites
+     * @returns {Array} Array of filtered site objects
+     */
+    getFilteredSites() {
+        return this.filteredSites;
     }
     
     /**

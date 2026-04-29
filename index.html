@@ -7,10 +7,13 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦕</text></svg>">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet" />
     <link rel="stylesheet" href="static/styles.css?v=1.4.0" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
     
     <!-- Modular ES6 JavaScript - GitHub Pages Standalone Build -->
@@ -62,6 +65,18 @@
                             <option value="darkness">Darkness (Darkest First)</option>
                             <option value="darkness_asc">Darkness (Lightest First)</option>
                         </select>
+                    </div>
+                    
+                    <div class="filter-section">
+                        <label class="filter-label">View Mode</label>
+                        <div class="view-mode-toggle">
+                            <button class="view-mode-btn active" id="listViewBtn" aria-label="List view" title="List view">
+                                📋 List
+                            </button>
+                            <button class="view-mode-btn" id="mapViewBtn" aria-label="Map view" title="Map view">
+                                🗺️ Map
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="filter-section">
@@ -136,6 +151,19 @@
                 <p>Select a site from the list to view details and images</p>
             </div>
         </main>
+        
+        <!-- Map View Container (hidden by default) -->
+        <div class="map-view-container" id="mapViewContainer" style="display: none;">
+            <div id="fullMapContainer" class="full-map"></div>
+            
+            <!-- Slide-in Detail Panel -->
+            <div class="map-detail-panel" id="mapDetailPanel" style="display: none;">
+                <button class="map-detail-close" id="mapDetailClose" aria-label="Close details">×</button>
+                <div class="map-detail-content" id="mapDetailContent">
+                    <!-- Site details will be loaded here -->
+                </div>
+            </div>
+        </div>
     </div>
 
     <footer role="contentinfo">

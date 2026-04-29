@@ -8,6 +8,7 @@ import { getCloudInfo, getEclipseInfo } from './utils.js';
 import { filterAndSortSites } from './data-loader.js';
 import { favoritesManager } from './favorites-manager.js';
 import { notesManager } from './notes-manager.js';
+import { updateMapView } from './map-view.js';
 
 /**
  * Update site counter display
@@ -189,7 +190,16 @@ export function filterSites() {
     // Apply advanced filters
     filtered = applyAdvancedFilters(filtered);
     
+    // Update state with filtered sites
+    appState.setFilteredSites(filtered);
+    
+    // Display in list view
     displaySites(filtered);
+    
+    // Update map view if in map mode
+    if (appState.viewMode === 'map') {
+        updateMapView(filtered);
+    }
 }
 
 /**
