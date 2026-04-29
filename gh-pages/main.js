@@ -203,6 +203,7 @@ function setupDocumentationButtons() {
             window.open(baseUrl + 'credits.html', '_blank');
         });
     }
+}
 
 /**
  * Setup view mode toggle listeners
@@ -263,7 +264,6 @@ function setupViewModeListeners() {
             }
         });
     }
-}
 }
 
 /**
