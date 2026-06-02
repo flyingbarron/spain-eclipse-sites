@@ -244,6 +244,9 @@ function renderSiteHeader(site, urls) {
 
     const shareUrl = `${window.location.origin}${window.location.pathname}?site=${site.code}`;
     
+    const siteName = site.denominacion || site.code;
+    const tresEclipsesUrl = `https://app.treseclipses.es/?eclipse=2026-total&horizon=official%3Anavarra_eklipse_${encodeURIComponent(siteName.toLowerCase().replace(/\s+/g, '_'))}&lat=${site.latitude}&lon=${site.longitude}&name=${encodeURIComponent(siteName)}&view=map&type=official_viewpoint`;
+    
     return `
         <div class="detail-header">
             <h2>${site.denominacion || site.code}</h2>
@@ -256,6 +259,7 @@ function renderSiteHeader(site, urls) {
                 <a href="${urls.xavierJubier}" target="_blank" class="link-button xavier">🗺️ Xavier Jubier Eclipse Map</a>
                 <a href="${urls.heliora}" target="_blank" class="link-button heliora">☀️ Heliora</a>
                 <a href="${urls.darkSkySites}" target="_blank" class="link-button darksky">🌌 Dark Sky Sites</a>
+                <a href="${tresEclipsesUrl}" target="_blank" class="link-button treseclipses">🌐 Tres Eclipses</a>
             </div>
             
             <!-- Preview Thumbnails Grid -->
