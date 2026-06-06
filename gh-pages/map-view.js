@@ -6,6 +6,7 @@
 import { appState } from '../static/js/state.js';
 import { CONFIG } from './config.js';
 import { displaySiteDetails } from './site-details.js';
+import { drawCelestialLines, clearCelestialLines, createCelestialLegend } from './celestial-lines.js';
 
 // Global map instance for map view
 let mapViewInstance = null;
@@ -109,6 +110,12 @@ export function initializeMapView(sites) {
             maxZoom: 19
         }).addTo(mapViewInstance);
         
+        // Add map click handler for celestial lines
+        mapViewInstance.on('click', (e) => {
+            const { lat, lng } = e.latlng;
+            drawCelestialLines(mapViewInstance, lat, lng);
+        });
+        
         // Create marker cluster group
         markerClusterGroup = L.markerClusterGroup({
             maxClusterRadius: 50,
@@ -150,8 +157,9 @@ export function initializeMapView(sites) {
             mapViewInstance.fitBounds(bounds, { padding: [50, 50] });
         }
         
-        // Add legend
+        // Add legends
         addMapLegend();
+        addCelestialLegend();
         
         // Invalidate size to ensure proper rendering
         setTimeout(() => {
@@ -187,6 +195,14 @@ function addMapLegend() {
     };
     
     legend.addTo(mapViewInstance);
+}
+
+/**
+ * Add celestial lines legend to map
+ */
+function addCelestialLegend() {
+    const celestialLegend = createCelestialLegend(mapViewInstance);
+    celestialLegend.addTo(mapViewInstance);
 }
 
 /**

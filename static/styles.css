@@ -2807,6 +2807,43 @@ body.high-contrast .view-mode-btn {
     background: #2a2a2a;
     color: #fff;
     border-color: #fff;
+
+/* Celestial Lines Styling */
+.celestial-label {
+    pointer-events: none;
+    z-index: 600;
+}
+
+.celestial-legend {
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    font-size: 12px;
+    line-height: 1.6;
+    z-index: 500;
+}
+
+/* High contrast mode for celestial elements */
+body.high-contrast .celestial-legend {
+    background: #1a1a1a;
+    color: #fff;
+    border: 2px solid #fff;
+}
+
+body.high-contrast .celestial-label > div {
+    background: #1a1a1a !important;
+    color: #fff !important;
+    border-color: #fff !important;
+}
+
+/* Responsive adjustments for celestial legend */
+@media (max-width: 768px) {
+    .celestial-legend {
+        font-size: 10px;
+        padding: 8px;
+    }
+}
 }
 
 body.high-contrast .view-mode-btn.active {
