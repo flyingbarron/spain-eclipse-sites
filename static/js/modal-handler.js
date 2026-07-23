@@ -181,6 +181,7 @@ export function setupModalListeners() {
     const resourcesBtn = document.getElementById('resourcesBtn');
     const aboutBtn = document.getElementById('aboutBtn');
     const helpBtn = document.getElementById('helpBtn');
+    const weatherBtn = document.getElementById('weatherBtn');
 
     if (resourcesBtn) {
         resourcesBtn.addEventListener('click', () => openPanel('resourcesModal'));
@@ -190,6 +191,9 @@ export function setupModalListeners() {
     }
     if (helpBtn) {
         helpBtn.addEventListener('click', () => openPanel('helpModal'));
+    }
+    if (weatherBtn) {
+        weatherBtn.addEventListener('click', () => openPanel('weatherModal'));
     }
     
     // Buttons inside About modal to open README and Credits in new tabs
